@@ -33,8 +33,9 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
 
   # Looping para sd
   pb <- txtProgressBar(min = 0, max = length(eoo), style = 3)
+  result <- list()
   for (i in 1:length(eoo)){
-    sd <- eoo[i,]
+    sd <- eoo[i, ]
     lc.crop <- crop(lc.rec, sd)
     lc.crop <- mask(lc.crop, sd)
     sp.habpref <- matrix.hab.pref[as.character(sd@data[, 2]) == as.character(matrix.hab.pref[, 1]),
@@ -45,7 +46,8 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
       hab.ref <- mask(hab.ref, sd)
     }
     if (nrow(sp.habpref) == 0){
-      hab.ref <- lc.crop
+      hab.ref <- lc.crop > 0
+      hab.ref <- mask(hab.ref, sd)
     }
     if (is.null(alt.map) == FALSE){
       alt.crop <- crop(alt.map, sd)
@@ -77,15 +79,17 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
             over <- over / (factor^2)
             if (continuous == FALSE){
               over <- over >= threshold
+              over <- resample(over, r, method = 'ngb')
             }
-            over <- resample(over, r, method = 'ngb')
+            if (continuous == TRUE){
+              over <- resample(over, r)
+            }
           }
           if (resolution < new.res){
             over <- disaggregate(over, fact = (res(over)[1] / resolution))
             over <- resample(over, r, method = 'ngb')
           }
         }
-        result <- list()
         if(shp.out == TRUE) {result[[i]] <- rasterToPolygons(over,
                                                              fun = function(x) x > 0,
                                                              dissolve = T)}
