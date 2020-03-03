@@ -1,3 +1,4 @@
+
 f.gbif <- function (spp){
   for (i in 1:length(spp)) {
     p.occ=gbif(spp, ext=ex, geo=T, download=T)
