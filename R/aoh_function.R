@@ -14,29 +14,139 @@
 #' @author Daniel Gonçalves-Souza & Thaís Dória
 #' @export aoh
 
-aoh <- function(sd, lc.rec, matrix.hab.pref, alt.map = NULL,
-                matrix.alt.pref, shp.out = FALSE){
-  lc.crop <- mask(crop(lc.rec, sd), sd)
-  sp.habpref <- matrix.hab.pref[sd@data[, 2] == matrix.hab.pref[, 1],
-                                2:ncol(matrix.hab.pref)]
-  hab.cat <- as.numeric(colnames(sp.habpref)[as.vector(sp.habpref[1, ] == 1)])
-  hab.ref <- lc.crop %in% hab.cat
-  hab.ref <- mask(hab.ref, sd)
 
-  if (is.null(alt.map) == FALSE){
-    pol.ref <- rasterToContour(hab.ref)
-    alt.crop <- mask(crop(alt.map, pol.ref), pol.ref)
-    sp.altpref <- matrix.alt.pref[sd@data[, 2] == matrix.alt.pref[, 1], 2:3]
-    alt.ref <- alt.crop >= sp.altpref[1] & alt.crop <= sp.altpref[2]
-    ifelse(shp.out == TRUE, return(rasterToPolygons(alt.ref, dissolve = TRUE)),
-           return(alt.ref))
+aoh <- function(shapes, lc.rec, matrix.hab.pref, alt.map = NULL,
+                matrix.alt.pref, shp.out = FALSE, resolution = NULL,
+                continuous = FALSE, threshold = 0.5){
+  require(raster)
+  require(rgdal)
+  require(stringr)
+  result <- list()
+
+  if(is.character(shapes)){
+    files.sp <- list.files(shapes)
+    files.sp <- substr(files.sp, 1, nchar(as.character(files.sp)) - 4)
+    files.sp <- unique(files.sp)
+    sps <- list()
+    for (i in 1:length(files.sp)){
+      sps[[i]] <- readOGR(dsn = shapes,
+                          layer = files.sp[i])
+    }
+
+    shapes <- do.call(bind, sps)
   }
 
-  if (is.null(alt.map)) {
-    warning('No altitude map was provided, therefore only the refined is based
-      on vegetation preference only ')
-    ifelse(shp.out == TRUE, return(rasterToPolygons(hab.ref, dissolve = TRUE)),
-           return(hab.ref))
+  # Looping para sd
+  pb <- txtProgressBar(min = 0, max = length(shapes), style = 3)
+  for (i in 1:length(shapes)){
+    sd <- shapes[i,]
+    lc.crop <- mask(crop(lc.rec, sd), sd)
+    sp.habpref <- matrix.hab.pref[as.character(sd@data[, 2]) == as.character(matrix.hab.pref[, 1]),
+                                  2:ncol(matrix.hab.pref)]
+    if (nrow(sp.habpref) > 0){
+      hab.cat <- as.numeric(colnames(sp.habpref)[as.vector(sp.habpref[1, ] == 1)])
+      hab.ref <- lc.crop %in% hab.cat
+      hab.ref <- mask(hab.ref, sd)
+    }
+    if (nrow(sp.habpref) == 0){
+      hab.ref <- lc.crop
+    }
+    if (is.null(alt.map) == FALSE){
+      alt.crop <- mask(crop(alt.map, sd), sd)
+      sp.altpref <- matrix.alt.pref[as.character(sd@data[, 2]) == as.character(matrix.alt.pref[, 1]), 2:3]
+      if (nrow(sp.altpref) > 0){
+        alt.ref <- alt.crop >= sp.altpref[1, 1] & alt.crop <= sp.altpref[1, 2]
+        alt.ref <- mask(crop(alt.ref, sd), sd)
+        # In case of different resolutions (not defined)
+        if(res(lc.rec)[1] > res(alt.map)[1]){
+          alt.ref <- resample(alt.ref, hab.ref)
+          new.res <- res(lc.rec)[1]
+        }
+        if(res(lc.rec)[1] <= res(alt.map)[1]){
+          hab.ref <- resample(hab.ref, alt.ref, method = 'ngb')
+          new.res <- res(alt.ref)[1]
+        }
+        # Overlay refinement by altitude and by lc
+        over <- overlay(hab.ref, alt.ref, fun = function(x, y) x * y)
+        # Custom resolution
+        if (is.null(resolution) == FALSE) {
+          r <- raster()
+          extent(r) <- extent(over)
+          res(r) <- resolution
+          if (resolution > (new.res)[1]){
+            factor <- round((resolution / res(over)[1]))
+            over <- aggregate(over, fact = factor, fun = sum)
+            over <- over / (factor^2)
+            if (continuous == FALSE){
+              over <- over >= threshold
+            }
+            over <- resample(over, r, method = 'ngb')
+          }
+          if (resolution < new.res){
+            over <- disaggregate(over, fact = (res(over)[1] / resolution))
+            over <- resample(over, r, method = 'ngb')
+          }
+        }
+        if(shp.out == TRUE) {result[[i]] <- rasterToPolygons(over,
+                                                             fun = function(x) x > 0,
+                                                             dissolve = T)}
+        if(shp.out == FALSE){
+          result[[i]] <- over
+        }
+      }
+    }
+    if (nrow(sp.habpref) == 0 & nrow(sp.altpref) != 0){
+      warning(paste('No vegetation preference found for',
+                    as.character(sd@data[, 2]),
+                    'therefore the refined shape is based on altitude
+                    preference only'))
+    }
+    if (nrow(sp.habpref) == 0 & nrow(sp.altpref) == 0){
+      warning(paste('No vegetation or altitude preference found for',
+                    as.character(sd@data[, 2]),
+                    'therefore, the shape was not refined'))
+    }
+    if (is.null(alt.map) | nrow(sp.altpref) == 0) {
+      if(is.null(alt.map)){
+        warning('No altitude map was provided, therefore the refined shape
+                is based on vegetation preference only')
+      }
+      if(nrow(sp.habpref) > 0 & nrow(sp.altpref) == 0){
+        warning(paste('No altitude preference found for',
+                      as.character(sd@data[, 2]),
+                      'therefore, the shape was refined based only on
+                      the land cover'))
+      }
+      # Custom resolution
+      if (is.null(resolution) == FALSE) {
+        r <- raster()
+        extent(r) <- extent(hab.ref)
+        res(r) <- resolution
+        if (resolution > new.res){
+          factor <- round((resolution / res(hab.ref)[1]))
+          hab.ref <- aggregate(hab.ref, fact = factor, fun = sum)
+          hab.ref <- hab.ref / (factor^2)
+          if (continuous == FALSE){
+            hab.ref <- hab.ref >= threshold
+          }
+          hab.ref <- resample(hab.ref, r, method ='ngb')
+        }
+        if (resolution < new.res){
+          hab.ref <- disaggregate(hab.ref, fact = (res(hab.ref)[1] / resolution))
+          hab.ref <- resample(hab.ref, r, method = 'ngb')
+        }
+      }
 
+      if(shp.out == TRUE){
+        result[[i]] <- rasterToPolygons(hab.ref, fun = function(x) x > 0,
+                                        dissolve = T)
+      }
+      if(shp.out == FALSE){
+        result[[i]] <- hab.ref
+      }
+    }
+    setTxtProgressBar(pb, i)
   }
+  names(result) <- shapes@data[, 2]
+  return(result)
 }
