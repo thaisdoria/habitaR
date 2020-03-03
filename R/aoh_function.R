@@ -18,10 +18,7 @@
 aoh <- function(shapes, lc.rec, matrix.hab.pref, alt.map = NULL,
                 matrix.alt.pref, shp.out = FALSE, resolution = NULL,
                 continuous = FALSE, threshold = 0.5){
-  require(raster)
-  require(rgdal)
-  require(stringr)
-  result <- list()
+   result <- list()
 
   if(is.character(shapes)){
     files.sp <- list.files(shapes)
