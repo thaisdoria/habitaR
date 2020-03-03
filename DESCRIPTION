@@ -1,0 +1,12 @@
+Package: habitaR
+Type: Package
+Title: Tools for mapping the species’ area of habitat (AOH) from geospatial data   
+Version: 0.1.0
+Authors@R: as.person(c("Thaís Dória <thaisafdoria@gmail.com> [aut, cre]", "Daniel Santos <dan-gs@live.com> [aut]"))
+Maintainer: Thaís Dória <thaisafdoria@gmail.com>
+Description: An R package that provides tools to create specie's area of habitat (AOH) as described in Brooks et al (2019).    The package habitaR includes R functions that enable users to follow the analysis protocol presented by Brooks et al. (2019), from handling spatial distribution data (e.g. shapefiles of distribution or species occurrence data) and editing environmental layers (e.g. landcover and elevation maps) until the use of species preferences for habitat to refine the original distribution and map the AOH.  
+License: GPL-3
+Encoding: UTF-8
+LazyData: TRUE
+Imports: raster, sp, rredlist, rgdal, spatial.tools
+RoxygenNote: 6.1.0
