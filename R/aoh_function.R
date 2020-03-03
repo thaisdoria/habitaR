@@ -2,7 +2,7 @@
 #'
 #' Provide the area of habitat (AOH) of a given species through refinement of its known geographic distribution
 #'
-#' @param sd Spatial distribution shapefile (ESRI shapefile format). The name of the species must be on the second column of the attribute table of the shapefile.
+#' @param eoo Spatial distribution shapefile (ESRI shapefile format). The name of the species must be on the second column of the attribute table of the shapefile.
 #' @param lc.rec Land use map reclassified for the categories of habitat
 #' @param matrix.hab.pref Data frame 0/1 of habitat preference of the species. First #column must be the species name. The posterior columns must be named after the categories of habitat as folowing the lc.rec classification
 #' @param alt.map Elevation map
@@ -15,26 +15,26 @@
 #' @export aoh
 
 
-aoh <- function(shapes, lc.rec, matrix.hab.pref, alt.map = NULL,
+aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
                 matrix.alt.pref, shp.out = FALSE, resolution = NULL,
                 continuous = FALSE, threshold = 0.5){
-  
-  if(is.character(shapes)){
-    files.sp <- list.files(shapes, pattern = ".shp$")
+
+  if(is.character(eoo)){
+    files.sp <- list.files(eoo, pattern = ".shp$")
     files.sp <- gsub(".shp","", files.sp)
     sps <- list()
     for (i in 1:length(files.sp)){
-      sps[[i]] <- readOGR(dsn = shapes,
+      sps[[i]] <- readOGR(dsn = eoo,
                           layer = files.sp[i])
     }
 
-    shapes <- do.call(bind, sps)
+    eoo <- do.call(bind, sps)
   }
 
   # Looping para sd
-  pb <- txtProgressBar(min = 0, max = length(shapes), style = 3)
-  for (i in 1:length(shapes)){
-    sd <- shapes[i,]
+  pb <- txtProgressBar(min = 0, max = length(eoo), style = 3)
+  for (i in 1:length(eoo)){
+    sd <- eoo[i,]
     lc.crop <- crop(lc.rec, sd)
     lc.crop <- mask(lc.crop, sd)
     sp.habpref <- matrix.hab.pref[as.character(sd@data[, 2]) == as.character(matrix.hab.pref[, 1]),
@@ -146,6 +146,6 @@ aoh <- function(shapes, lc.rec, matrix.hab.pref, alt.map = NULL,
     }
     setTxtProgressBar(pb, i)
   }
-  names(result) <- shapes@data[, 2]
+  names(result) <- eoo@data[, 2]
   return(result)
 }
