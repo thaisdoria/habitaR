@@ -34,9 +34,7 @@ validation.aoh <- function (eoos, aohs, resolution){
       }}} 
 
 
-
 if(class(eoo)=="RasterLayer"){
-  
-  p.occ=gbif(spp, ext=ex, geo=T, download=T)
-  return(as.data.frame(cbind(p.occ$species, p.occ$lon, p.occ$lat))) # returning only coordinates and name of species
+    p.occ=gbif(spp, ext=ex, geo=T, download=T)
+  return(as.data.frame(cbind(p.occ$species, p.occ$lon, p.occ$lat))) # returning only coordinates and name of species}
   
