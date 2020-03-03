@@ -2,7 +2,7 @@
 #'
 #' Provide the area of habitat (AOH) of a given species through refinement of its known geographic distribution
 #'
-#' @param sd Spatial distribution shapefile. The name of the species must be on the second column of the attribute table of the shapefile.
+#' @param sd Spatial distribution shapefile (ESRI shapefile format). The name of the species must be on the second column of the attribute table of the shapefile.
 #' @param lc.rec Land use map reclassified for the categories of habitat
 #' @param matrix.hab.pref Data frame 0/1 of habitat preference of the species. First #column must be the species name. The posterior columns must be named after the categories of habitat as folowing the lc.rec classification
 #' @param alt.map Elevation map
@@ -18,12 +18,10 @@
 aoh <- function(shapes, lc.rec, matrix.hab.pref, alt.map = NULL,
                 matrix.alt.pref, shp.out = FALSE, resolution = NULL,
                 continuous = FALSE, threshold = 0.5){
-   result <- list()
-
+  
   if(is.character(shapes)){
-    files.sp <- list.files(shapes)
-    files.sp <- substr(files.sp, 1, nchar(as.character(files.sp)) - 4)
-    files.sp <- unique(files.sp)
+    files.sp <- list.files(shapes, pattern = ".shp$")
+    files.sp <- gsub(".shp","", files.sp)
     sps <- list()
     for (i in 1:length(files.sp)){
       sps[[i]] <- readOGR(dsn = shapes,
@@ -37,7 +35,8 @@ aoh <- function(shapes, lc.rec, matrix.hab.pref, alt.map = NULL,
   pb <- txtProgressBar(min = 0, max = length(shapes), style = 3)
   for (i in 1:length(shapes)){
     sd <- shapes[i,]
-    lc.crop <- mask(crop(lc.rec, sd), sd)
+    lc.crop <- crop(lc.rec, sd)
+    lc.crop <- mask(lc.crop, sd)
     sp.habpref <- matrix.hab.pref[as.character(sd@data[, 2]) == as.character(matrix.hab.pref[, 1]),
                                   2:ncol(matrix.hab.pref)]
     if (nrow(sp.habpref) > 0){
@@ -49,14 +48,16 @@ aoh <- function(shapes, lc.rec, matrix.hab.pref, alt.map = NULL,
       hab.ref <- lc.crop
     }
     if (is.null(alt.map) == FALSE){
-      alt.crop <- mask(crop(alt.map, sd), sd)
+      alt.crop <- crop(alt.map, sd)
+      alt.crop <- mask(alt.crop, sd)
       sp.altpref <- matrix.alt.pref[as.character(sd@data[, 2]) == as.character(matrix.alt.pref[, 1]), 2:3]
       if (nrow(sp.altpref) > 0){
         alt.ref <- alt.crop >= sp.altpref[1, 1] & alt.crop <= sp.altpref[1, 2]
-        alt.ref <- mask(crop(alt.ref, sd), sd)
+        alt.ref <- crop(alt.ref, sd)
+        alt.ref <- mask(alt.ref, sd)
         # In case of different resolutions (not defined)
         if(res(lc.rec)[1] > res(alt.map)[1]){
-          alt.ref <- resample(alt.ref, hab.ref)
+          alt.ref <- resample(alt.ref, hab.ref, method = 'ngb')
           new.res <- res(lc.rec)[1]
         }
         if(res(lc.rec)[1] <= res(alt.map)[1]){
@@ -84,6 +85,7 @@ aoh <- function(shapes, lc.rec, matrix.hab.pref, alt.map = NULL,
             over <- resample(over, r, method = 'ngb')
           }
         }
+        result <- list()
         if(shp.out == TRUE) {result[[i]] <- rasterToPolygons(over,
                                                              fun = function(x) x > 0,
                                                              dissolve = T)}
@@ -133,7 +135,7 @@ aoh <- function(shapes, lc.rec, matrix.hab.pref, alt.map = NULL,
           hab.ref <- resample(hab.ref, r, method = 'ngb')
         }
       }
-
+      result <- list()
       if(shp.out == TRUE){
         result[[i]] <- rasterToPolygons(hab.ref, fun = function(x) x > 0,
                                         dissolve = T)
