@@ -12,8 +12,6 @@
 #' @author Daniel Gonçalves-Souza & Thaís Dória
 #' @export validation.aoh
 
-sps <- list()
-
 validation.aoh <- function (eoo, aoh, resolution){
   
   if(is.character(eoo)){
@@ -27,42 +25,53 @@ validation.aoh <- function (eoo, aoh, resolution){
     eoo <- do.call(bind, sps)
   }
   
-  if(class(eoo) & class (aoh) =="SpatialPolygonsDataFrame"){
-    # rasterizing the shp
+  if(class(eoo) =="SpatialPolygonsDataFrame" & class (aoh) == "SpatialPolygonsDataFrame"){
+    # rasterize the shapefiles
     for (i in 1:length(eoo)){
-      sp.e <- eoo[1, ]
+      sp.e <- eoo[i, ]
       r <- raster()
       extent(r) <- extent(sp.e)
       res(r) <- resolution
       sp.re <- rasterize(sp.e, r)
       sp.re [sp.re > 1] <- 1
-      sp.a <- aoh[1, ]
+      sp.a <- aoh[i, ]
       sp.ra <- rasterize(sp.a, r)
       { 
-        # downloading the reccords from gbif based on extent of EOO (to restrict the search to inside of original distribution)
+        # download occurrences from gbif based on extent of EOO (to restrict the search to inside of original distribution)
         ex <- extent(sp.re)
         names(sp.re) <- eoo@data[1,2]
         occ <- gbif(names(sp.re), ext=ex, geo=T)
         pts <- as.data.frame(cbind(occ$lon, occ$lat)) # coordinates corresponding to specified extent
         coordinates(pts) <- ~ V1 + V2
-        match.eoo <- as.matrix(extract (sp.re, pts))
+        match.eoo <- extract (sp.re, pts)
+        match.eoo <- as.data.frame(table(match.eoo))
         match.aoh <- extract (sp.ra, pts)
-        
-        spaoh <- aoh [1,]
-        
-        if(class(eoo) & class (aoh) =="RasterLayer"){
-          for (i in 1:length(aoh)){
-            sp.re <- eoo[1, ]
-            ex <- extent(sp.re)
-            occ <- gbif(names(sp.re), ext=ex, geo=T)
-            pts <- as.data.frame(cbind(occ$lon, occ$lat)) # coordinates corresponding to specified extent
-            coordinates(pts) <- ~ V1 + V2
-            match.eoo <- as.matrix(extract (sp.re, pts))
-            match.aoh <- extract (sp.ra, pts)
-            
-            
-            result <- list()
-            result[[i]] <- rasterToPolygons(hab.ref, fun = function(x) x > 0,
-                                            dissolve = T)
+        match.aoh <- as.data.frame(table(match.aoh))
+        pp <- as.numeric(match.aoh) / as.numeric(match.eoo)
+        mp <- cellStats(sp.ra, sum) /cellStats(sp.re, sum)
+        val <- pp - mp
+      }}
+  }
+  
+  if(class(eoo) =="RasterLayer" & class (aoh) =="RasterLayer"){
+    for (i in 1:length(aoh)){
+      sp.re <- eoo[1, ]
+      ex <- extent(sp.re)
+      occ <- gbif(names(sp.re), ext=ex, geo=T)
+      pts <- as.data.frame(cbind(occ$lon, occ$lat)) # coordinates corresponding to specified extent
+      coordinates(pts) <- ~ V1 + V2
+      match.eoo <- extract (sp.re, pts)
+      match.eoo <- as.data.frame(table(match.eoo))
+      match.aoh <- extract (sp.ra, pts)
+      match.aoh <- as.data.frame(table(match.aoh))
+      pp <- as.numeric(match.aoh) / as.numeric(match.eoo)
+      mp <- cellStats(sp.ra, sum) /cellStats(sp.re, sum)
+      val <- pp - mp
+    }}
+  
+  result <- NULL
+  result[i,] <- cbind(result, val)
+}
+
   
   
