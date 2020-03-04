@@ -14,27 +14,41 @@
 
 sps <- list()
 
-validation.aoh <- function (eoos, aohs, resolution){
-  if(is.character(eoos)){
-    files.sp <- list.files(eoos, pattern = ".shp$")
-    files.sp <- gsub(eoos, files.sp)
+validation.aoh <- function (eoo, aoh, resolution){
+  
+  if(is.character(eoo)){
+    files.sp <- list.files(eoo, pattern = ".shp$")
+    files.sp <- gsub(".shp","", files.sp)
     sps <- list()
     for (i in 1:length(files.sp)){
-      sps[[i]] <- readOGR(dsn = eoos,
+      sps[[i]] <- readOGR(dsn = eoo,
                           layer = files.sp[i])
     }
-    eoos <- do.call(bind, sps)
+    eoo <- do.call(bind, sps)
   }
   
-  if(class(eoos)=="SpatialPolygonsDataFrame"){
-        for (i in 1:length(eoos)){
+  if(class(eoo)=="SpatialPolygonsDataFrame"){
+        for (i in 1:length(eoo)){
+        sp <- eoo[i, ]
         r <- raster()
-        extent(r) <- extent(eoo[i,])
+        extent(r) <- extent(sp)
         res(r) <- resolution
-      }}} 
+        sp.r <- rasterize(sp, r, background = 0)
+        sp.r[sp.r > 1] <- 1
+        names(sp.r) <- eoo[1,]$binomial
+        ex <- extent(sp.r)
+        occ <- gbif(names(sp.r), ext=ex, geo=T)
+                        }}
 
-
+  
+  
+  
+  
 if(class(eoo)=="RasterLayer"){
-    p.occ=gbif(spp, ext=ex, geo=T, download=T)
+  for (i in 1:length(eoo)){
+    for (i in 1:length(eoo)){
+      sp <- eoo[i, ]
+   
+    occ=gbif(eoo.r, ext=extent(eoo), geo=T, download=T)
   return(as.data.frame(cbind(p.occ$species, p.occ$lon, p.occ$lat))) # returning only coordinates and name of species}
   
