@@ -25,8 +25,11 @@ validation.aoh <- function (eoo, aoh, resolution){
     eoo <- do.call(bind, sps)
   }
   
-  if(class(eoo) =="SpatialPolygonsDataFrame" & class (aoh) == "SpatialPolygonsDataFrame"){
+  
+  
+  if(class(eoo) == "SpatialPolygonsDataFrame" & class (aoh) == "SpatialPolygonsDataFrame"){
     # rasterize the shapefiles
+    list<- list()
     for (i in 1:length(eoo)){
       sp.e <- eoo[i, ]
       r <- raster()
@@ -34,28 +37,32 @@ validation.aoh <- function (eoo, aoh, resolution){
       res(r) <- resolution
       sp.re <- rasterize(sp.e, r)
       sp.re [sp.re > 1] <- 1
+      # download occurrences from gbif based on extent of EOO (to restrict the search to inside of original distribution)
+      ex <- extent(sp.re)
+      names(sp.re) <- eoo@data[1,2]
+      occ <- gbif(names(sp.re), ext=ex, geo=T)
+      pts <- as.data.frame(cbind(occ$lon, occ$lat)) # coordinates corresponding to specified extent
+      coordinates(pts) <- ~ V1 + V2
+      match.eoo <- extract (sp.re, pts)
+      match.eoo <- as.data.frame(table(match.eoo))
       sp.a <- aoh[i, ]
       sp.ra <- rasterize(sp.a, r)
-      { 
-        # download occurrences from gbif based on extent of EOO (to restrict the search to inside of original distribution)
-        ex <- extent(sp.re)
-        names(sp.re) <- eoo@data[1,2]
-        occ <- gbif(names(sp.re), ext=ex, geo=T)
-        pts <- as.data.frame(cbind(occ$lon, occ$lat)) # coordinates corresponding to specified extent
-        coordinates(pts) <- ~ V1 + V2
-        match.eoo <- extract (sp.re, pts)
-        match.eoo <- as.data.frame(table(match.eoo))
-        match.aoh <- extract (sp.ra, pts)
-        match.aoh <- as.data.frame(table(match.aoh))
-        pp <- as.numeric(match.aoh) / as.numeric(match.eoo)
-        mp <- cellStats(sp.ra, sum) /cellStats(sp.re, sum)
-        val <- pp - mp
-      }}
+      match.aoh <- extract (sp.ra, pts)
+      match.aoh <- as.data.frame(table(match.aoh))
+      pp <- as.numeric(match.aoh$Freq) / as.numeric(match.eoo$Freq)
+      mp <- cellStats(sp.ra, sum) /cellStats(sp.re, sum)
+      val <- pp - mp
+      list[[i]] <- val
+    }
+    result <- do.call(rbind, list)
+    return(result)
   }
   
-  if(class(eoo) =="RasterLayer" & class (aoh) =="RasterLayer"){
-    for (i in 1:length(aoh)){
-      sp.re <- eoo[1, ]
+  
+  if(class(eoo) == "RasterLayer" & class (aoh) == "RasterLayer"){
+    list <- list()
+    for (i in 1:length(eoo)){
+      sp.re <- eoo[i, ]
       ex <- extent(sp.re)
       occ <- gbif(names(sp.re), ext=ex, geo=T)
       pts <- as.data.frame(cbind(occ$lon, occ$lat)) # coordinates corresponding to specified extent
@@ -64,14 +71,14 @@ validation.aoh <- function (eoo, aoh, resolution){
       match.eoo <- as.data.frame(table(match.eoo))
       match.aoh <- extract (sp.ra, pts)
       match.aoh <- as.data.frame(table(match.aoh))
-      pp <- as.numeric(match.aoh) / as.numeric(match.eoo)
+      pp <- as.numeric(match.aoh$Freq) / as.numeric(match.eoo@Freq)
       mp <- cellStats(sp.ra, sum) /cellStats(sp.re, sum)
       val <- pp - mp
-    }}
-  
-  result <- NULL
-  result[i,] <- cbind(result, val)
-}
+      list[[i]] <- val
+    }
+    result <- do.call(rbind, list)
+    return(result)
+  }}
 
   
   
