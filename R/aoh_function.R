@@ -1,23 +1,41 @@
 #'  AOH function
 #'
 #' Provide the area of habitat (AOH) of a given species through refinement of its known geographic distribution
+#' @usage aoh(eoo, lc.rec, matrix.hab.pref, alt.map = NULL, matrix.alt.pref = NULL,
+#' shp.out = FALSE, resolution = NULL, continuous = FALSE, threshold = 0.5,
+#' extent.out = NULL)
+#' @param eoo SpatialPolygons of the spatial distribution of the species or path for a folder with spatial distribution shapefiles (ESRI shapefile format) . The name of the species must be on the second column of the attribute table of the shapefile.
+#' @param lc.rec RasterLayer object of the land use map reclassified for the categories of habitat
+#' @param matrix.hab.pref Data frame 0/1 of habitat preference of the species. First column must be the species name. The posterior columns must be named after the categories of habitat as following the lc.rec classification
+#' @param alt.map RasterLayer object of the elevation map. Optional.
+#' @param matrix.alt.pref Data frame with altitudinal range of species. First column must be the species name, second column the minimum value of altitude and the third column the maximum value of altitude
+#' @param shp.out (logical) Whether the output should be a shapefile as opposed to a raster.
+#' @param resolution numeric value indicating the preferred resolution for the rasters. Resolution must coarser than the resolution of lc.rec and alt.map. Only used if alt.map provided.
+#' @param continuous (logical) Whether the output should be binary or continuous for the rasters. Only used if resolution provided.
+#' @param threshold numeric value indicating the threshold of the cell coverage by the species to the species be considered present. Only used if continuous = FALSE.
+#' @param extent.out Extent object or a vector of four numbers indicating the preferred output for the rasters. Optional.
 #'
-#' @param eoo Spatial distribution shapefile (ESRI shapefile format). The name of the species must be on the second column of the attribute table of the shapefile.
-#' @param lc.rec Land use map reclassified for the categories of habitat
-#' @param matrix.hab.pref Data frame 0/1 of habitat preference of the species. First #column must be the species name. The posterior columns must be named after the categories of habitat as folowing the lc.rec classification
-#' @param alt.map Elevation map
-#' @param matrix.alt.pref Data frame with altitudinal range of species. First column must be the species name, second column the min value of altitude and the third column the max value of altitude
-#' @param shp.out (logical) Whether the output should be a shapefile as opposed to a raster
 #' @import raster
-#' @return The result is a RasterLayer or RasterBrick; or SpatialPolygons object
+#' @return The result is a list with two elements. The first element is a data.frame detailing if the function was able (1) or not (0) to refinate the species distribution. The second element is a list of RasterLayer or SpatialPolygons object representing the refinated distribution of the species.
 #' @details The function map the area of habitat within the geographical distribution (SpatialPolygon) given as the input data. as the refined distribution of a given species. This refinement is made considering the specific preference for habitats of a given species.
 #' @author Daniel Gonçalves-Souza & Thaís Dória
 #' @export aoh
 
 
 aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
-                matrix.alt.pref, shp.out = FALSE, resolution = NULL,
-                continuous = FALSE, threshold = 0.5){
+                matrix.alt.pref = NULL, shp.out = FALSE, resolution = NULL,
+                continuous = FALSE, threshold = 0.5, extent.out = NULL){
+  #Summary data frame
+  df <- data.frame(matrix(ncol = 3, nrow = length(sd)))
+  names(df) <- c('Species', 'Vegetation', 'Altitude')
+  df[, 1] <- sd@data[, 2]
+  df[, 2:3] <- 1
+
+  if (is.null(alt.map)) {
+    warning('No altitude map was provided, therefore the refined shapes
+                will be based on vegetation preference only')
+    df[, 3] <- 0
+  }
 
   if(is.character(eoo)){
     files.sp <- list.files(eoo, pattern = ".shp$")
@@ -36,6 +54,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
   result <- list()
   for (i in 1:length(eoo)){
     sd <- eoo[i, ]
+    sd <- crop(sd, lc.rec)
     lc.crop <- crop(lc.rec, sd)
     lc.crop <- mask(lc.crop, sd)
     sp.habpref <- matrix.hab.pref[as.character(sd@data[, 2]) == as.character(matrix.hab.pref[, 1]),
@@ -50,6 +69,9 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
       hab.ref <- mask(hab.ref, sd)
     }
     if (is.null(alt.map) == FALSE){
+      if(is.null(alt.map)){
+        stop('No matrix of altitude preference provided')
+      }
       alt.crop <- crop(alt.map, sd)
       alt.crop <- mask(alt.crop, sd)
       sp.altpref <- matrix.alt.pref[as.character(sd@data[, 2]) == as.character(matrix.alt.pref[, 1]), 2:3]
@@ -59,10 +81,14 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
         alt.ref <- mask(alt.ref, sd)
         # In case of different resolutions (not defined)
         if(res(lc.rec)[1] > res(alt.map)[1]){
-          alt.ref <- resample(alt.ref, hab.ref, method = 'ngb')
+          #factor <- round(res(lc.rec)[1] / res(alt.map)[1])
+          #alt.ref <- aggregate(alt.ref, fact = factor, fun = mean)
+          alt.ref <- resample(alt.ref, hab.ref)
           new.res <- res(lc.rec)[1]
         }
         if(res(lc.rec)[1] <= res(alt.map)[1]){
+          #factor <- round(res(alt.map)[1] / res(lc.rec)[1])
+          #hab.ref <- aggregate(hab.ref, fact = factor, fun = modal)
           hab.ref <- resample(hab.ref, alt.ref, method = 'ngb')
           new.res <- res(alt.ref)[1]
         }
@@ -74,7 +100,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
           extent(r) <- extent(over)
           res(r) <- resolution
           if (resolution > (new.res)[1]){
-            factor <- round((resolution / res(over)[1]))
+            factor <- round(resolution / res(over)[1])
             over <- aggregate(over, fact = factor, fun = sum)
             over <- over / (factor^2)
             if (continuous == FALSE){
@@ -86,8 +112,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
             }
           }
           if (resolution < new.res){
-            over <- disaggregate(over, fact = (res(over)[1] / resolution))
-            over <- resample(over, r, method = 'ngb')
+            stop('Chosen resulution is smaller than the maps provided')
           }
         }
         if(shp.out == TRUE) {result[[i]] <- rasterToPolygons(over,
@@ -99,27 +124,30 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
       }
     }
     if (nrow(sp.habpref) == 0 & nrow(sp.altpref) != 0){
+      df[i, 2] <- 0
       warning(paste('No vegetation preference found for',
                     as.character(sd@data[, 2]),
                     'therefore the refined shape is based on altitude
                     preference only'))
     }
-    if (nrow(sp.habpref) == 0 & nrow(sp.altpref) == 0){
+    if (nrow(sp.habpref) == 0 & (nrow(sp.altpref) == 0 | sp.altpref[, 2] == 0 |
+        is.na(sp.altpref[, 2]))){
+      df[i, 2:3] <- 0
       warning(paste('No vegetation or altitude preference found for',
                     as.character(sd@data[, 2]),
                     'therefore, the shape was not refined'))
     }
-    if (is.null(alt.map) | nrow(sp.altpref) == 0) {
-      if(is.null(alt.map)){
-        warning('No altitude map was provided, therefore the refined shape
-                is based on vegetation preference only')
-      }
-      if(nrow(sp.habpref) > 0 & nrow(sp.altpref) == 0){
-        warning(paste('No altitude preference found for',
-                      as.character(sd@data[, 2]),
-                      'therefore, the shape was refined based only on
+
+    if(nrow(sp.habpref) > 0 & (nrow(sp.altpref) == 0 | sp.altpref[, 2] == 0 |
+       is.na(sp.altpref[, 2]))){
+      df[i, 3] <- 0
+      warning(paste('No altitude preference found for',
+                    as.character(sd@data[, 2]),
+                    'therefore, the shape was refined based only on
                       the land cover'))
-      }
+    }
+
+    if (is.null(alt.map)) {
       # Custom resolution
       if (is.null(resolution) == FALSE) {
         r <- raster()
@@ -150,6 +178,20 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
     }
     setTxtProgressBar(pb, i)
   }
+
+  if(is.null(extent.out) == FALSE){
+    r <- raster()
+    extent(r) <- extent.out
+    res(r) <- res(hab.ref)
+
+    if(continuous == FALSE){
+      result <- lapply(result, resample, r, method = 'ngb')
+    }
+    if(continuous == TRUE){
+      result <- lapply(result, resample, r)
+    }
+  }
   names(result) <- eoo@data[, 2]
-  return(result)
+  result.full <- list(Summary = df, Data = result)
+  return(result.full)
 }
