@@ -1,15 +1,14 @@
-#'  Validation function
+#' Validation function
 #'
-#' Provide the area of habitat (AOH) of a given species through refinement of its known geographic distribution
+#' Provide the summary of validation results based on comparison between an independent occurrence records of species and the extent of occurrence (EOO) and area of habitat (AOH) following Rondinini et al. (2011)
 #'
-#' @param eoos Directory where are the species 'Extent of Occurrence' (EOO) in format ESRI shapefile or raster. 
-#' @param aohs Species 'Area of habitat' (AOH) in format ESRI shapefile or raster. 
-#' @param matrix.alt.pref Data frame with altitudinal range of species. First column must be the species name, second column the min value of altitude and the third column the max value of altitude
-#' @param shp.out (logical) Whether the output should be a shapefile as opposed to a raster
-#' @import raster
-#' @return The result is a RasterLayer or RasterBrick; or SpatialPolygons object
-#' @details The function map the area of habitat within the geographical distribution (SpatialPolygon) given as the input data. as the refined distribution of a given species. This refinement is made considering the specific preference for habitats of a given species.
-#' @author Daniel Gonçalves-Souza & Thaís Dória
+#' @param eoo Species distribution data corresponding to its original (or not refined) extent of occurrence (EOO) or path for a folder to the species 'Extent of Occurrence' (EOO) in format ESRI shapefile or raster file. 
+#' @param aoh Species 'Area of habitat' (AOH) in format ESRI shapefile or raster. 
+#' @param resolution Value of Data frame with altitudinal range of species. First column must be the species name, second column the min value of altitude and the third column the max value of altitude
+#' @return The result is a data frame with a species-specific summary of informations about the number of records matching with the EOO ("MATCH.EOO) and with the AOH ("MATCH.AOH), as well the values of prevalence of points ("PP", Rondinini et al. 2011) through the proportion of occurrences spatially congruent with suitable cells, and of model prevalence ("MP", Rondinini et al. 2011), which represents EOOs proportion assigned as suitable). AOH predict species occurrences correctly when all available records match with its suitable cells (PP = 1). The evaluation of quality of AOHs is based on difference between PP and MP. If PP > MP, AOH performs better than EOO in predict presences (Ficetola et al. 2015).
+#' @details The function gives the summary of data necessary to evaluate the quality of models as described and performed by Rondidini et al. (2011) and Ficetola et al. (2015) map the area of habitat within the geographical distribution (SpatialPolygon) given as the input data. as the refined distribution of a given species. This refinement is made considering the specific preference for habitats of a given species.
+#' @references Rondinini, C., Di Marco, M., Chiozza, F., Santulli, G., Baisero, D., Visconti, P., Boitani, L. (2011). Global habitat suitability models of terrestrial mammals. Philosophical Transactions of the Royal Society B, 366, 2633–2641. Brooks, T. M, Fonseca, S.L. Pimm, Akçakaya, H.R., Buchanan, G.M., …, Rondinini C. (2019). Measuring Terrestrial Area of Habitat (AOH) and Its Utility for the IUCN Red List. Trends in Ecology &amp; Evolution, 34(11), 977–986. Ficetola, G. F., Rondinini, C., Bonardi, A., Baisero, D., &amp; Padoa-Schippa, E. (2015).Habitat availability for amphibians and extinction threat: a global analysis. Diversity and Distributions, 21(3), 302–311.
+#' @author Thaís Dória & Daniel Gonçalves-Souza 
 #' @export validation.aoh
 
 validation.aoh <- function (eoo, aoh, resolution){
