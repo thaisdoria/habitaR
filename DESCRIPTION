@@ -9,4 +9,4 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: TRUE
 Imports: raster, sp, rredlist, rgdal, spatial.tools
-RoxygenNote: 6.1.0
+RoxygenNote: 7.0.2
