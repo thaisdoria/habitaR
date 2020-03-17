@@ -1,23 +1,55 @@
 #'  AOH function
 #'
-#' Provide the area of habitat (AOH) of a given species through refinement of its known geographic distribution
+#' Provide the area of habitat (AOH) of a given species through refinement of its
+#' known geographic distribution
 #' @usage aoh(eoo, lc.rec, matrix.hab.pref, alt.map = NULL, matrix.alt.pref = NULL,
 #' shp.out = FALSE, resolution = NULL, continuous = FALSE, threshold = 0.5,
 #' extent.out = NULL)
-#' @param eoo SpatialPolygons of the spatial distribution of the species or path for a folder with spatial distribution shapefiles (ESRI shapefile format) . The name of the species must be on the second column of the attribute table of the shapefile.
-#' @param lc.rec RasterLayer object of the land use map reclassified for the categories of habitat
-#' @param matrix.hab.pref Data frame 0/1 of habitat preference of the species. First column must be the species name. The posterior columns must be named after the categories of habitat as following the lc.rec classification
+#' @param eoo SpatialPolygons of the spatial distribution of the species or path
+#'  for a folder with spatial distribution shapefiles (ESRI shapefile format) .
+#'  The name of the species must be on the second column of the attribute table
+#'  of the shapefile.
+#' @param lc.rec RasterLayer object of the land use map reclassified for the
+#' categories of habitat
+#' @param matrix.hab.pref Data frame 0/1 of habitat preference of the species.
+#'  First column must be the species name. The posterior columns must be named
+#'  after the categories of habitat as following the lc.rec classification
 #' @param alt.map RasterLayer object of the elevation map. Optional.
-#' @param matrix.alt.pref Data frame with altitudinal range of species. First column must be the species name, second column the minimum value of altitude and the third column the maximum value of altitude
-#' @param shp.out (logical) Whether the output should be a shapefile as opposed to a raster.
-#' @param resolution numeric value indicating the preferred resolution for the rasters. Resolution must coarser than the resolution of lc.rec and alt.map. Only used if alt.map provided.
-#' @param continuous (logical) Whether the output should be binary or continuous for the rasters. Only used if resolution provided.
-#' @param threshold numeric value indicating the threshold of the cell coverage by the species to the species be considered present. Only used if continuous = FALSE.
-#' @param extent.out Extent object or a vector of four numbers indicating the preferred output for the rasters. Optional.
+#' @param matrix.alt.pref Data frame with altitudinal range of species. First
+#' column must be the species name, second column the minimum value of altitude
+#' and the third column the maximum value of altitude
+#' @param shp.out (logical) Whether the output should be a shapefile as opposed
+#' to a raster.
+#' @param resolution numeric value indicating the preferred resolution for the
+#' rasters. Resolution must coarser than the resolution of lc.rec and alt.map.
+#' Only used if alt.map provided.
+#' @param continuous (logical) Whether the output should be binary or continuous
+#' for the rasters. Only used if resolution provided.
+#' @param threshold numeric value indicating the threshold of the cell coverage
+#' by the species to the species be considered present. Only used if continuous = FALSE.
+#' @param extent.out Extent object or a vector of four numbers indicating the
+#' preferred output for the rasters. Optional.
 #'
 #' @import raster
-#' @return The result is a list with two elements. The first element is a data.frame detailing if the function was able (1) or not (0) to refinate the species distribution. The second element is a list of RasterLayer or SpatialPolygons object representing the refinated distribution of the species.
-#' @details The function map the area of habitat within the geographical distribution (SpatialPolygon) given as the input data. as the refined distribution of a given species. This refinement is made considering the specific preference for habitats of a given species.
+#' @return The result is a list with two elements. The first element is a
+#' data.frame detailing if the function was able (1) or not (0) to refinate the
+#' species distribution. The second element is a list of RasterLayer or
+#' SpatialPolygons object representing the refinated distribution of the species.
+#' For the RasterLayer the value of 0 indicates the cells where the the species
+#' were considerated present before the refinement. Values higher than 0 indicates
+#' the coverage of cell by the spatial distribution after the refinement.
+#' @details The function map the area of habitat within the geographical
+#' distribution (SpatialPolygon) given as the input data. as the refined
+#' distribution of a given species. This refinement is made considering the
+#' specific preference for habitats of a given species.
+#' @examples
+#' data(sd_amph)
+#' data(lc)
+#' data(habpref)
+#' data(al)
+#' data(alpref)
+#' ref_data <- aoh(eoo = sd_amph, lc.rec = lc , matrix.hab.pref = habpref,
+#' alt.map = al, matrix.alt.pref = alpref)
 #' @author Daniel Gonçalves-Souza & Thaís Dória
 #' @export aoh
 
@@ -26,9 +58,9 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
                 matrix.alt.pref = NULL, shp.out = FALSE, resolution = NULL,
                 continuous = FALSE, threshold = 0.5, extent.out = NULL){
   #Summary data frame
-  df <- data.frame(matrix(ncol = 3, nrow = length(sd)))
+  df <- data.frame(matrix(ncol = 3, nrow = length(eoo)))
   names(df) <- c('Species', 'Vegetation', 'Altitude')
-  df[, 1] <- sd@data[, 2]
+  df[, 1] <- eoo@data[, 2]
   df[, 2:3] <- 1
 
   if (is.null(alt.map)) {

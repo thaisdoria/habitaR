@@ -9,34 +9,62 @@ shp.out = FALSE, resolution = NULL, continuous = FALSE, threshold = 0.5,
 extent.out = NULL)
 }
 \arguments{
-\item{eoo}{SpatialPolygons of the spatial distribution of the species or path for a folder with spatial distribution shapefiles (ESRI shapefile format) . The name of the species must be on the second column of the attribute table of the shapefile.}
+\item{eoo}{SpatialPolygons of the spatial distribution of the species or path
+for a folder with spatial distribution shapefiles (ESRI shapefile format) .
+The name of the species must be on the second column of the attribute table of the shapefile.}
 
-\item{lc.rec}{RasterLayer object of the land use map reclassified for the categories of habitat}
+\item{lc.rec}{RasterLayer object of the land use map reclassified for the
+categories of habitat}
 
-\item{matrix.hab.pref}{Data frame 0/1 of habitat preference of the species. First column must be the species name. The posterior columns must be named after the categories of habitat as following the lc.rec classification}
+\item{matrix.hab.pref}{Data frame 0/1 of habitat preference of the species.
+First column must be the species name. The posterior columns must be named
+after the categories of habitat as following the lc.rec classification}
 
 \item{alt.map}{RasterLayer object of the elevation map. Optional.}
 
-\item{matrix.alt.pref}{Data frame with altitudinal range of species. First column must be the species name, second column the minimum value of altitude and the third column the maximum value of altitude}
+\item{matrix.alt.pref}{Data frame with altitudinal range of species. First
+column must be the species name, second column the minimum value of altitude
+and the third column the maximum value of altitude}
 
-\item{shp.out}{(logical) Whether the output should be a shapefile as opposed to a raster.}
+\item{shp.out}{(logical) Whether the output should be a shapefile as opposed
+to a raster.}
 
-\item{resolution}{numeric value indicating the preferred resolution for the rasters. Resolution must coarser than the resolution of lc.rec and alt.map. Only used if alt.map provided.}
+\item{resolution}{numeric value indicating the preferred resolution for the
+rasters. Resolution must coarser than the resolution of lc.rec and alt.map.
+Only used if alt.map provided.}
 
-\item{continuous}{(logical) Whether the output should be binary or continuous for the rasters. Only used if resolution provided.}
+\item{continuous}{(logical) Whether the output should be binary or continuous
+for the rasters. Only used if resolution provided.}
 
-\item{threshold}{numeric value indicating the threshold of the cell coverage by the species to the species be considered present. Only used if continuous = FALSE.}
+\item{threshold}{numeric value indicating the threshold of the cell coverage
+by the species to the species be considered present. Only used if continuous = FALSE.}
 
-\item{extent.out}{Extent object or a vector of four numbers indicating the preferred output for the rasters. Optional.}
+\item{extent.out}{Extent object or a vector of four numbers indicating the
+preferred output for the rasters. Optional.}
 }
 \value{
-The result is a list with two elements. The first element is a data.frame detailing if the function was able (1) or not (0) to refinate the species distribution. The second element is a list of RasterLayer or SpatialPolygons object representing the refinated distribution of the species.
+The result is a list with two elements. The first element is a
+data.frame detailing if the function was able (1) or not (0) to refinate the
+species distribution. The second element is a list of RasterLayer or
+SpatialPolygons object representing the refinated distribution of the species.
 }
 \description{
-Provide the area of habitat (AOH) of a given species through refinement of its known geographic distribution
+Provide the area of habitat (AOH) of a given species through refinement of its
+known geographic distribution
 }
 \details{
-The function map the area of habitat within the geographical distribution (SpatialPolygon) given as the input data. as the refined distribution of a given species. This refinement is made considering the specific preference for habitats of a given species.
+The function map the area of habitat within the geographical
+distribution (SpatialPolygon) given as the input data. as the refined
+distribution of a given species. This refinement is made considering the
+specific preference for habitats of a given species.
+}
+\examples{
+data(sd_amph)
+data(lc)
+data(habpref)
+data(al)
+data(alpref)
+aoh(sd_amph, lc, habpref, al, alpref)
 }
 \author{
 Daniel Gonçalves-Souza & Thaís Dória
