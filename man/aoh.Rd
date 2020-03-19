@@ -11,7 +11,8 @@ extent.out = NULL)
 \arguments{
 \item{eoo}{SpatialPolygons of the spatial distribution of the species or path
 for a folder with spatial distribution shapefiles (ESRI shapefile format) .
-The name of the species must be on the second column of the attribute table of the shapefile.}
+The name of the species must be on the second column of the attribute table
+of the shapefile.}
 
 \item{lc.rec}{RasterLayer object of the land use map reclassified for the
 categories of habitat}
@@ -47,6 +48,9 @@ The result is a list with two elements. The first element is a
 data.frame detailing if the function was able (1) or not (0) to refinate the
 species distribution. The second element is a list of RasterLayer or
 SpatialPolygons object representing the refinated distribution of the species.
+For the RasterLayer the value of 0 indicates the cells where the the species
+were considerated present before the refinement. Values higher than 0 indicates
+the coverage of cell by the spatial distribution after the refinement.
 }
 \description{
 Provide the area of habitat (AOH) of a given species through refinement of its
@@ -64,7 +68,8 @@ data(lc)
 data(habpref)
 data(al)
 data(alpref)
-aoh(sd_amph, lc, habpref, al, alpref)
+ref_data <- aoh(eoo = sd_amph, lc.rec = lc , matrix.hab.pref = habpref,
+alt.map = al, matrix.alt.pref = alpref)
 }
 \author{
 Daniel Gonçalves-Souza & Thaís Dória

@@ -65,3 +65,15 @@ NULL
 #' @format A SpatialPolygonsDataFrame 4 features.
 NULL
 
+#### class_ref ####
+#' Habitat classification reference
+#'
+#' A dataset exemplifying how the shapefile for the argument 'eoo'
+#' of the function aoh could be structured.
+
+#' @docType data
+#' @keywords datasets
+#' @name class_ref
+#' @usage data(class_ref)
+#' @format A data frame with 6 rows and 125 variables
+NULL
