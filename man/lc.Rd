@@ -10,7 +10,7 @@
 data(lc)
 }
 \description{
-A fictitious dataset exemplifying how the raster for the argument 'lc.rec'
-of the function aoh should be structured.
+A fictitious dataset exemplifying how the raster for the argument \code{lc.rec}
+of the function \code{aoh} should be structured.
 }
 \keyword{datasets}

@@ -1,8 +1,8 @@
 #### habpref ####
 #' Habitat preference for Amphibians
 #'
-#' A fictitious dataset exemplifying how the data frame for the argument 'matrix.hab.pref'
-#' of the function aoh should be structured.
+#' A fictitious dataset exemplifying how the data frame for the argument \code{matrix.hab.pref}
+#' of the function \code{aoh} should be structured.
 
 #' @docType data
 #' @keywords datasets
@@ -14,8 +14,8 @@ NULL
 #### alpref ####
 #' Altitude preference for Amphibians
 #'
-#' A fictitious dataset exemplifying how the data frame for the argument 'matrix.alt.pref'
-#' of the function aoh should be structured.
+#' A fictitious dataset exemplifying how the data frame for the argument \code{matrix.alt.pref}
+#' of the function \code{aoh} should be structured.
 
 #' @docType data
 #' @keywords datasets
@@ -27,8 +27,8 @@ NULL
 #### lc ####
 #' Land Cover
 #'
-#' A fictitious dataset exemplifying how the raster for the argument 'lc.rec'
-#' of the function aoh should be structured.
+#' A fictitious dataset exemplifying how the raster for the argument \code{lc.rec}
+#' of the function \code{aoh} should be structured.
 
 #' @docType data
 #' @keywords datasets
@@ -41,8 +41,8 @@ NULL
 #### al ####
 #' Altitude Map
 #'
-#' A fictitious dataset exemplifying how the raster for the argument 'alt.map'
-#' of the function aoh should be structured.
+#' A fictitious dataset exemplifying how the raster for the argument \code{alt.map}
+#' of the function \code{aoh} should be structured.
 
 #' @docType data
 #' @keywords datasets
@@ -55,8 +55,8 @@ NULL
 #### sd_amph ####
 #' Spatial distribution for Amphibians Map
 #'
-#' A fictitious dataset exemplifying how the shapefile for the argument 'eoo'
-#' of the function aoh could be structured.
+#' A fictitious dataset exemplifying how the shapefile for the argument \code{eoo}
+#' of the function \code{aoh} could be structured.
 
 #' @docType data
 #' @keywords datasets
@@ -68,8 +68,9 @@ NULL
 #### class_ref ####
 #' Habitat classification reference
 #'
-#' A dataset exemplifying how the shapefile for the argument 'eoo'
-#' of the function aoh could be structured.
+#' A dataset to reference how the user could reclassify the
+#' IUCN's Habitats Classification Scheme for the argument \code{cat}
+#' of the function \code{prefHab}.
 
 #' @docType data
 #' @keywords datasets
@@ -77,3 +78,5 @@ NULL
 #' @usage data(class_ref)
 #' @format A data frame with 6 rows and 125 variables
 NULL
+
+if (getRversion() >= "2.15.1") utils::globalVariables('class_ref')

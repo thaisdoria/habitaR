@@ -9,7 +9,7 @@
 data(habpref)
 }
 \description{
-A fictitious dataset exemplifying how the data frame for the argument 'matrix.hab.pref'
-of the function aoh should be structured.
+A fictitious dataset exemplifying how the data frame for the argument \code{matrix.hab.pref}
+of the function \code{aoh} should be structured.
 }
 \keyword{datasets}

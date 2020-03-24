@@ -10,7 +10,7 @@
 data(al)
 }
 \description{
-A fictitious dataset exemplifying how the raster for the argument 'alt.map'
-of the function aoh should be structured.
+A fictitious dataset exemplifying how the raster for the argument \code{alt.map}
+of the function \code{aoh} should be structured.
 }
 \keyword{datasets}

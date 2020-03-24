@@ -9,7 +9,7 @@
 data(sd_amph)
 }
 \description{
-A fictitious dataset exemplifying how the shapefile for the argument 'eoo'
-of the function aoh could be structured.
+A fictitious dataset exemplifying how the shapefile for the argument \code{eoo}
+of the function \code{aoh} could be structured.
 }
 \keyword{datasets}

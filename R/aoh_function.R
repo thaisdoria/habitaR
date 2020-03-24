@@ -4,7 +4,7 @@
 #' known geographic distribution
 #' @usage aoh(eoo, lc.rec, matrix.hab.pref, alt.map = NULL, matrix.alt.pref = NULL,
 #' shp.out = FALSE, resolution = NULL, continuous = FALSE, threshold = 0.5,
-#' extent.out = NULL)
+#' extent.out = NULL, progress = FALSE)
 #' @param eoo SpatialPolygons of the spatial distribution of the species or path
 #'  for a folder with spatial distribution shapefiles (ESRI shapefile format) .
 #'  The name of the species must be on the second column of the attribute table
@@ -13,7 +13,8 @@
 #' categories of habitat
 #' @param matrix.hab.pref Data frame 0/1 of habitat preference of the species.
 #'  First column must be the species name. The posterior columns must be named
-#'  after the categories of habitat as following the lc.rec classification
+#'  after the categories of habitat as following the lc.rec classification.
+#'  \code{\link[habitaR]{prefHab}} can help obtain this data.
 #' @param alt.map RasterLayer object of the elevation map. Optional.
 #' @param matrix.alt.pref Data frame with altitudinal range of species. First
 #' column must be the species name, second column the minimum value of altitude
@@ -29,9 +30,10 @@
 #' by the species to the species be considered present. Only used if continuous = FALSE.
 #' @param extent.out Extent object or a vector of four numbers indicating the
 #' preferred output for the rasters. Optional.
+#' @param progress (logical) a bar showing the progress of the function.
 #'
 #' @import raster
-#' @return The result is a list with two elements. The first element is a
+#' @return \code{aoh} returns a list with two elements. The first element is a
 #' data.frame detailing if the function was able (1) or not (0) to refinate the
 #' species distribution. The second element is a list of RasterLayer or
 #' SpatialPolygons object representing the refinated distribution of the species.
@@ -52,11 +54,14 @@
 #' alt.map = al, matrix.alt.pref = alpref)
 #' @author Daniel Gonçalves-Souza & Thaís Dória
 #' @export aoh
+#' @import rgdal
+#' @importFrom utils txtProgressBar setTxtProgressBar
 
 
 aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
                 matrix.alt.pref = NULL, shp.out = FALSE, resolution = NULL,
-                continuous = FALSE, threshold = 0.5, extent.out = NULL){
+                continuous = FALSE, threshold = 0.5, extent.out = NULL,
+                progress = FALSE){
   #Summary data frame
   df <- data.frame(matrix(ncol = 3, nrow = length(eoo)))
   names(df) <- c('Species', 'Vegetation', 'Altitude')
@@ -82,7 +87,9 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
   }
 
   # Looping para sd
-  pb <- txtProgressBar(min = 0, max = length(eoo), style = 3)
+  if(progress == TRUE){
+    pb <- txtProgressBar(min = 0, max = length(eoo), style = 3)
+  }
   result <- list()
   for (i in 1:length(eoo)){
     sd <- eoo[i, ]
@@ -101,7 +108,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
       hab.ref <- mask(hab.ref, sd)
     }
     if (is.null(alt.map) == FALSE){
-      if(is.null(alt.map)){
+      if(is.null(matrix.alt.pref)){
         stop('No matrix of altitude preference provided')
       }
       alt.crop <- crop(alt.map, sd)
@@ -162,16 +169,23 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
                     'therefore the refined shape is based on altitude
                     preference only'))
     }
-    if (nrow(sp.habpref) == 0 & (nrow(sp.altpref) == 0 | sp.altpref[, 2] == 0 |
-        is.na(sp.altpref[, 2]))){
+    if (nrow(sp.habpref) == 0 & nrow(sp.altpref) == 0){
       df[i, 2:3] <- 0
       warning(paste('No vegetation or altitude preference found for',
                     as.character(sd@data[, 2]),
                     'therefore, the shape was not refined'))
     }
 
-    if(nrow(sp.habpref) > 0 & (nrow(sp.altpref) == 0 | sp.altpref[, 2] == 0 |
-       is.na(sp.altpref[, 2]))){
+    if (nrow(sp.habpref) == 0 & nrow(sp.altpref) != 0){
+      if(sp.altpref[, 2] == 0 |is.na(sp.altpref[, 2])){
+      df[i, 2:3] <- 0
+      warning(paste('No vegetation or altitude preference found for',
+                    as.character(sd@data[, 2]),
+                    'therefore, the shape was not refined'))
+      }
+    }
+
+    if(nrow(sp.habpref) > 0 & nrow(sp.altpref) == 0){
       df[i, 3] <- 0
       warning(paste('No altitude preference found for',
                     as.character(sd@data[, 2]),
@@ -179,7 +193,16 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
                       the land cover'))
     }
 
-    if (is.null(alt.map)) {
+    if(nrow(sp.habpref) > 0 & length(sp.altpref[, 2]) != 0){
+      if(sp.altpref[, 2] == 0 |is.na(sp.altpref[, 2])){
+      df[i, 3] <- 0
+      warning(paste('No altitude preference found for',
+                    as.character(sd@data[, 2]),
+                    'therefore, the shape was refined based only on
+                      the land cover'))
+      }
+    }
+    if (is.null(alt.map) | nrow(sp.altpref) == 0) {
       # Custom resolution
       if (is.null(resolution) == FALSE) {
         r <- raster()
@@ -208,7 +231,9 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
         result[[i]] <- hab.ref
       }
     }
-    setTxtProgressBar(pb, i)
+    if(progress == TRUE){
+      setTxtProgressBar(pb, i)
+    }
   }
 
   if(is.null(extent.out) == FALSE){

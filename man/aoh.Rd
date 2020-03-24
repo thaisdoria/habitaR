@@ -6,7 +6,7 @@
 \usage{
 aoh(eoo, lc.rec, matrix.hab.pref, alt.map = NULL, matrix.alt.pref = NULL,
 shp.out = FALSE, resolution = NULL, continuous = FALSE, threshold = 0.5,
-extent.out = NULL)
+extent.out = NULL, progress = FALSE)
 }
 \arguments{
 \item{eoo}{SpatialPolygons of the spatial distribution of the species or path
@@ -19,7 +19,8 @@ categories of habitat}
 
 \item{matrix.hab.pref}{Data frame 0/1 of habitat preference of the species.
 First column must be the species name. The posterior columns must be named
-after the categories of habitat as following the lc.rec classification}
+after the categories of habitat as following the lc.rec classification.
+\code{\link[habitaR]{prefHab}} can help obtain this data.}
 
 \item{alt.map}{RasterLayer object of the elevation map. Optional.}
 
@@ -42,9 +43,11 @@ by the species to the species be considered present. Only used if continuous = F
 
 \item{extent.out}{Extent object or a vector of four numbers indicating the
 preferred output for the rasters. Optional.}
+
+\item{progress}{(logical) a bar showing the progress of the function.}
 }
 \value{
-The result is a list with two elements. The first element is a
+\code{aoh} returns a list with two elements. The first element is a
 data.frame detailing if the function was able (1) or not (0) to refinate the
 species distribution. The second element is a list of RasterLayer or
 SpatialPolygons object representing the refinated distribution of the species.

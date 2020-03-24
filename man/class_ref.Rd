@@ -9,7 +9,8 @@
 data(class_ref)
 }
 \description{
-A dataset exemplifying how the shapefile for the argument 'eoo'
-of the function aoh could be structured.
+A dataset to reference how the user could reclassify the
+IUCN's Habitats Classification Scheme for the argument \code{cat}
+of the function \code{prefHab}.
 }
 \keyword{datasets}
