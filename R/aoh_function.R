@@ -45,16 +45,12 @@
 #' distribution of a given species. This refinement is made considering the
 #' specific preference for habitats of a given species.
 #' @examples
-#' data(sd_amph)
-#' data(lc)
-#' data(habpref)
-#' data(al)
-#' data(alpref)
 #' ref_data <- aoh(eoo = sd_amph, lc.rec = lc , matrix.hab.pref = habpref,
 #' alt.map = al, matrix.alt.pref = alpref)
 #' @author Daniel Gonçalves-Souza & Thaís Dória
 #' @export aoh
 #' @import rgdal
+#' @import rgeos
 #' @importFrom utils txtProgressBar setTxtProgressBar
 
 

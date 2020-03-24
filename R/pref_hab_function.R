@@ -33,11 +33,10 @@
 #' given class of land use while 0 indicates that it has not.
 #'
 #' @examples
-#'
+#' ## Not run:
 #' sp <- c('Bradypus torquatus', 'Adelophryne maranguapensis', 'Dermatonotus muelleri')
-#' key <- 'xxxxx'
-#' teste <- prefHab(sp, key, progress = T)
-#
+#' prefHab(sp, progress = TRUE)
+#' ## End(**Not run**)
 #' @author Daniel Gonçalves-Souza & Thaís Dória
 #' @export prefHab
 #'
