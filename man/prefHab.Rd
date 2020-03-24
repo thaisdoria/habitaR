@@ -46,10 +46,12 @@ format required to the function \code{aoh}, based on the classification scheme o
 the user's land use map.
 }
 \examples{
+\donttest{
 ## Not run:
 sp <- c('Bradypus torquatus', 'Adelophryne maranguapensis', 'Dermatonotus muelleri')
 prefHab(sp, progress = TRUE)
-## End(**Not run**)
+## End
+}
 }
 \author{
 Daniel Gonçalves-Souza & Thaís Dória
