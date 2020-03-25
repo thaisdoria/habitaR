@@ -58,17 +58,6 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
                 matrix.alt.pref = NULL, shp.out = FALSE, resolution = NULL,
                 continuous = FALSE, threshold = 0.5, extent.out = NULL,
                 progress = FALSE){
-  #Summary data frame
-  df <- data.frame(matrix(ncol = 3, nrow = length(eoo)))
-  names(df) <- c('Species', 'Vegetation', 'Altitude')
-  df[, 1] <- eoo@data[, 2]
-  df[, 2:3] <- 1
-
-  if (is.null(alt.map)) {
-    warning('No altitude map was provided, therefore the refined shapes
-                will be based on vegetation preference only')
-    df[, 3] <- 0
-  }
 
   if(is.character(eoo)){
     files.sp <- list.files(eoo, pattern = ".shp$")
@@ -80,6 +69,18 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
     }
 
     eoo <- do.call(bind, sps)
+  }
+
+  #Summary data frame
+  df <- data.frame(matrix(ncol = 3, nrow = length(eoo)))
+  names(df) <- c('Species', 'Vegetation', 'Altitude')
+  df[, 1] <- eoo@data[, 2]
+  df[, 2:3] <- 1
+
+  if (is.null(alt.map)) {
+    warning('No altitude map was provided, therefore the refined shapes
+                will be based on vegetation preference only')
+    df[, 3] <- 0
   }
 
   # Looping para sd
@@ -111,52 +112,54 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
       alt.crop <- mask(alt.crop, sd)
       sp.altpref <- matrix.alt.pref[as.character(sd@data[, 2]) == as.character(matrix.alt.pref[, 1]), 2:3]
       if (nrow(sp.altpref) > 0){
-        alt.ref <- alt.crop >= sp.altpref[1, 1] & alt.crop <= sp.altpref[1, 2]
-        alt.ref <- crop(alt.ref, sd)
-        alt.ref <- mask(alt.ref, sd)
-        # In case of different resolutions (not defined)
-        if(res(lc.rec)[1] > res(alt.map)[1]){
-          #factor <- round(res(lc.rec)[1] / res(alt.map)[1])
-          #alt.ref <- aggregate(alt.ref, fact = factor, fun = mean)
-          alt.ref <- resample(alt.ref, hab.ref)
-          new.res <- res(lc.rec)[1]
-        }
-        if(res(lc.rec)[1] <= res(alt.map)[1]){
-          #factor <- round(res(alt.map)[1] / res(lc.rec)[1])
-          #hab.ref <- aggregate(hab.ref, fact = factor, fun = modal)
-          hab.ref <- resample(hab.ref, alt.ref, method = 'ngb')
-          new.res <- res(alt.ref)[1]
-        }
-        # Overlay refinement by altitude and by lc
-        over <- overlay(hab.ref, alt.ref, fun = function(x, y) x * y)
-        # Custom resolution
-        if (is.null(resolution) == FALSE) {
-          r <- raster()
-          extent(r) <- extent(over)
-          res(r) <- resolution
-          if (resolution > (new.res)[1]){
-            factor <- round(resolution / res(over)[1])
-            over <- aggregate(over, fact = factor, fun = sum)
-            over <- over / (factor^2)
-            if (continuous == FALSE){
-              over <- over >= threshold
-              over <- resample(over, r, method = 'ngb')
+        if(sp.altpref[, 2] != 0 & sum(is.na(sp.altpref[1, ])) == 0){
+          alt.ref <- alt.crop >= sp.altpref[1, 1] & alt.crop <= sp.altpref[1, 2]
+          alt.ref <- crop(alt.ref, sd)
+          alt.ref <- mask(alt.ref, sd)
+          # In case of different resolutions (not defined)
+          if(res(lc.rec)[1] > res(alt.map)[1]){
+            #factor <- round(res(lc.rec)[1] / res(alt.map)[1])
+            #alt.ref <- aggregate(alt.ref, fact = factor, fun = mean)
+            alt.ref <- resample(alt.ref, hab.ref)
+            new.res <- res(lc.rec)[1]
+          }
+          if(res(lc.rec)[1] <= res(alt.map)[1]){
+            #factor <- round(res(alt.map)[1] / res(lc.rec)[1])
+            #hab.ref <- aggregate(hab.ref, fact = factor, fun = modal)
+            hab.ref <- resample(hab.ref, alt.ref, method = 'ngb')
+            new.res <- res(alt.ref)[1]
+          }
+          # Overlay refinement by altitude and by lc
+          over <- overlay(hab.ref, alt.ref, fun = function(x, y) x * y)
+          # Custom resolution
+          if (is.null(resolution) == FALSE) {
+            r <- raster()
+            extent(r) <- extent(over)
+            res(r) <- resolution
+            if (resolution > (new.res)[1]){
+              factor <- round(resolution / res(over)[1])
+              over <- aggregate(over, fact = factor, fun = sum)
+              over <- over / (factor^2)
+              if (continuous == FALSE){
+                over <- over >= threshold
+                over <- resample(over, r, method = 'ngb')
+              }
+              if (continuous == TRUE){
+                over <- resample(over, r)
+              }
             }
-            if (continuous == TRUE){
-              over <- resample(over, r)
+            if (resolution < new.res){
+              stop('Chosen resulution is smaller than the maps provided')
             }
           }
-          if (resolution < new.res){
-            stop('Chosen resulution is smaller than the maps provided')
+          if(shp.out == TRUE) {result[[i]] <- rasterToPolygons(over,
+                                                               fun = function(x) x > 0,
+                                                               dissolve = T)}
+          if(shp.out == FALSE){
+            result[[i]] <- over
           }
         }
-        if(shp.out == TRUE) {result[[i]] <- rasterToPolygons(over,
-                                                             fun = function(x) x > 0,
-                                                             dissolve = T)}
-        if(shp.out == FALSE){
-          result[[i]] <- over
         }
-      }
     }
     if (nrow(sp.habpref) == 0 & nrow(sp.altpref) != 0){
       df[i, 2] <- 0
@@ -173,7 +176,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
     }
 
     if (nrow(sp.habpref) == 0 & nrow(sp.altpref) != 0){
-      if(sp.altpref[, 2] == 0 |is.na(sp.altpref[, 2])){
+      if(sp.altpref[, 2] == 0 | sum(is.na(sp.altpref[1, ])) == 0){
       df[i, 2:3] <- 0
       warning(paste('No vegetation or altitude preference found for',
                     as.character(sd@data[, 2]),
@@ -190,7 +193,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
     }
 
     if(nrow(sp.habpref) > 0 & length(sp.altpref[, 2]) != 0){
-      if(sp.altpref[, 2] == 0 |is.na(sp.altpref[, 2])){
+      if(sp.altpref[, 2] == 0 | sum(is.na(sp.altpref[1, ])) == 0){
       df[i, 3] <- 0
       warning(paste('No altitude preference found for',
                     as.character(sd@data[, 2]),
@@ -214,11 +217,9 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
           hab.ref <- resample(hab.ref, r, method ='ngb')
         }
         if (resolution < new.res){
-          hab.ref <- disaggregate(hab.ref, fact = (res(hab.ref)[1] / resolution))
-          hab.ref <- resample(hab.ref, r, method = 'ngb')
+          stop('Chosen resulution is smaller than the maps provided')
         }
       }
-      result <- list()
       if(shp.out == TRUE){
         result[[i]] <- rasterToPolygons(hab.ref, fun = function(x) x > 0,
                                         dissolve = T)
