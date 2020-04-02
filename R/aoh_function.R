@@ -59,6 +59,10 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
                 continuous = FALSE, threshold = 0.5, extent.out = NULL,
                 progress = FALSE){
 
+  if(substr(eoo, nchar(eoo), nchar(eoo)) == '/'){
+    eoo <- substr(eoo, 1, nchar(eoo) - 1)
+  }
+
   if(is.character(eoo)){
     files.sp <- list.files(eoo, pattern = ".shp$")
     files.sp <- gsub(".shp","", files.sp)
@@ -68,7 +72,12 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
                           layer = files.sp[i])
     }
 
-    eoo <- do.call(bind, sps)
+    if(length(sps) > 1){
+      eoo <- do.call(bind, sps)
+    }
+    if(length(sps) == 1){
+      eoo <- sps[[1]]
+    }
   }
 
   #Summary data frame
