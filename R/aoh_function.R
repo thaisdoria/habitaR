@@ -59,11 +59,10 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
                 continuous = FALSE, threshold = 0.5, extent.out = NULL,
                 progress = FALSE){
 
-  if(substr(eoo, nchar(eoo), nchar(eoo)) == '/'){
-    eoo <- substr(eoo, 1, nchar(eoo) - 1)
-  }
-
   if(is.character(eoo)){
+    if(substr(eoo, nchar(eoo), nchar(eoo)) == '/'){
+      eoo <- substr(eoo, 1, nchar(eoo) - 1)
+    }
     files.sp <- list.files(eoo, pattern = ".shp$")
     files.sp <- gsub(".shp","", files.sp)
     sps <- list()
@@ -112,17 +111,48 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
     if (nrow(sp.habpref) == 0){
       hab.ref <- lc.crop > 0
       hab.ref <- mask(hab.ref, sd)
+      df[i, 2] <- 0
     }
+
+    # Refinamento de altitude
     if (is.null(alt.map) == FALSE){
       if(is.null(matrix.alt.pref)){
         stop('No matrix of altitude preference provided')
       }
       alt.crop <- crop(alt.map, sd)
       alt.crop <- mask(alt.crop, sd)
+
+      if(is.factor(matrix.alt.pref[, 2])){
+        matrix.alt.pref[, 2] <- as.numeric(levels(matrix.alt.pref[, 2]))[matrix.alt.pref[, 2]]
+      }
+      if(is.factor(matrix.alt.pref[, 3])){
+        matrix.alt.pref[, 3] <- as.numeric(levels(matrix.alt.pref[, 3]))[matrix.alt.pref[, 3]]
+      }
+      if(is.character(matrix.alt.pref[, 2])){
+        matrix.alt.pref[, 2] <- as.numeric(matrix.alt.pref[, 2])
+      }
+      if(is.character(matrix.alt.pref[, 3])){
+        matrix.alt.pref[, 3] <- as.numeric(matrix.alt.pref[, 3])
+      }
+
+      if(sum(matrix.alt.pref[, 3] < matrix.alt.pref[, 2], na.rm = T) > 0){
+        stop(paste('Some maximum values are smaller than minimum in the matrix.alt.pref'))
+      }
+
       sp.altpref <- matrix.alt.pref[as.character(sd@data[, 2]) == as.character(matrix.alt.pref[, 1]), 2:3]
       if (nrow(sp.altpref) > 0){
-        if(sp.altpref[, 2] != 0 & sum(is.na(sp.altpref[1, ])) == 0){
-          alt.ref <- alt.crop >= sp.altpref[1, 1] & alt.crop <= sp.altpref[1, 2]
+        if(sum(is.na(sp.altpref)) != 2){
+          if(sum(is.na(sp.altpref)) == 1){
+            if(is.na(sp.altpref[1])){
+              alt.ref <- alt.crop <= sp.altpref[1, 2]          }
+            if(is.na(sp.altpref[2])){
+              alt.ref <- alt.crop >= sp.altpref[1, 1]
+            }
+          }
+          if(sum(is.na(sp.altpref)) == 0){
+            alt.ref <- alt.crop >= sp.altpref[1, 1] & alt.crop <= sp.altpref[1, 2]
+          }
+
           alt.ref <- crop(alt.ref, sd)
           alt.ref <- mask(alt.ref, sd)
           # In case of different resolutions (not defined)
@@ -168,49 +198,11 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
             result[[i]] <- over
           }
         }
-        }
-    }
-    if (nrow(sp.habpref) == 0 & nrow(sp.altpref) != 0){
-      df[i, 2] <- 0
-      warning(paste('No vegetation preference found for',
-                    as.character(sd@data[, 2]),
-                    'therefore the refined shape is based on altitude
-                    preference only'))
-    }
-    if (nrow(sp.habpref) == 0 & nrow(sp.altpref) == 0){
-      df[i, 2:3] <- 0
-      warning(paste('No vegetation or altitude preference found for',
-                    as.character(sd@data[, 2]),
-                    'therefore, the shape was not refined'))
-    }
-
-    if (nrow(sp.habpref) == 0 & nrow(sp.altpref) != 0){
-      if(sp.altpref[, 2] == 0 | sum(is.na(sp.altpref[1, ])) == 0){
-      df[i, 2:3] <- 0
-      warning(paste('No vegetation or altitude preference found for',
-                    as.character(sd@data[, 2]),
-                    'therefore, the shape was not refined'))
       }
     }
 
-    if(nrow(sp.habpref) > 0 & nrow(sp.altpref) == 0){
+    if (is.null(alt.map) | nrow(sp.altpref) == 0 | sum(is.na(sp.altpref)) == 2) {
       df[i, 3] <- 0
-      warning(paste('No altitude preference found for',
-                    as.character(sd@data[, 2]),
-                    'therefore, the shape was refined based only on
-                      the land cover'))
-    }
-
-    if(nrow(sp.habpref) > 0 & length(sp.altpref[, 2]) != 0){
-      if(sp.altpref[, 2] == 0 | sum(is.na(sp.altpref[1, ])) == 0){
-      df[i, 3] <- 0
-      warning(paste('No altitude preference found for',
-                    as.character(sd@data[, 2]),
-                    'therefore, the shape was refined based only on
-                      the land cover'))
-      }
-    }
-    if (is.null(alt.map) | nrow(sp.altpref) == 0) {
       # Custom resolution
       if (is.null(resolution) == FALSE) {
         r <- raster()

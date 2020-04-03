@@ -49,7 +49,7 @@ the user's land use map.
 \donttest{
 ## Not run:
 sp <- c('Bradypus torquatus', 'Adelophryne maranguapensis', 'Dermatonotus muelleri')
-prefHab(sp, progress = TRUE)
+prefHab(sp)
 ## End
 }
 }
