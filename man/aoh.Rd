@@ -32,14 +32,14 @@ and the third column the maximum value of altitude}
 to a raster.}
 
 \item{resolution}{numeric value indicating the preferred resolution for the
-rasters. Resolution must coarser than the resolution of lc.rec and alt.map.
-Only used if alt.map provided.}
+rasters. Resolution must coarser than the resolution of lc.rec and alt.map.}
 
 \item{continuous}{(logical) Whether the output should be binary or continuous
 for the rasters. Only used if resolution provided.}
 
 \item{threshold}{numeric value indicating the threshold of the cell coverage
-by the species to the species be considered present. Only used if continuous = FALSE.}
+by the species to the species be considered present (values between 0 and 1).
+Only used if continuous = FALSE.}
 
 \item{extent.out}{Extent object or a vector of four numbers indicating the
 preferred output for the rasters. Optional.}
