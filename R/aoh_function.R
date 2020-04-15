@@ -205,7 +205,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
             }
           }
           if(shp.out == TRUE) {result[[i]] <- rasterToPolygons(over,
-                                                               fun = function(x) x > 0,
+                                                               fun = function(x) x > threshold,
                                                                dissolve = T)}
           if(shp.out == FALSE){
             result[[i]] <- over
@@ -235,7 +235,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
         }
       }
       if(shp.out == TRUE){
-        result[[i]] <- rasterToPolygons(hab.ref, fun = function(x) x > 0,
+        result[[i]] <- rasterToPolygons(hab.ref, fun = function(x) x > threshold,
                                         dissolve = T)
       }
       if(shp.out == FALSE){

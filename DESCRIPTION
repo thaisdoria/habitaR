@@ -8,5 +8,5 @@ Description: An R package that provides tools to create specie's area of habitat
 License: GPL-3
 Encoding: UTF-8
 LazyData: TRUE
-Imports: utils, raster, sp, rredlist, rgdal, spatial.tools, rgeos, dismo, sp, ggplot2
+Imports: utils, raster, sp, rredlist, rgdal, spatial.tools, rgeos, dismo, ggplot2
 RoxygenNote: 7.0.2
