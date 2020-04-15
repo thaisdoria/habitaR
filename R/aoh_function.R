@@ -27,7 +27,7 @@
 #' for the rasters. Only used if resolution provided.
 #' @param threshold numeric value indicating the threshold of the cell coverage
 #' by the species to the species be considered present (values between 0 and 1).
-#' Only used if continuous = FALSE.
+#' Only used if a coarser resolution is provided and if continuous = FALSE.
 #' @param extent.out Extent object or a vector of four numbers indicating the
 #' preferred output for the rasters. Optional.
 #' @param progress (logical) a bar showing the progress of the function.
@@ -181,7 +181,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
             hab.ref <- resample(hab.ref, alt.ref, method = 'ngb')
             new.res <- res(alt.ref)[1]
           }
-          # Overlay refinement by altitude and by lc
+          # Overlay refinement by altitude and by land cover
           over <- overlay(hab.ref, alt.ref, fun = function(x, y) x * y)
           # Custom resolution
           if (!is.null(resolution)) {
