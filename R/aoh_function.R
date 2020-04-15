@@ -23,11 +23,11 @@
 #' to a raster.
 #' @param resolution numeric value indicating the preferred resolution for the
 #' rasters. Resolution must coarser than the resolution of lc.rec and alt.map.
-#' Only used if alt.map provided.
 #' @param continuous (logical) Whether the output should be binary or continuous
 #' for the rasters. Only used if resolution provided.
 #' @param threshold numeric value indicating the threshold of the cell coverage
-#' by the species to the species be considered present. Only used if continuous = FALSE.
+#' by the species to the species be considered present (values between 0 and 1).
+#' Only used if continuous = FALSE.
 #' @param extent.out Extent object or a vector of four numbers indicating the
 #' preferred output for the rasters. Optional.
 #' @param progress (logical) a bar showing the progress of the function.
@@ -58,6 +58,19 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
                 matrix.alt.pref = NULL, shp.out = FALSE, resolution = NULL,
                 continuous = FALSE, threshold = 0.5, extent.out = NULL,
                 progress = FALSE){
+  {
+    if (missing(eoo))
+      stop("missing eoo")
+    if (missing(lc.rec))
+      stop("missing lc.rec")
+    if (missing(matrix.hab.pref))
+      stop("missing matrix.hab.pref")
+    if(!is.null(extent.out) & shp.out == TRUE)
+      stop('extent.out can be only used when shp.out = FALSE')
+    if(!is.null(alt.map))
+    if(compareCRS(alt.map, lc.rec) == FALSE)
+      warning('CRS from lc.rec e alt.map are different')
+  }
 
   if(is.character(eoo)){
     if(substr(eoo, nchar(eoo), nchar(eoo)) == '/'){
@@ -115,7 +128,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
     }
 
     # Refinamento de altitude
-    if (is.null(alt.map) == FALSE){
+    if (!is.null(alt.map)){
       if(is.null(matrix.alt.pref)){
         stop('No matrix of altitude preference provided')
       }
@@ -159,7 +172,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
           if(res(lc.rec)[1] > res(alt.map)[1]){
             #factor <- round(res(lc.rec)[1] / res(alt.map)[1])
             #alt.ref <- aggregate(alt.ref, fact = factor, fun = mean)
-            alt.ref <- resample(alt.ref, hab.ref)
+            alt.ref <- resample(alt.ref, hab.ref, method = 'ngb')
             new.res <- res(lc.rec)[1]
           }
           if(res(lc.rec)[1] <= res(alt.map)[1]){
@@ -171,7 +184,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
           # Overlay refinement by altitude and by lc
           over <- overlay(hab.ref, alt.ref, fun = function(x, y) x * y)
           # Custom resolution
-          if (is.null(resolution) == FALSE) {
+          if (!is.null(resolution)) {
             r <- raster()
             extent(r) <- extent(over)
             res(r) <- resolution
@@ -204,7 +217,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
     if (is.null(alt.map) | nrow(sp.altpref) == 0 | sum(is.na(sp.altpref)) == 2) {
       df[i, 3] <- 0
       # Custom resolution
-      if (is.null(resolution) == FALSE) {
+      if (!is.null(resolution)) {
         r <- raster()
         extent(r) <- extent(hab.ref)
         res(r) <- resolution
@@ -215,7 +228,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
           if (continuous == FALSE){
             hab.ref <- hab.ref >= threshold
           }
-          hab.ref <- resample(hab.ref, r, method ='ngb')
+          hab.ref <- resample(hab.ref, r, method = 'ngb')
         }
         if (resolution < new.res){
           stop('Chosen resulution is smaller than the maps provided')
@@ -234,7 +247,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
     }
   }
 
-  if(is.null(extent.out) == FALSE){
+  if(!is.null(extent.out)){
     r <- raster()
     extent(r) <- extent.out
     res(r) <- res(hab.ref)
