@@ -81,15 +81,60 @@ NULL
 
 if (getRversion() >= "2.15.1") utils::globalVariables('class_ref')
 
-#### aoh_amph ####
-#' Spatial distribution corresponding to 'Area of Habitat' (AOH) for Amphibians
+
+#### eoo_amphShp ####
+#' Spatial distribution corresponding to original (i.e. nof refined) 'Extent of Occurrence' (EOO)
+#' for Amphibians as SpatialPolygons in ESRI shapefile (.shp)
+#'
+#' A fictitious dataset exemplifying how the raster file for the argument \code{eoo}
+#' of the function \code{aohVal} could be structured.
+
+#' @docType data
+#' @keywords datasets
+#' @name eoo_amphShp
+#' @usage data(eoo_amphShp)
+#' @format A SpatialPolygons with 3 features.
+NULL
+
+#### eoo_amphRas ####
+#' Spatial distribution corresponding to original (i.e. nof refined) 'Extent of Occurrence' (EOO)
+#' for Amphibians as raster file format (.asc)
+#'
+#' A fictitious dataset exemplifying how the raster file for the argument \code{eoo}
+#' of the function \code{aohVal} could be structured.
+
+#' @docType data
+#' @keywords datasets
+#' @name eoo_amphRas
+#' @usage data(eoo_amphRas)
+#' @format A RasterStack with 3 layers.
+NULL
+
+#### aoh_amphShp ####
+#' Spatial distribution corresponding to the 'Area of Habitat' (AOH) for Amphibians as
+#' SpatialPolygons in ESRI shapefile (.shp)
+#'
+#' A fictitious dataset exemplifying how the spatial distribution file for
+#' the argument \code{aoh} of the function \code{aohVal} could be structured.
+
+#' @docType data
+#' @keywords datasets
+#' @name aoh_amphShp
+#' @usage data(aoh_amphShp)
+#' @format A SpatialPolygons with 3 features.
+NULL
+
+#### aoh_amphRas ####
+#' Spatial distribution corresponding to 'Area of Habitat' (AOH) for Amphibians as
+#' raster file format (.asc).
 #'
 #' A fictitious dataset exemplifying how the raster file for the argument \code{aoh}
 #' of the function \code{aohVal} could be structured.
 
 #' @docType data
 #' @keywords datasets
-#' @name aoh_amph
-#' @usage data(aoh_amph)
-#' @format A RasterStack 4 features.
+#' @name aoh_amphRas
+#' @usage data(aoh_amphRas)
+#' @format A RasterStack with 3 layers.
 NULL
+
