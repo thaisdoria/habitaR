@@ -47,6 +47,15 @@
 
 aohVal <- function (eoo, aoh, resolution=NULL, spplist=NULL, plot=TRUE){
 
+    {
+    if (missing(eoo))
+      stop("missing eoo")
+    if (missing(aoh))
+      stop("missing aoh")
+    if(class(eoo) == "RasterLayer" & class(aoh) == "RasterLayer" & !is.null(spplist))
+      stop("spplist is required if eoo and aoh are both in raster format")
+      }
+
   if(is.character(eoo)){
     files.sp.e <- list.files(eoo, pattern = ".shp$")
     files.sp.e <- gsub(".shp","", files.sp.e)
