@@ -31,23 +31,23 @@ and the third column the maximum value of altitude}
 \item{shp.out}{(logical) Whether the output should be a shapefile as opposed
 to a raster.}
 
-\item{resolution}{Numeric value indicating the preferred resolution for the
-rasters. Resolution must coarser than the resolution of lc.rec and alt.map.
-Only used if alt.map provided.}
+\item{resolution}{numeric value indicating the preferred resolution for the
+rasters. Resolution must coarser than the resolution of lc.rec and alt.map.}
 
 \item{continuous}{(logical) Whether the output should be binary or continuous
 for the rasters. Only used if resolution provided.}
 
 \item{threshold}{numeric value indicating the threshold of the cell coverage
-by the species to the species be considered present. Only used if continuous = FALSE.}
+by the species to the species be considered present (values between 0 and 1).
+Only used if continuous = FALSE.}
 
 \item{extent.out}{Extent object or a vector of four numbers indicating the
-preferred extension output for the rasters. Optional.}
+preferred output for the rasters. Optional.}
 
 \item{progress}{(logical) a bar showing the progress of the function.}
 }
 \value{
-\code{aoh} Returns a list with two elements. The first element is a
+\code{aoh} returns a list with two elements. The first element is a
 data.frame detailing if the function was able (1) or not (0) to refinate the
 species distribution. The second element is a list of RasterLayer or
 SpatialPolygons object representing the refinated distribution of the species.
@@ -61,7 +61,7 @@ known geographic distribution
 }
 \details{
 The function map the area of habitat within the geographical
-distribution (SpatialPolygon) given as the input data as the refined
+distribution (SpatialPolygon) given as the input data. as the refined
 distribution of a given species. This refinement is made considering the
 specific preference for habitats of a given species.
 }
