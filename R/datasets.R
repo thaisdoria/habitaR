@@ -80,3 +80,16 @@ NULL
 NULL
 
 if (getRversion() >= "2.15.1") utils::globalVariables('class_ref')
+
+#### aoh_amph ####
+#' Spatial distribution corresponding to 'Area of Habitat' (AOH) for Amphibians
+#'
+#' A fictitious dataset exemplifying how the raster file for the argument \code{aoh}
+#' of the function \code{aohVal} could be structured.
+
+#' @docType data
+#' @keywords datasets
+#' @name aoh_amph
+#' @usage data(aoh_amph)
+#' @format A RasterStack 4 features.
+NULL
