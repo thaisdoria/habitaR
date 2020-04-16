@@ -52,8 +52,8 @@ aohVal <- function (eoo, aoh, resolution=NULL, spplist=NULL, plot=TRUE){
       stop("missing eoo")
     if (missing(aoh))
       stop("missing aoh")
-    if(class(eoo) == "RasterLayer" & class(aoh) == "RasterLayer" & !is.null(spplist))
-      stop("spplist is required if eoo and aoh are both in raster format")
+    if(class(eoo) == "RasterStack" & class(aoh) == "RasterStack" & !is.null(spplist))
+      stop("spplist is required if eoo and aoh are both in RasterStack format")
       }
 
   if(is.character(eoo)){
@@ -157,7 +157,7 @@ aohVal <- function (eoo, aoh, resolution=NULL, spplist=NULL, plot=TRUE){
   }
  }
 
-  if(class(eoo) == "SpatialPolygonsDataFrame" & class(aoh) == "RasterLayer"){
+  if(class(eoo) == "SpatialPolygonsDataFrame" & class(aoh) == "RasterStack"){
     # rasterize the shapefiles
     dfRes <- data.frame(matrix(ncol = 6, nrow = length(eoo)))
     colnames(dfRes) <- c("Species", "MATCH.EOO", "MATCH.AOH", "PP", "MP", "PP-MP")
@@ -181,7 +181,7 @@ aohVal <- function (eoo, aoh, resolution=NULL, spplist=NULL, plot=TRUE){
 
       if (sum(match.eoo, na.rm=T) != 0){
         match.eoo <- sum(match.eoo, na.rm=T)
-        sp.ra <- aoh[i]
+        sp.ra <- aoh[[i]]
         match.aoh <- extract (sp.ra, pts)
         match.aoh <- sum(match.aoh, na.rm=T)
         pp <- as.numeric(match.aoh) / as.numeric(match.eoo)
