@@ -6,18 +6,18 @@
 #' @usage aohVal(eoo, aoh, resolution=NULL, plot=TRUE)
 #' @param eoo Spatial distribution data of the species representing the original
 #' (i.e. not refined) extent of occurrence (EOO). It might correspond to
-#' SpatialPolygons in ESRI shapefile (.shp), to Raster file (.asc or .tif) or to a
+#' SpatialPolygons in ESRI shapefile (.shp), to RasterStack file (.asc or .tif) or to a
 #' path for a folder with EOO shapefiles (.shp). If the shapefile is used, the
 #' name of the species must be on the second column of the attribute table
 #' of the shapefile.
 #' @param aoh Spatial distribution data of the species representing the area
 #' of habitat (AOH). It might correspond to SpatialPolygons in ESRI shapefile (.shp),
-#' to Raster file (.asc or .tif), created or not with function 'aoh', or to
+#' to RasterStack file (.asc or .tif), created or not with function 'aoh', or to
 #' path for a folder with EOO shapefiles (.shp). If the shapefile is used, the
 #' name of the species must be on the second column of the attribute table.
 #' @param resolution Numeric value to indicate the resolution prefered to generate
 #' the raster files. This argument is only used if the spatial distribution data of
-#' species are in shapefile format. In this case, it should be used the same
+#' species ('eoo' or 'aoh') are in shapefile format. In this case, it should be used the same
 #' resolution adopted to mapping the area of habitat (AOH).
 #' @param spplist Vector of species list in the same order as the rasterstack of
 #' distribution data.
@@ -237,7 +237,7 @@ aohVal <- function (eoo, aoh, resolution=NULL, spplist=NULL, plot=TRUE){
 
   if(class(eoo) == "RasterLayer" & class(aoh) == "RasterLayer"){
     # rasterize the shapefiles
-    dfRes <- data.frame(matrix(ncol = 6, nrow = length(eoo)))
+    dfRes <- data.frame(matrix(ncol = 6, nrow = nlayers(eoo)))
     colnames(dfRes) <- c("Species", "MATCH.EOO", "MATCH.AOH", "PP", "MP", "PP-MP")
     dfRes[,1] <- spplist
     for (i in 1:nlayers(eoo)){
