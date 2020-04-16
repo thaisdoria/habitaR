@@ -52,7 +52,7 @@ aohVal <- function (eoo, aoh, resolution=NULL, spplist=NULL, plot=TRUE){
       stop("missing eoo")
     if (missing(aoh))
       stop("missing aoh")
-    if(class(eoo) == "RasterStack" & class(aoh) == "RasterStack" & !is.null(spplist))
+    if(class(eoo) == "RasterStack" & class(aoh) == "RasterStack" & is.null(spplist))
       stop("spplist is required if eoo and aoh are both in RasterStack format")
       }
 
