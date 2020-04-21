@@ -68,17 +68,17 @@ aohVal <- function (eoo, aoh, resolution=NULL, spplist=NULL, plot=TRUE){
 
   {
     if (missing(eoo))
-      stop("missing eoo")
+      stop("eoo is missing")
     if (missing(aoh))
-      stop("missing aoh")
+      stop("aoh is missing")
     if(class(eoo) == "SpatialPolygonsDataFrame" & class(aoh) == "SpatialPolygonsDataFrame" & is.null(resolution))
       stop("resolution is required if 'eoo' and 'aoh' are in shapefile format")
     if(class(eoo) == "SpatialPolygonsDataFrame" & class(aoh) == "RasterStack" & !is.null(resolution))
       stop("resolution is NOT required if 'aoh' is a rasterstack (resolution will be the same as that from 'aoh')")
     if(class(eoo) == "RasterStack" & class(aoh) == "RasterStack" & missing(spplist))
-      stop("spplist is required if eoo and aoh are in RasterStack format")
+      stop("spplist is required if eoo and aoh are both in RasterStack format")
     if(class(eoo) == "RasterStack" & class(aoh) == "RasterStack" & !is.null(resolution))
-      stop("a resolution should be the same or coarser than 'eoo' and 'aoh'")
+      stop("resolution will be the same than 'eoo' and 'aoh'")
   }
 
   if(is.character(eoo)){
