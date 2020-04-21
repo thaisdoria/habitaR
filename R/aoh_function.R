@@ -267,7 +267,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
   if(!is.null(extent.out)){
     r <- raster()
     extent(r) <- extent.out
-    res(r) <- res(hab.ref)
+    res(r) <- res(result[[i]])
 
     if(continuous == FALSE){
       result <- lapply(result, resample, r, method = 'ngb')
