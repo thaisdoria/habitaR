@@ -10,7 +10,7 @@
 #'  The name of the species must be on the second column of the attribute table
 #'  of the shapefile.
 #' @param lc.rec RasterLayer object of the land use map reclassified for the
-#' categories of habitat
+#' categories of habitat.
 #' @param matrix.hab.pref Data frame 0/1 of habitat preference of the species.
 #'  First column must be the species name. The posterior columns must be named
 #'  after the categories of habitat as following the lc.rec classification.
@@ -21,11 +21,11 @@
 #' and the third column the maximum value of altitude
 #' @param shp.out (logical) Whether the output should be a shapefile as opposed
 #' to a raster.
-#' @param resolution numeric value indicating the preferred resolution for the
+#' @param resolution Numeric value indicating the preferred resolution for the
 #' rasters. Resolution must coarser than the resolution of lc.rec and alt.map.
 #' @param continuous (logical) Whether the output should be binary or continuous
 #' for the rasters. Only used if resolution provided.
-#' @param threshold numeric value indicating the threshold of the cell coverage
+#' @param threshold Numeric value indicating the threshold of the cell coverage
 #' by the species to the species be considered present (values between 0 and 1).
 #' Only used if a coarser resolution is provided and if continuous = FALSE.
 #' @param extent.out Extent object or a vector of four numbers indicating the
@@ -60,7 +60,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
                 progress = FALSE){
   {
     if (missing(eoo))
-      stop("eoo is missing ")
+      stop("eoo is missing")
     if (missing(lc.rec))
       stop("lc.rec is missing")
     if (missing(matrix.hab.pref))
@@ -128,7 +128,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
       hab.ref <- mask(hab.ref, sd)
       df[i, 2] <- 0
     }
-
+    names(hab.ref) <- sd@data[, 2]
     # Refinamento de altitude
     if (!is.null(alt.map)){
       if(is.null(matrix.alt.pref)){
@@ -185,6 +185,8 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
           }
           # Overlay refinement by altitude and by land cover
           over <- overlay(hab.ref, alt.ref, fun = function(x, y) x * y)
+          names(over) <- sd@data[, 2]
+
           # Custom resolution
           if (!is.null(resolution)) {
             r <- raster()
