@@ -60,13 +60,15 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
                 progress = FALSE){
   {
     if (missing(eoo))
-      stop("missing eoo")
+      stop("eoo is missing ")
     if (missing(lc.rec))
-      stop("missing lc.rec")
+      stop("lc.rec is missing")
     if (missing(matrix.hab.pref))
-      stop("missing matrix.hab.pref")
+      stop("matrix.hab.pref is missing")
     if(!is.null(extent.out) & shp.out == TRUE)
       stop('extent.out can be only used when shp.out = FALSE')
+    if(continuous == TRUE & shp.out == TRUE)
+      stop('shp.out can be only be true when continuous = FALSE')
     if(!is.null(alt.map))
     if(compareCRS(alt.map, lc.rec) == FALSE)
       warning('CRS from lc.rec e alt.map are different')
@@ -204,9 +206,17 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
               stop('Chosen resulution is smaller than the maps provided')
             }
           }
-          if(shp.out == TRUE) {result[[i]] <- rasterToPolygons(over,
-                                                               fun = function(x) x > threshold,
-                                                               dissolve = T)}
+          if(shp.out == TRUE) {
+            if(sum(values(over > 0), na.rm = T) == 0){
+              warning(paste('Cannot return shapefile of', sd@data[, 2],
+                            'because there is no cells left after the refinement'))
+              result[[i]] <- NULL
+            }
+            if(sum(values(over > 0), na.rm = T) > 0){
+              result[[i]] <- rasterToPolygons(over, fun = function(x) x > 0,
+                                              dissolve = T)
+            }
+          }
           if(shp.out == FALSE){
             result[[i]] <- over
           }
@@ -234,9 +244,16 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
           stop('Chosen resulution is smaller than the maps provided')
         }
       }
-      if(shp.out == TRUE){
-        result[[i]] <- rasterToPolygons(hab.ref, fun = function(x) x > threshold,
-                                        dissolve = T)
+      if(shp.out == TRUE) {
+        if(sum(values(hab.ref > 0), na.rm = T) == 0){
+          warning(paste('Cannot return shapefile of', sd@data[, 2],
+                        'because there is no cells left after the refinement'))
+          result[[i]] <- NULL
+        }
+        if(sum(values(hab.ref > 0), na.rm = T) > 0){
+          result[[i]] <- rasterToPolygons(hab.ref, fun = function(x) x > 0,
+                                          dissolve = T)
+        }
       }
       if(shp.out == FALSE){
         result[[i]] <- hab.ref

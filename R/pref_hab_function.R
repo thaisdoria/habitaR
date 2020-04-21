@@ -48,10 +48,15 @@ prefHab <- function(sp, key = NULL, cat = NULL,
                     mi = FALSE,
                     season = c('Resident', 'Breeding','Non-breeding', 'Passage',
                                            'Unknown'), progress = FALSE){
-  if(mi == TRUE & sum(suitability %in% c('Marginal', 'Unknown')) > 0){
+  {
+  if(mi == TRUE & sum(suitability %in% c('Marginal', 'Unknown')) > 0)
     stop('It is not possible to simultaneously include Marginal e Unknown habitat
          suitability and major importance habitats only')
+    if(!is.null(cat))
+       if(!ncol(cat) == 2)
+      stop('cat has to have 2 columns')
   }
+
   if(is.null(cat) == TRUE){
     cat <- class_ref
   }
