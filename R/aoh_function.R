@@ -194,7 +194,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
           }
           # Overlay refinement by altitude and by land cover
           over <- overlay(hab.ref, alt.ref, fun = function(x, y) x * y)
-          names(over) <- sd@data[, 2]
+
 
           # Custom resolution
           if (!is.null(resolution)) {
@@ -226,12 +226,14 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
               over <- over >= threshold
               result[[i]] <- rasterToPolygons(over, fun = function(x) x > 0,
                                               dissolve = T)
+              names(result[[i]]) <- sd@data[, 2]
             }
           }
           if(shp.out == FALSE){
             if(continuous == FALSE){
               over <- over >= threshold
             }
+            names(over) <- sd@data[, 2]
             result[[i]] <- over
           }
         }
@@ -267,6 +269,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
         if(sum(values(hab.ref > 0), na.rm = T) > 0){
           result[[i]] <- rasterToPolygons(hab.ref, fun = function(x) x > 0,
                                           dissolve = T)
+          result[[i]] <- sd@data[, 2]
         }
       }
       if(shp.out == FALSE){
@@ -292,5 +295,6 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
   }
   names(result) <- eoo@data[, 2]
   result.full <- list(Summary = df, Data = result)
+  class(result.full) <- "habitaR"
   return(result.full)
 }
