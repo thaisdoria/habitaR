@@ -24,10 +24,13 @@
 #' @param resolution Numeric value indicating the preferred resolution for the
 #' rasters. Resolution must coarser than the resolution of lc.rec and alt.map.
 #' @param continuous (logical) Whether the output should be binary or continuous
-#' for the rasters. Only used if resolution provided.
+#' for the rasters. Only used if resolution provided or when the resolution of
+#' lc.rec and alt.map are different.
 #' @param threshold Numeric value indicating the threshold of the cell coverage
 #' by the species to the species be considered present (values between 0 and 1).
-#' Only used if a coarser resolution is provided and if continuous = FALSE.
+#' Only used if continuous = \code{FALSE} and a coarser resolution is provided or
+#' the resolution of lc.rec and alt.map are different or shp.out is
+#' \code{TRUE}.
 #' @param extent.out Extent object or a vector of four numbers indicating the
 #' preferred output for the rasters. Optional.
 #' @param progress (logical) a bar showing the progress of the function.
@@ -72,6 +75,12 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
     if(!is.null(alt.map))
     if(compareCRS(alt.map, lc.rec) == FALSE)
       warning('CRS from lc.rec e alt.map are different')
+    if(!is.null(matrix.alt.pref) & is.null(alt.map))
+      stop('alt.map is missing')
+    if(is.null(matrix.alt.pref) & !is.null(alt.map))
+      stop('matrix.alt.pref is missing')
+    if(is.null(matrix.alt.pref))
+      sp.altpref <- matrix(nrow = 0, ncol = 1)
   }
 
   if(is.character(eoo)){
@@ -172,16 +181,16 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
           alt.ref <- mask(alt.ref, sd)
           # In case of different resolutions (not defined)
           if(res(lc.rec)[1] > res(alt.map)[1]){
-            #factor <- round(res(lc.rec)[1] / res(alt.map)[1])
-            #alt.ref <- aggregate(alt.ref, fact = factor, fun = mean)
-            alt.ref <- resample(alt.ref, hab.ref, method = 'ngb')
-            new.res <- res(lc.rec)[1]
+            factor <- round(res(lc.rec)[1] / res(alt.map)[1])
+            alt.ref <- aggregate(alt.ref, fact = factor, fun = sum)
+            alt.ref <- alt.ref / (factor^2)
+            alt.ref <- resample(alt.ref, hab.ref)
           }
           if(res(lc.rec)[1] <= res(alt.map)[1]){
-            #factor <- round(res(alt.map)[1] / res(lc.rec)[1])
-            #hab.ref <- aggregate(hab.ref, fact = factor, fun = modal)
-            hab.ref <- resample(hab.ref, alt.ref, method = 'ngb')
-            new.res <- res(alt.ref)[1]
+            factor <- round(res(alt.map)[1] / res(lc.rec)[1])
+            hab.ref <- aggregate(hab.ref, fact = factor, fun = sum)
+            hab.ref <- hab.ref / (factor^2)
+            hab.ref <- resample(hab.ref, alt.ref)
           }
           # Overlay refinement by altitude and by land cover
           over <- overlay(hab.ref, alt.ref, fun = function(x, y) x * y)
@@ -192,22 +201,21 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
             r <- raster()
             extent(r) <- extent(over)
             res(r) <- resolution
-            if (resolution > (new.res)[1]){
+            if (resolution < res(over)[1]){
+              stop('Chosen resulution is smaller than the maps provided')
+            }
+            if (resolution > res(over)[1]){
               factor <- round(resolution / res(over)[1])
               over <- aggregate(over, fact = factor, fun = sum)
               over <- over / (factor^2)
-              if (continuous == FALSE){
-                over <- over >= threshold
-                over <- resample(over, r, method = 'ngb')
-              }
-              if (continuous == TRUE){
-                over <- resample(over, r)
-              }
+              over <- resample(over, r)
             }
-            if (resolution < new.res){
-              stop('Chosen resulution is smaller than the maps provided')
+            if (continuous == FALSE){
+              over <- over >= threshold
             }
+
           }
+
           if(shp.out == TRUE) {
             if(sum(values(over > 0), na.rm = T) == 0){
               warning(paste('Cannot return shapefile of', sd@data[, 2],
@@ -215,11 +223,15 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
               result[[i]] <- NULL
             }
             if(sum(values(over > 0), na.rm = T) > 0){
+              over <- over >= threshold
               result[[i]] <- rasterToPolygons(over, fun = function(x) x > 0,
                                               dissolve = T)
             }
           }
           if(shp.out == FALSE){
+            if(continuous == FALSE){
+              over <- over >= threshold
+            }
             result[[i]] <- over
           }
         }
@@ -233,17 +245,17 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
         r <- raster()
         extent(r) <- extent(hab.ref)
         res(r) <- resolution
-        if (resolution > new.res){
+        if (resolution < res(hab.ref)[1]){
+          stop('Chosen resulution is smaller than the maps provided')
+        }
+        if (resolution > res(hab.ref)[1]){
           factor <- round((resolution / res(hab.ref)[1]))
           hab.ref <- aggregate(hab.ref, fact = factor, fun = sum)
           hab.ref <- hab.ref / (factor^2)
+          hab.ref <- resample(hab.ref, r)
           if (continuous == FALSE){
             hab.ref <- hab.ref >= threshold
           }
-          hab.ref <- resample(hab.ref, r, method = 'ngb')
-        }
-        if (resolution < new.res){
-          stop('Chosen resulution is smaller than the maps provided')
         }
       }
       if(shp.out == TRUE) {

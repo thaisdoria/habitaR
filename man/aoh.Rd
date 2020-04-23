@@ -15,7 +15,7 @@ The name of the species must be on the second column of the attribute table
 of the shapefile.}
 
 \item{lc.rec}{RasterLayer object of the land use map reclassified for the
-categories of habitat}
+categories of habitat.}
 
 \item{matrix.hab.pref}{Data frame 0/1 of habitat preference of the species.
 First column must be the species name. The posterior columns must be named
@@ -31,15 +31,18 @@ and the third column the maximum value of altitude}
 \item{shp.out}{(logical) Whether the output should be a shapefile as opposed
 to a raster.}
 
-\item{resolution}{numeric value indicating the preferred resolution for the
+\item{resolution}{Numeric value indicating the preferred resolution for the
 rasters. Resolution must coarser than the resolution of lc.rec and alt.map.}
 
 \item{continuous}{(logical) Whether the output should be binary or continuous
-for the rasters. Only used if resolution provided.}
+for the rasters. Only used if resolution provided or when the resolution of
+lc.rec and alt.map are different.}
 
-\item{threshold}{numeric value indicating the threshold of the cell coverage
+\item{threshold}{Numeric value indicating the threshold of the cell coverage
 by the species to the species be considered present (values between 0 and 1).
-Only used if continuous = FALSE.}
+Only used if continuous = \code{FALSE} and a coarser resolution is provided or
+the resolution of lc.rec and alt.map are different or shp.out is
+\code{TRUE}.}
 
 \item{extent.out}{Extent object or a vector of four numbers indicating the
 preferred output for the rasters. Optional.}
