@@ -4,9 +4,10 @@
 #' from a specified folder and provide a SpatialPolygonDataFrame object.
 #'
 #' @usage readShp (path)
-#' @param path path for a folder with spatial distribution shapefiles
+#' @param path Path for a folder with spatial distribution shapefiles
 #' (ESRI shapefile format). The name of the species must be on the second
 #' column of the attribute table of the shapefile.
+#' @return A object from a class of 'SpatialPolygonDataFrame'
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export readShp
 
@@ -30,3 +31,5 @@ readShp <- function(path){
     return(sd)
   }
 }
+
+
