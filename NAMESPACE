@@ -3,6 +3,8 @@
 export(aoh)
 export(aohVal)
 export(prefHab)
+export(readRas)
+export(readShp)
 import(dismo)
 import(ggplot2)
 import(raster)
