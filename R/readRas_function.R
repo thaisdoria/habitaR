@@ -22,13 +22,14 @@ readRas <- function(path){
   for (i in 1:length(files.sp)){
     sps[[i]] <- raster(files.sp[i])
   }
-  names(sps)<-gsub(".tif|.asc","", files.sp)
+  names(sps)<-sub("(\\w+\\s+\\w+).*", "\\1", files.sp)
   return(sps)
   }
 
   if(length(files.sp) == 1){
     sps <- raster(files.sp[1])
-    names(sps)<-gsub(".tif|.asc","", files.sp)
+    names(sps)<-sub("(\\w+\\s+\\w+).*", "\\1", files.sp)
     return(sps)
   }
 }
+
