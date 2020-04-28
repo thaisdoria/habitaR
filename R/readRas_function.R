@@ -15,7 +15,7 @@ readRas <- function(path){
     path <- substr(path, 1, nchar(path) - 1)
   }
 
-   files.sp <- list.files(path, pattern = ".tif|.asc$")
+   files.sp <- list.files(path, pattern = ".tif$|.asc$")
 
    if(length(files.sp) > 1){
   sps <- list()
