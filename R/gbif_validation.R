@@ -78,7 +78,8 @@
 #' Padoa-Schippa, E. (2015).Habitat availability for amphibians and extinction
 #' threat: a global analysis. Diversity and Distributions, 21(3), 302–311.
 #'
-#' @author Thais Doria & Daniel Goncalves-Souza
+#' @encoding UTF-8
+#' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export aohVal
 #' @import dismo
 #' @import sp
