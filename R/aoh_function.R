@@ -50,6 +50,7 @@
 #' @examples
 #' ref_data <- aoh(eoo.sp = sd_amph, lc.rec = lc , matrix.hab.pref = habpref,
 #' alt.map = al, matrix.alt.pref = alpref)
+#' @encoding UTF-8
 #' @author Daniel Gonçalves-Souza & Thaís Dória
 #' @export aoh
 #' @import rgdal
