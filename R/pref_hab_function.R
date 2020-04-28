@@ -39,6 +39,8 @@
 #' prefHab(sp)
 #' ## End
 #' }
+#'
+#' @encoding UTF-8
 #' @author Daniel Gonçalves-Souza & Thaís Dória
 #' @export prefHab
 #'
