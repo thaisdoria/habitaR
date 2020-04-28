@@ -2,10 +2,10 @@
 #'
 #' Provide the area of habitat (AOH) of a given species through refinement of its
 #' known geographic distribution
-#' @usage aoh(eoo, lc.rec, matrix.hab.pref, alt.map = NULL, matrix.alt.pref = NULL,
+#' @usage aoh(eoo.sp, lc.rec, matrix.hab.pref, alt.map = NULL, matrix.alt.pref = NULL,
 #' shp.out = FALSE, resolution = NULL, continuous = FALSE, threshold = 0.5,
 #' extent.out = NULL, progress = FALSE)
-#' @param eoo SpatialPolygons of the spatial distribution of the species or path
+#' @param eoo.sp SpatialPolygons of the spatial distribution of the species or path
 #'  for a folder with spatial distribution shapefiles (ESRI shapefile format) .
 #'  The name of the species must be on the second column of the attribute table
 #'  of the shapefile.
@@ -48,7 +48,7 @@
 #' distribution of a given species. This refinement is made considering the
 #' specific preference for habitats of a given species.
 #' @examples
-#' ref_data <- aoh(eoo = sd_amph, lc.rec = lc , matrix.hab.pref = habpref,
+#' ref_data <- aoh(eoo.sp = sd_amph, lc.rec = lc , matrix.hab.pref = habpref,
 #' alt.map = al, matrix.alt.pref = alpref)
 #' @author Daniel Gonçalves-Souza & Thaís Dória
 #' @export aoh
@@ -57,13 +57,13 @@
 #' @importFrom utils txtProgressBar setTxtProgressBar
 
 
-aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
+aoh <- function(eoo.sp, lc.rec, matrix.hab.pref, alt.map = NULL,
                 matrix.alt.pref = NULL, shp.out = FALSE, resolution = NULL,
                 continuous = FALSE, threshold = 0.5, extent.out = NULL,
                 progress = FALSE){
   {
-    if (missing(eoo))
-      stop("eoo is missing")
+    if (missing(eoo.sp))
+      stop("eoo.sp is missing")
     if (missing(lc.rec))
       stop("lc.rec is missing")
     if (missing(matrix.hab.pref))
@@ -83,30 +83,30 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
       sp.altpref <- matrix(nrow = 0, ncol = 1)
   }
 
-  if(is.character(eoo)){
-    if(substr(eoo, nchar(eoo), nchar(eoo)) == '/'){
-      eoo <- substr(eoo, 1, nchar(eoo) - 1)
+  if(is.character(eoo.sp)){
+    if(substr(eoo.sp, nchar(eoo.sp), nchar(eoo.sp)) == '/'){
+      eoo.sp <- substr(eoo.sp, 1, nchar(eoo.sp) - 1)
     }
-    files.sp <- list.files(eoo, pattern = ".shp$")
+    files.sp <- list.files(eoo.sp, pattern = ".shp$")
     files.sp <- gsub(".shp","", files.sp)
     sps <- list()
     for (i in 1:length(files.sp)){
-      sps[[i]] <- readOGR(dsn = eoo,
+      sps[[i]] <- readOGR(dsn = eoo.sp,
                           layer = files.sp[i])
     }
 
     if(length(sps) > 1){
-      eoo <- do.call(bind, sps)
+      eoo.sp <- do.call(bind, sps)
     }
     if(length(sps) == 1){
-      eoo <- sps[[1]]
+      eoo.sp <- sps[[1]]
     }
   }
 
   #Summary data frame
-  df <- data.frame(matrix(ncol = 3, nrow = length(eoo)))
+  df <- data.frame(matrix(ncol = 3, nrow = length(eoo.sp)))
   names(df) <- c('Species', 'Vegetation', 'Altitude')
-  df[, 1] <- eoo@data[, 2]
+  df[, 1] <- eoo.sp@data[, 2]
   df[, 2:3] <- 1
 
   if (is.null(alt.map)) {
@@ -117,11 +117,11 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
 
   # Looping para sd
   if(progress == TRUE){
-    pb <- txtProgressBar(min = 0, max = length(eoo), style = 3)
+    pb <- txtProgressBar(min = 0, max = length(eoo.sp), style = 3)
   }
   result <- list()
-  for (i in 1:length(eoo)){
-    sd <- eoo[i, ]
+  for (i in 1:length(eoo.sp)){
+    sd <- eoo.sp[i, ]
     sd <- crop(sd, lc.rec)
     lc.crop <- crop(lc.rec, sd)
     lc.crop <- mask(lc.crop, sd)
@@ -202,7 +202,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
             extent(r) <- extent(over)
             res(r) <- resolution
             if (resolution < res(over)[1]){
-              stop('Chosen resulution is smaller than the maps provided')
+              stop('Chosen resolution is smaller than the maps provided')
             }
             if (resolution > res(over)[1]){
               factor <- round(resolution / res(over)[1])
@@ -248,7 +248,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
         extent(r) <- extent(hab.ref)
         res(r) <- resolution
         if (resolution < res(hab.ref)[1]){
-          stop('Chosen resulution is smaller than the maps provided')
+          stop('Chosen resolution is smaller than the maps provided')
         }
         if (resolution > res(hab.ref)[1]){
           factor <- round((resolution / res(hab.ref)[1]))
@@ -293,7 +293,7 @@ aoh <- function(eoo, lc.rec, matrix.hab.pref, alt.map = NULL,
       result <- lapply(result, resample, r)
     }
   }
-  names(result) <- eoo@data[, 2]
+  names(result) <- eoo.sp@data[, 2]
   result.full <- list(Summary = df, Data = result)
   class(result.full) <- "habitaR"
   return(result.full)
