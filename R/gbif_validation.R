@@ -88,9 +88,9 @@ aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
 
   {
     if (missing(eoo.sp))
-      stop("eoo is missing")
+      stop("eoo.sp is missing")
     if (missing(aoh.sp))
-      stop("aoh is missing")
+      stop("aoh.sp is missing")
      }
 
   # Extracting the name of species from input data
