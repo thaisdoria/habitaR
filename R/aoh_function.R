@@ -33,20 +33,21 @@
 #' \code{TRUE}.
 #' @param extent.out Extent object or a vector of four numbers indicating the
 #' preferred output for the rasters. Optional.
-#' @param progress (logical) a bar showing the progress of the function.
+#' @param progress (logical) A bar showing the progress of the function.
 #'
 #' @import raster
 #' @return \code{aoh} returns a list with two elements. The first element is a
 #' data.frame detailing if the function was able (1) or not (0) to refinate the
-#' species distribution. The second element is a list of RasterLayer or
-#' SpatialPolygons object representing the refinated distribution of the species.
-#' For the RasterLayer the value of 0 indicates the cells where the the species
-#' were considerated present before the refinement. Values higher than 0 indicates
-#' the coverage of cell by the spatial distribution after the refinement.
-#' @details The function map the area of habitat within the geographical
-#' distribution (SpatialPolygon) given as the input data. as the refined
-#' distribution of a given species. This refinement is made considering the
-#' specific preference for habitats of a given species.
+#' species distribution. The second element is a list of 'RasterLayer' or
+#' 'SpatialPolygons' object representing the refined distribution of the species.
+#' For the 'RasterLayer' the value of 0 indicates the cells where the species
+#' were considered as present before the refinement. Values higher than 0 indicates
+#' the coverage of cell by the spatial distribution after the species habitat's
+#' mapping.
+#' @details The function map the 'area of habitat' (AOH) within the polygon of
+#' geographical distribution (SpatialPolygon) representing the 'extent of occurrence'
+#' (EOO). This mapping is made considering the specific preference for habitats
+#' of a given species.
 #' @examples
 #' ref_data <- aoh(eoo.sp = sd_amph, lc.rec = lc , matrix.hab.pref = habpref,
 #' alt.map = al, matrix.alt.pref = alpref)
