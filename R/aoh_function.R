@@ -49,7 +49,7 @@
 #' (EOO). This mapping is made considering the specific preference for habitats
 #' of a given species.
 #' @examples
-#' ref_data <- aoh(eoo.sp = sd_amph, lc.rec = lc , matrix.hab.pref = habpref,
+#' ref_data <- aoh(eoo.sp = eoo_amphShp, lc.rec = lc , matrix.hab.pref = habpref,
 #' alt.map = al, matrix.alt.pref = alpref)
 #' @encoding UTF-8
 #' @author Daniel Gonçalves-Souza & Thaís Dória
