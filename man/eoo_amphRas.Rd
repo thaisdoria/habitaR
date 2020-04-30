@@ -3,14 +3,16 @@
 \docType{data}
 \name{eoo_amphRas}
 \alias{eoo_amphRas}
-\title{Spatial distribution corresponding to original (i.e. nof refined) 'Extent of Occurrence' (EOO)
-for Amphibians as raster file format (.asc)}
+\title{Extent of Occurrence' (EOO) corresponding to the original (i.e. not refined)
+ spatial distribution of Amphibians in class of 'SpatialPolygonsDataFrame'.}
 \format{A RasterStack with 3 layers.}
 \usage{
 data(eoo_amphRas)
 }
 \description{
-A fictitious dataset exemplifying how the raster file for the argument \code{eoo}
-of the function \code{aohVal} could be structured.
+A fictitious dataset exemplifying how the raster file for the argument \code{eoo.sp}
+of the function \code{aohVal} could be structured. This dataset was generated
+based on available data from the IUCN database. To provide an example dataset
+for this package, the original maps were thinned and lightly custom modified.
 }
 \keyword{datasets}
