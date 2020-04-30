@@ -52,19 +52,6 @@ NULL
 #' 0.005 x 0.005 degrees
 NULL
 
-#### sd_amph ####
-#' Spatial distribution for Amphibians Map
-#'
-#' A fictitious dataset exemplifying how the shapefile for the argument \code{eoo}
-#' of the function \code{aoh} could be structured.
-
-#' @docType data
-#' @keywords datasets
-#' @name sd_amph
-#' @usage data(sd_amph)
-#' @format A SpatialPolygonsDataFrame 4 features.
-NULL
-
 #### class_ref ####
 #' Habitat classification reference
 #'
@@ -81,27 +68,33 @@ NULL
 
 if (getRversion() >= "2.15.1") utils::globalVariables('class_ref')
 
+#### AMPHIBIANS DATASET ####
 
 #### eoo_amphShp ####
-#' Spatial distribution corresponding to original (i.e. nof refined) 'Extent of Occurrence' (EOO)
-#' for Amphibians as SpatialPolygons in ESRI shapefile (.shp)
+#'  Extent of Occurrence' (EOO) corresponding to the original (i.e. not refined)
+#'  spatial distribution of Amphibians in class of 'SpatialPolygonsDataFrame'.
 #'
-#' A fictitious dataset exemplifying how the raster file for the argument \code{eoo}
-#' of the function \code{aohVal} could be structured.
+#' A fictitious dataset exemplifying how the raster file for the argument \code{eoo.sp}
+#' of the function \code{aohVal} could be structured. This dataset was generated
+#' based on available data from the IUCN database. To provide an example dataset
+#' for this package, the original maps were thinned and lightly custom modified.
+
 
 #' @docType data
 #' @keywords datasets
 #' @name eoo_amphShp
 #' @usage data(eoo_amphShp)
-#' @format A SpatialPolygons with 3 features.
+#' @format A SpatialPolygonDataFrame with 3 features.
 NULL
 
 #### eoo_amphRas ####
-#' Spatial distribution corresponding to original (i.e. nof refined) 'Extent of Occurrence' (EOO)
-#' for Amphibians as raster file format (.asc)
+#'  Extent of Occurrence' (EOO) corresponding to the original (i.e. not refined)
+#'  spatial distribution of Amphibians in class of 'SpatialPolygonsDataFrame'.
 #'
-#' A fictitious dataset exemplifying how the raster file for the argument \code{eoo}
-#' of the function \code{aohVal} could be structured.
+#' A fictitious dataset exemplifying how the raster file for the argument \code{eoo.sp}
+#' of the function \code{aohVal} could be structured. This dataset was generated
+#' based on available data from the IUCN database. To provide an example dataset
+#' for this package, the original maps were thinned and lightly custom modified.
 
 #' @docType data
 #' @keywords datasets
@@ -138,3 +131,4 @@ NULL
 #' @format A RasterStack with 3 layers.
 NULL
 
+#### BIRDS DATASET ####
