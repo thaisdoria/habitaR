@@ -155,7 +155,7 @@ aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
        sp.a <- aoh.sp$Data[[i]]
        r <- raster()
        extent(r) <- extent(sp.a)
-       res(r) <- res(eoo.sp[[i]])
+       res(r) <- res(sp.re)
        sp.ra <- rasterize(sp.a, r)
        sp.ra [sp.ra > 1] <- 1
           }
@@ -179,7 +179,7 @@ aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
        sp.ra <- aoh.sp[[i]]
        }
        if(class(aoh.sp) == "habitaR" & class(aoh.sp$Data[[1]]) == "RasterLayer"){
-         res(r) <- res(aoh.sp[[i]] | aoh.sp$Data[[i]])
+         res(r) <- res(aoh.sp$Data[[i]])
          sp.re <- rasterize(sp.e, r)
          sp.re [sp.re > 1] <- 1
          sp.ra <- aoh.sp$Data[[i]]
