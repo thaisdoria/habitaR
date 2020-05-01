@@ -29,7 +29,7 @@ of habitat (AOH). It might correspond to 'SpatialPolygonsDataFrame'
 representing the graphical result of validation (see Rondinini et al. 2011).
 Default is TRUE.}
 
-\item{progress}{(logical) a bar showing the progress of the function.
+\item{progress}{(logical) A bar showing the progress of the function.
 Default is FALSE.}
 }
 \value{
@@ -62,15 +62,29 @@ and Ficetola et al. (2015)
 
 ### Fictitious amphibians data
 
+data(amphs_val)
+
 # Example for signature 'SpatialPolygonsDataFrame' (eoo) and 'habitaR' (aoh) with
 a 'RasterLayer' class of features.
 
 val_data1 <- aohVal(eoo = eoo_amphShp, aoh = aoh_amphRas, plot=TRUE, progress = TRUE)
 
 # Example for signature 'SpatialPolygonsDataFrame' (eoo) and 'habitaR' (aoh) with
-a 'SpatialPolygonsDataFrame' class of features.
+a 'RasterLayer' class of features.
 
-val_data2 <- aohVal(eoo = eoo_amphShp, aoh = aoh_amphShp, resolution = 0.05, plot=TRUE, progress = TRUE)
+val_amph1 <- aohVal(eoo = eoo_amphShp, aoh = aoh_amphRas, plot=TRUE, progress = TRUE)
+
+### Fictitious birds data
+
+data(birds_val)
+
+# Example for signature 'SpatialPolygonsDataFrame' (eoo) and 'habitaR' (aoh) with
+a 'RasterLayer' class of features.
+
+val_data1 <- aohVal(eoo = eoo_birdShp, aoh = aoh_birdRas, plot=TRUE, progress = TRUE)
+
+# Example for signature 'SpatialPolygonsDataFrame' (eoo) and 'habitaR' (aoh) with
+a 'RasterLayer' class of features.
 
 }
 \references{
