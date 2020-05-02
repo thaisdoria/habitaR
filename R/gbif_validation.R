@@ -209,6 +209,7 @@ aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
          occ <- gbif(as.character(sp.e@data[,2]), ext=sp.e@bbox, geo=T)
          pts <- as.data.frame(cbind(occ$lon, occ$lat)) # coordinates corresponding to specified extent
          coordinates(pts) <- ~ V1 + V2
+         proj4string(pts)<-crs(sp.e)
          plot(pts, add=T)
          match.eoo <- poly.counts (pts, sp.e)
 
