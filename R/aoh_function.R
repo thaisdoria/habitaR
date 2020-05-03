@@ -179,7 +179,7 @@ aoh <- function(eoo.sp, lc.rec, matrix.hab.pref, alt.map = NULL,
             alt.ref <- alt.crop >= sp.altpref[1, 1] & alt.crop <= sp.altpref[1, 2]
           }
 
-          alt.ref <- crop(alt.ref, sd) #Redundantes?
+          alt.ref <- crop(alt.ref, sd)
           alt.ref <- mask(alt.ref, sd)
           # In case of different resolutions (not defined)
           if(res(lc.rec)[1] > res(alt.map)[1]){
@@ -223,7 +223,7 @@ aoh <- function(eoo.sp, lc.rec, matrix.hab.pref, alt.map = NULL,
             if(sum(values(over > 0), na.rm = T) == 0){
               warning(paste('Cannot return shapefile of', sd@data[, 2],
                             'because there is no cells left after the refinement'))
-              result[[i]] <- NULL
+              result[[i]] <- NA
             }
             if(sum(values(over > 0), na.rm = T) > 0){
               result[[i]] <- rasterToPolygons(over, fun = function(x) x > 0,
@@ -267,7 +267,7 @@ aoh <- function(eoo.sp, lc.rec, matrix.hab.pref, alt.map = NULL,
         if(sum(values(hab.ref > 0), na.rm = T) == 0){
           warning(paste('Cannot return shapefile of', sd@data[, 2],
                         'because there is no cells left after the refinement'))
-          result[[i]] <- NULL
+          result[[i]] <- NA
         }
         if(sum(values(hab.ref > 0), na.rm = T) > 0){
           result[[i]] <- rasterToPolygons(hab.ref, fun = function(x) x > 0,
