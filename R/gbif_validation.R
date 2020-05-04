@@ -143,10 +143,13 @@ aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
      sp.re <- eoo.sp[[i]]
 
      if(class(aoh.sp) == "RasterLayer" | class(aoh.sp) ==  "RasterStack"){
-     sp.ra <- aoh.sp[[i]]}
+     sp.ra <- aoh.sp[[i]]
+     sp.ra [sp.ra > 0] <- 1
+     }
 
      if(class(aoh.sp) == "habitaR" & class(aoh.sp$Data[[1]]) == "RasterLayer"){
        sp.ra <- aoh.sp$Data[[i]]
+       sp.ra [sp.ra > 0] <- 1
      }
 
 
@@ -157,8 +160,7 @@ aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
        extent(r) <- extent(sp.a)
        res(r) <- res(sp.re)
        sp.ra <- rasterize(sp.a, r)
-       sp.ra [sp.ra > 1] <- 1
-          }
+                        }
       }
 
    # Input 'eoo' object as SpatialPolygonsDataFrame and 'aoh' object as Raster
@@ -177,12 +179,14 @@ aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
        sp.re <- rasterize(sp.e, r)
        sp.re [sp.re > 1] <- 1
        sp.ra <- aoh.sp[[i]]
+       sp.ra [sp.ra > 0] <- 1
        }
        if(class(aoh.sp) == "habitaR" & class(aoh.sp$Data[[1]]) == "RasterLayer"){
          res(r) <- res(aoh.sp$Data[[i]])
          sp.re <- rasterize(sp.e, r)
          sp.re [sp.re > 1] <- 1
          sp.ra <- aoh.sp$Data[[i]]
+         sp.ra [sp.ra > 0] <- 1
        }
      }
 
@@ -190,14 +194,27 @@ aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
        plot(sp.re)
        ex <- extent(sp.re)
        occ <- gbif(as.character(sp.names[i]), ext=ex, geo=T)
+
+       if (is.null(occ)){
+         warning(paste('No records found for',sp.names[i],'inside of the extent provided'))
+       match.eoo <- NA
+       match.aoh <- NA
+       pp <- NA
+       mp <- NA
+       }
+
+       if (is.null(occ) == FALSE){
        pts <- as.data.frame(cbind(occ$lon, occ$lat)) # coordinates corresponding to specified extent
        coordinates(pts) <- ~ V1 + V2
        plot(pts, add=T)
        close(pb)
        match.eoo <- extract (sp.re, pts)
+       match.eoo <- sum(match.eoo, na.rm=T)
        match.aoh <- extract (sp.ra, pts)
+       match.aoh <- sum(match.aoh, na.rm=T)
        pp <- as.numeric(match.aoh) / as.numeric(match.eoo)
        mp <- cellStats(sp.ra, sum) /cellStats(sp.re, sum)
+       }
 
        # Input eoo and aoh as SpatialPolygonsDataFrame
        if(class(eoo.sp) == "SpatialPolygonsDataFrame" # can be generated with 'readShp' function)
@@ -220,6 +237,7 @@ aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
 
          if(class(aoh.sp) == "habitaR" & class(aoh.sp$Data[[1]]) == "SpatialPolygonsDataFrame"){
          sp.a <- aoh.sp$Data[[i]]
+         sp.ra [sp.ra > 0] <- 1
          match.aoh <- poly.counts(pts, sp.a)
          }
 
