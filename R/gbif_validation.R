@@ -97,16 +97,18 @@
 #' @export aohVal
 #' @import dismo
 #' @import sp
+#' @import GISTools
 #' @importFrom utils txtProgressBar setTxtProgressBar
 
 aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
 
+  # Warning messages
   {
     if (missing(eoo.sp))
       stop("eoo.sp is missing")
     if (missing(aoh.sp))
       stop("aoh.sp is missing")
-     }
+  }
 
   # Extracting the name of species from input data
   if(class(eoo.sp) == "SpatialPolygonsDataFrame"){ # can be generated with 'readShp' function)
@@ -114,161 +116,168 @@ aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
   }
   if(class(eoo.sp) == "RasterLayer" | class(eoo.sp) == "RasterStack"
      | class(eoo.sp) == "list" & class(eoo.sp[[1]]) == "RasterLayer"){ # a 'list' of rasters can be generated with 'readRas' function)
-    sp.names <- gsub("//.", " ", names(eoo.sp))
+    sp.names <- gsub("[.]", " ", names(eoo.sp))
   }
 
   # Summary data frame of results
-    dfRes <- data.frame(matrix(ncol = 6, nrow = length(sp.names)))
-    colnames(dfRes) <- c("Species", "MATCH.EOO", "MATCH.AOH", "PP", "MP", "PP-MP")
-    dfRes[,1] <- sp.names
+  dfRes <- data.frame(matrix(ncol = 6, nrow = length(sp.names)))
+  colnames(dfRes) <- c("Species", "MATCH.EOO", "MATCH.AOH", "PP", "MP", "PP-MP")
+  dfRes[,1] <- sp.names
 
   # Enabling the progress bar
   if(progress == TRUE){
-      pb <- txtProgressBar(min = 0, max = length(sp.names), style = 3)
-    }
+    pb <- txtProgressBar(min = 0, max = length(sp.names), style = 3)
+  }
 
-   # Lopping the validation steps for each-species
- for (i in 1:length(sp.names)){
-   if(progress == TRUE){
-     setTxtProgressBar(pb, i)
-   }
+  # Lopping the validation steps for each-species
+  for (i in 1:length(sp.names)){
+    if(progress == TRUE){
+      setTxtProgressBar(pb, i)
+    }
 
     # Input 'eoo' and 'aoh' as Raster objects
     if(class(eoo.sp) == "RasterLayer" | class(eoo.sp) == "list" & # a 'list' of rasters can be generated with 'readRas' function)
        class(eoo.sp[[1]]) == "RasterLayer" | class(eoo.sp) == "RasterStack"
-       & class(aoh.sp) == "RasterLayer" | class(aoh.sp) == "list" & # a 'list' of rasters can be generated with 'readRas' function)
-       class(aoh.sp[[1]]) == "RasterLayer" | class(aoh.sp) == "RasterStack" |
-       class(aoh.sp) == "habitaR")
-      {
-     sp.re <- eoo.sp[[i]]
+       & (class(aoh.sp) == "RasterLayer" | class(aoh.sp) == "list" & # a 'list' of rasters can be generated with 'readRas' function)
+          class(aoh.sp[[1]]) == "RasterLayer" | class(aoh.sp) == "RasterStack" |
+          class(aoh.sp) == "habitaR" & class(aoh.sp$Data[[1]]) == "RasterLayer"))
+    {
+      sp.re <- eoo.sp[[i]]
 
-     if(class(aoh.sp) == "RasterLayer" | class(aoh.sp) ==  "RasterStack"){
-     sp.ra <- aoh.sp[[i]]
-     sp.ra [sp.ra > 0] <- 1
-     }
-
-     if(class(aoh.sp) == "habitaR" & class(aoh.sp$Data[[1]]) == "RasterLayer"){
-       sp.ra <- aoh.sp$Data[[i]]
-       sp.ra [sp.ra > 0] <- 1
-     }
-
-
-     if(class(aoh.sp) == "habitaR" & class(aoh.sp$Data[[1]]) == "SpatialPolygonsDataFrame"){
-       # rasterize the aoh based on resolution of eoo
-       sp.a <- aoh.sp$Data[[i]]
-       r <- raster()
-       extent(r) <- extent(sp.a)
-       res(r) <- res(sp.re)
-       sp.ra <- rasterize(sp.a, r)
-                        }
+      if(class(aoh.sp) == "RasterLayer" | class(aoh.sp) ==  "RasterStack"){
+        sp.ra <- aoh.sp[[i]]
+        sp.ra [sp.ra > 0] <- 1
       }
 
-   # Input 'eoo' object as SpatialPolygonsDataFrame and 'aoh' object as Raster
-    if(class(eoo.sp) == "SpatialPolygonsDataFrame" & class(aoh.sp) == "RasterLayer"
-     | class(aoh.sp) == "list" & class(aoh.sp[[1]]) == "RasterLayer" | # a 'list' of rasters can be generated with 'readRas' function)
-     class(aoh.sp) == "RasterStack"| class(aoh.sp) == "habitaR" &
-     class(aoh.sp$Data[[1]]) == "RasterLayer") {
-       # rasterize the eoo based on resolution of aoh
-       sp.e <- eoo.sp[i, ]
-       r <- raster()
-       extent(r) <- extent(sp.e)
+      if(class(aoh.sp) == "habitaR" & class(aoh.sp$Data[[1]]) == "RasterLayer"){
+        sp.ra <- aoh.sp$Data[[i]]
+        sp.ra [sp.ra > 0] <- 1
+      }
 
-       if(class(aoh.sp) == "RasterLayer" | class(aoh.sp) == "list" &
-          class(aoh.sp[[1]]) == "RasterLayer" | class(aoh.sp) == "RasterStack"){
-       res(r) <- res(aoh.sp[[i]])
-       sp.re <- rasterize(sp.e, r)
-       sp.re [sp.re > 1] <- 1
-       sp.ra <- aoh.sp[[i]]
-       sp.ra [sp.ra > 0] <- 1
-       }
-       if(class(aoh.sp) == "habitaR" & class(aoh.sp$Data[[1]]) == "RasterLayer"){
-         res(r) <- res(aoh.sp$Data[[i]])
-         sp.re <- rasterize(sp.e, r)
-         sp.re [sp.re > 1] <- 1
-         sp.ra <- aoh.sp$Data[[i]]
-         sp.ra [sp.ra > 0] <- 1
-       }
-     }
+      if(class(aoh.sp) == "habitaR" & class(aoh.sp$Data[[1]]) == "SpatialPolygonsDataFrame"){
+        # rasterize the aoh based on resolution of eoo
+        sp.a <- aoh.sp$Data[[i]]
+        r <- raster()
+        extent(r) <- extent(sp.a)
+        res(r) <- res(sp.re)
+        sp.ra <- rasterize(sp.a, r)
+      }
+    }
 
-# download occurrences from gbif based on extent of EOO (to restrict the search to inside of original distribution)
-       plot(sp.re)
-       ex <- extent(sp.re)
-       occ <- gbif(as.character(sp.names[i]), ext=ex, geo=T)
+    # Input 'eoo' object as SpatialPolygonsDataFrame and 'aoh' object as Raster
+    if(class(eoo.sp) == "SpatialPolygonsDataFrame" & (class(aoh.sp) == "RasterLayer"
+                                                      | class(aoh.sp) == "list" & class(aoh.sp[[1]]) == "RasterLayer" | # a 'list' of rasters can be generated with 'readRas' function)
+                                                      class(aoh.sp) == "RasterStack"| class(aoh.sp) == "habitaR" &
+                                                      class(aoh.sp$Data[[1]]) == "RasterLayer")) {
+      # rasterize the eoo based on resolution of aoh
+      sp.e <- eoo.sp[i, ]
+      r <- raster()
+      extent(r) <- extent(sp.e)
 
-       if (is.null(occ)){
-         warning(paste('No records found for',sp.names[i],'inside of the extent provided'))
-       match.eoo <- NA
-       match.aoh <- NA
-       pp <- NA
-       mp <- NA
-       }
+      if(class(aoh.sp) == "RasterLayer" | class(aoh.sp) == "list" &
+         class(aoh.sp[[1]]) == "RasterLayer" | class(aoh.sp) == "RasterStack"){
+        res(r) <- res(aoh.sp[[i]])
+        sp.re <- rasterize(sp.e, r)
+        sp.re [sp.re > 1] <- 1
+        sp.ra <- aoh.sp[[i]]
+        sp.ra [sp.ra > 0] <- 1
+      }
+      if(class(aoh.sp) == "habitaR" & class(aoh.sp$Data[[1]]) == "RasterLayer"){
+        res(r) <- res(aoh.sp$Data[[i]])
+        sp.re <- rasterize(sp.e, r)
+        sp.re [sp.re > 1] <- 1
+        sp.ra <- aoh.sp$Data[[i]]
+        sp.ra [sp.ra > 0] <- 1
+      }
+    }
 
-       if (is.null(occ) == FALSE){
-       pts <- as.data.frame(cbind(occ$lon, occ$lat)) # coordinates corresponding to specified extent
-       coordinates(pts) <- ~ V1 + V2
-       plot(pts, add=T)
-       close(pb)
-       match.eoo <- extract (sp.re, pts)
-       match.eoo <- sum(match.eoo, na.rm=T)
-       match.aoh <- extract (sp.ra, pts)
-       match.aoh <- sum(match.aoh, na.rm=T)
-       pp <- as.numeric(match.aoh) / as.numeric(match.eoo)
-       mp <- cellStats(sp.ra, sum) /cellStats(sp.re, sum)
-       }
+    # download occurrences from gbif based on extent of EOO (to restrict the search to inside of original distribution)
+    plot(sp.re)
+    ex <- extent(sp.re)
+    occ <- gbif(as.character(sp.names[i]), ext=ex, geo=T)
 
-       # Input eoo and aoh as SpatialPolygonsDataFrame
-       if(class(eoo.sp) == "SpatialPolygonsDataFrame" # can be generated with 'readShp' function)
-          & class(aoh.sp) == "SpatialPolygonsDataFrame" | class(aoh.sp) == "habitaR" &
-          class(aoh.sp$Data[[1]]) == "SpatialPolygonsDataFrame"){ # can be generated with 'readShp' or 'aoh' function)
+    if (is.null(occ)){
+      warning(paste('No occurrence records found inside of the searched extent for',sp.names[i]))
+      match.eoo <- NA
+      match.aoh <- NA
+      pp <- NA
+      mp <- NA
+    }
 
-         sp.e <- eoo.sp[i, ]
-         plot(sp.e)
-         occ <- gbif(as.character(sp.e@data[,2]), ext=sp.e@bbox, geo=T)
-         pts <- as.data.frame(cbind(occ$lon, occ$lat)) # coordinates corresponding to specified extent
-         coordinates(pts) <- ~ V1 + V2
-         proj4string(pts)<-crs(sp.e)
-         plot(pts, add=T)
-         match.eoo <- poly.counts (pts, sp.e)
+    if (is.null(occ) == FALSE){
+      pts <- as.data.frame(cbind(occ$lon, occ$lat)) # coordinates corresponding to specified extent
+      coordinates(pts) <- ~ V1 + V2
+      plot(pts, add=T)
+      match.eoo <- extract (sp.re, pts)
+      match.eoo <- sum(match.eoo, na.rm=T)
+      match.aoh <- extract (sp.ra, pts)
+      match.aoh <- sum(match.aoh, na.rm=T)
+      pp <- as.numeric(match.aoh) / as.numeric(match.eoo)
+      mp <- cellStats(sp.ra, sum) /cellStats(sp.re, sum)
+    }
 
-         if(class(aoh.sp) == "SpatialPolygonsDataFrame"){
-           sp.a <- aoh.sp[i, ]
-           match.aoh <- poly.counts(pts, sp.a)
-         }
+    # Input eoo and aoh as SpatialPolygonsDataFrame
+    if(class(eoo.sp) == "SpatialPolygonsDataFrame" # can be generated with 'readShp' function)
+       & (class(aoh.sp) == "SpatialPolygonsDataFrame" | class(aoh.sp) == "habitaR" &
+          class(aoh.sp$Data[[1]]) == "SpatialPolygonsDataFrame")){ # can be generated with 'readShp' or 'aoh' function)
 
-         if(class(aoh.sp) == "habitaR" & class(aoh.sp$Data[[1]]) == "SpatialPolygonsDataFrame"){
-         sp.a <- aoh.sp$Data[[i]]
-         sp.ra [sp.ra > 0] <- 1
-         match.aoh <- poly.counts(pts, sp.a)
-         }
+      sp.e <- eoo.sp[i, ]
+      plot(sp.e)
+      occ <- gbif(as.character(sp.e@data[,2]), ext=sp.e@bbox, geo=T)
 
-         pp <- as.numeric(match.aoh) / as.numeric(match.eoo)
-         mp <- poly.areas(sp.a) / poly.areas(sp.e)
-         }
+      if (is.null(occ)){
+        warning(paste('No occurrence records found inside of the searched extent for',sp.names[i]))
+        match.eoo <- NA
+        match.aoh <- NA
+        pp <- NA
+        mp <- NA
+      }
 
+      if (is.null(occ) == FALSE){
+        pts <- as.data.frame(cbind(occ$lon, occ$lat)) # coordinates corresponding to specified extent
+        coordinates(pts) <- ~ V1 + V2
+        proj4string(pts)<-crs(sp.e)
+        plot(pts, add=T)
+        match.eoo <- poly.counts (pts, sp.e)
+      }
 
-          if (sum(match.eoo, na.rm=T) != 0){
-          dfRes[i,2] <- match.eoo
-          dfRes[i,3] <- match.aoh
-          dfRes[i,4] <- pp
-          dfRes[i,5] <- mp
-          dfRes[i,6] <- pp - mp
-        }
+      if(class(aoh.sp) == "SpatialPolygonsDataFrame"){
+        sp.a <- aoh.sp[i, ]
+        match.aoh <- poly.counts(pts, sp.a)
+      }
 
-          if (sum(match.eoo, na.rm=T) == 0) {
-          warning (paste('No occurrence record found inside the eoo raster for', as.character(nm)))
-          dfRes[i,2:6] <- NA
-        }
-            }
+      if(class(aoh.sp) == "habitaR" & class(aoh.sp$Data[[1]]) == "SpatialPolygonsDataFrame"){
+        sp.a <- aoh.sp$Data[[i]]
+        match.aoh <- poly.counts(pts, sp.a)
+      }
 
-if (plot == FALSE){
-  return(dfRes)}
+      pp <- as.numeric(match.aoh) / as.numeric(match.eoo)
+      mp <- poly.areas(sp.a) / poly.areas(sp.e)
+    }
 
-if (plot == TRUE){
-  plot(as.numeric(dfRes$MP), as.numeric(dfRes$PP), type="p", ylim=c(0,1),
-       xlim=c(0,1), xlab="Model Prevalence (MP)", ylab="Point Prevalence (PP)",
-       cex=sqrt(dfRes$MATCH.EOO)/4)
-  abline(c(0,1), lwd=0.8, lty=5, col="dark grey")
-  return(dfRes)
-}
+    # Summarizing the validation results
+    if (sum(match.eoo, na.rm=T) != 0){
+      dfRes[i,2] <- match.eoo
+      dfRes[i,3] <- match.aoh
+      dfRes[i,4] <- pp
+      dfRes[i,5] <- mp
+      dfRes[i,6] <- pp - mp
+    }
+    if (sum(match.eoo, na.rm=T) == 0) {
+      warning (paste('No occurrence records found inside of the eoo raster for', as.character(sp.names[i])))
+      dfRes[i,2:6] <- NA
+    }
   }
+
+  if (plot == FALSE){
+    return(dfRes)}
+
+  if (plot == TRUE){
+    plot(as.numeric(dfRes$MP), as.numeric(dfRes$PP), type="p", ylim=c(0,1),
+         xlim=c(0,1), xlab="Model Prevalence (MP)", ylab="Point Prevalence (PP)",
+         cex=sqrt(dfRes$MATCH.EOO)/4)
+    abline(c(0,1), lwd=0.8, lty=5, col="dark grey")
+    return(dfRes)
+  }
+}
 
