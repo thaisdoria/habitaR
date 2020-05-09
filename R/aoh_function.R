@@ -297,6 +297,6 @@ aoh <- function(eoo.sp, lc.rec, matrix.hab.pref, alt.map = NULL,
   }
   names(result) <- eoo.sp@data[, 2]
   result.full <- list(Summary = df, Data = result)
-  class(result.full) <- "habitaR"
+  class(result.full) <- "aoh"
   return(result.full)
 }
