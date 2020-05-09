@@ -285,3 +285,4 @@ aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
   }
 }
 
+
