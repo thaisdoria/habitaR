@@ -6,23 +6,23 @@
 #'
 #' @usage
 #' # method for signature 'SpatialPolygonsDataFrame', 'RasterLayer',
-#' 'RasterStack', a 'list' of 'RasterLayer' or 'habitaR' object (see
-#'  \code{\link[habitaR]{aoh}} to generate the latter object)
+#' 'RasterStack', a 'list' of 'RasterLayer' or 'aoh' object (see
+#'  \code{\link[aoh]{aoh}} to generate the latter object)
 #'
 #' aohVal(eoo.sp, aoh.sp, plot=TRUE, progress=FALSE)
 #'
 #' @param eoo.sp Spatial distribution data of the species representing the
 #' original (i.e. not refined) extent of occurrence (EOO). It might correspond to
-#' 'SpatialPolygonsDataFrame' (see \code{\link[habitaR]{readShp}} to obtain such
+#' 'SpatialPolygonsDataFrame' (see \code{\link[aoh]{readShp}} to obtain such
 #' class of object), a 'RasterLayer', a 'RasterStack', or a 'list' with 'RasterLayer'
-#' class of features (see \code{\link[habitaR]{readRas}} to obtain such object).
+#' class of features (see \code{\link[aoh]{readRas}} to obtain such object).
 #'
 #' @param aoh.sp Spatial distribution data of the species representing the area
 #' of habitat (AOH). It might correspond to 'SpatialPolygonsDataFrame'
-#' (see \code{\link[habitaR]{readShp}} to obtain such class of object), a
+#' (see \code{\link[aoh]{readShp}} to obtain such class of object), a
 #' 'RasterLayer', a 'RasterStack', a 'list' with 'RasterLayer' class of features
-#' (see \code{\link[habitaR]{readRas}} to obtain such object), or a 'habitaR'
-#' (see \code{\link[habitaR]{aoh}} to obtain such class of object).
+#' (see \code{\link[aoh]{readRas}} to obtain such object), or a 'aoh'
+#' (see \code{\link[aoh]{aoh}} to obtain such class of object).
 #'
 #' @param plot (logical) Whether the output should also return a plot
 #' representing the graphical result of validation (see Rondinini et al. 2011).
@@ -57,21 +57,21 @@
 #' data(birds_val)
 #' data(amphs_val)
 #'
-#' # Example for signature 'SpatialPolygonsDataFrame' (eoo) and 'habitaR' (aoh) with
+#' # Example for signature 'SpatialPolygonsDataFrame' (eoo) and 'aoh' (aoh) with
 #' a 'RasterLayer' class of features.
 #'
 #' birdVal1<-aohVal(eoo = eoo_birdShp, aoh = aoh_birdRas, plot = TRUE, progress = TRUE)
 #' amphVal1<-aohVal(eoo = eoo_amphShp, aoh = aoh_amphRas, plot = TRUE, progress = TRUE)
 #'
 #'
-#' # Example for signature 'RasterLayer' or 'RasterStack' (eoo) and 'habitaR' (aoh) with
+#' # Example for signature 'RasterLayer' or 'RasterStack' (eoo) and 'aoh' (aoh) with
 #' a 'RasterLayer' class of features.
 #'
 #' birdVal2<-aohVal(eoo = eoo_birdRas, aoh = aoh_birdRas, plot = TRUE, progress = TRUE)
 #' amphVal2<-aohVal(eoo = eoo_amphRas, aoh = aoh_amphRas, plot = TRUE, progress = TRUE)
 #'
 #'
-#' # Example for signature 'SpatialPolygonsDataFrame' (eoo) and 'habitaR' (aoh) with
+#' # Example for signature 'SpatialPolygonsDataFrame' (eoo) and 'aoh' (aoh) with
 #' a 'SpatialPolygonsDataFrame' class of features.
 #'
 #' birdVal3<-aohVal(eoo = eoo_birdShp, aoh = aoh_birdShp, plot = TRUE, progress = TRUE)
@@ -99,7 +99,7 @@
 #' @import GISTools
 #' @importFrom utils txtProgressBar setTxtProgressBar
 
-aohVal6 <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
+aohVal9 <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
 
   # Warning messages
   {
@@ -135,14 +135,56 @@ aohVal6 <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
       setTxtProgressBar(pb, i)
     }
 
-    # Input data based on raster analysis
+    # Input data based on shape analysis - it is not the best recomended
+    {
+      # Input eoo and aoh as SpatialPolygonsDataFrame
+      if(class(eoo.sp) == "SpatialPolygonsDataFrame" # can be generated with 'readShp' function)
+         & (class(aoh.sp) == "SpatialPolygonsDataFrame" | class(aoh.sp) == "aoh" &
+            class(aoh.sp$Data[[1]]) == "SpatialPolygonsDataFrame")){ # can be generated with 'readShp' or 'aoh' function)
 
+        sp.e <- eoo.sp[i, ]
+        plot(sp.e)
+        occ <- gbif(as.character(sp.e@data[,2]), ext=sp.e@bbox, geo=T)
+
+        if (is.null(occ)){
+          warning(paste('No occurrence records found inside of the searched extent for',sp.names[i]))
+          match.eoo <- NA
+          match.aoh <- NA
+          pp <- NA
+          mp <- NA
+        }
+
+        if (is.null(occ) == FALSE){
+          pts <- as.data.frame(cbind(occ$lon, occ$lat)) # coordinates corresponding to specified extent
+          coordinates(pts) <- ~ V1 + V2
+          proj4string(pts)<-crs(sp.e)
+          plot(pts, add=T)
+          match.eoo <- poly.counts (pts, sp.e)
+        }
+
+        if(class(aoh.sp) == "SpatialPolygonsDataFrame"){
+          sp.a <- aoh.sp[i, ]
+          match.aoh <- poly.counts(pts, sp.a)
+        }
+
+        if(class(aoh.sp) == "aoh" & class(aoh.sp$Data[[1]]) == "SpatialPolygonsDataFrame"){
+          sp.a <- aoh.sp$Data[[i]]
+          match.aoh <- poly.counts(pts, sp.a)
+        }
+
+        pp <- as.numeric(match.aoh) / as.numeric(match.eoo)
+        mp <- poly.areas(sp.a) / poly.areas(sp.e)
+      }
+    }
+
+    # Input data based on raster analysis
+    {
     # Input 'eoo' and 'aoh' as Raster objects
     if(class(eoo.sp) == "RasterLayer" | (class(eoo.sp) == "list" & # a 'list' of rasters can be generated with 'readRas' function)
                                          class(eoo.sp[[1]]) == "RasterLayer") | class(eoo.sp) == "RasterStack"
        & (class(aoh.sp) == "RasterLayer" | (class(aoh.sp) == "list" & # a 'list' of rasters can be generated with 'readRas' function)
                                             class(aoh.sp[[1]]) == "RasterLayer") | class(aoh.sp) == "RasterStack" |
-          (class(aoh.sp) == "habitaR" & class(aoh.sp$Data[[1]]) == "RasterLayer")))
+          (class(aoh.sp) == "aoh" & class(aoh.sp$Data[[1]]) == "RasterLayer")))
     {
       sp.re <- eoo.sp[[i]]
 
@@ -164,7 +206,7 @@ aohVal6 <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
         sp.ra [sp.ra > 0] <- 1
       }
 
-      if(class(aoh.sp) == "habitaR" & class(aoh.sp$Data[[1]]) == "RasterLayer"){
+      if(class(aoh.sp) == "aoh" & class(aoh.sp$Data[[1]]) == "RasterLayer"){
         sp.ra <- aoh.sp$Data[[i]]
 
         if(res(sp.ra) > res(sp.re)){
@@ -181,12 +223,48 @@ aohVal6 <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
         sp.ra <- mask(sp.ra, sp.re)
         sp.ra [sp.ra > 0] <- 1
       }
+      plot(sp.re)
     }
+
+    # Input 'eoo' object as Raster and 'aoh' object as SpatialPolygonsDataFrame
+    if(class(eoo.sp) == "RasterLayer" | (class(eoo.sp) == "list" & # a 'list' of rasters can be generated with 'readRas' function)
+                                         class(eoo.sp[[1]]) == "RasterLayer") | class(eoo.sp) == "RasterStack"
+       & (class(aoh.sp) == "SpatialPolygonsDataFrame" | (class(aoh.sp) == "aoh"
+                                                         & class(aoh.sp$Data[[1]]) == "SpatialPolygonsDataFrame")))
+    {
+      sp.re <- eoo.sp[[i]]
+
+
+      if(class(aoh.sp) == "SpatialPolygonsDataFrame"){
+        # rasterize the aoh based on resolution of eoo
+        sp.a <- aoh.sp[i,]
+        r <- raster()
+        extent(r) <- extent(sp.re)
+        res(r) <- res(sp.re)
+        sp.ra <- rasterize(sp.a, r)
+        sp.ra<-resample(sp.ra, sp.re)
+        sp.ra <- mask(sp.ra, sp.re)
+        sp.ra [sp.ra > 0] <- 1
+      }
+
+      if(class(aoh.sp) == "aoh" & class(aoh.sp$Data[[1]]) == "SpatialPolygonsDataFrame"){
+        # rasterize the aoh based on resolution of eoo
+        sp.a <- aoh.sp$Data[[i]]
+        r <- raster()
+        extent(r) <- extent(sp.re)
+        res(r) <- res(sp.re)
+        sp.ra <- rasterize(sp.a, r)
+        sp.ra<-resample(sp.ra, sp.re)
+        sp.ra <- mask(sp.ra, sp.re)
+        sp.ra [sp.ra > 0] <- 1
+      }
+      plot(sp.re)
+       }
 
     # Input 'eoo' object as SpatialPolygonsDataFrame and 'aoh' object as Raster
     if(class(eoo.sp) == "SpatialPolygonsDataFrame" & (class(aoh.sp) %in% c("RasterLayer", "RasterStack")
       | (class(aoh.sp) == "list" & class(aoh.sp[[1]]) == "RasterLayer") | # a 'list' of rasters can be generated with 'readRas' function)
-      (class(aoh.sp) == "habitaR" & class(aoh.sp$Data[[1]]) == "RasterLayer")))
+      (class(aoh.sp) == "aoh" & class(aoh.sp$Data[[1]]) == "RasterLayer")))
       {
       # rasterize the eoo based on resolution of aoh
       sp.e <- eoo.sp[i, ]
@@ -204,7 +282,7 @@ aohVal6 <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
         sp.ra <- mask(sp.ra, sp.e)
       }
 
-      if(class(aoh.sp) == "habitaR" & class(aoh.sp$Data[[1]]) == "RasterLayer"){
+      if(class(aoh.sp) == "aoh" & class(aoh.sp$Data[[1]]) == "RasterLayer"){
         res(r) <- res(aoh.sp$Data[[i]])
         sp.re <- rasterize(sp.e, r)
         sp.re [sp.re > 1] <- 1
@@ -213,10 +291,10 @@ aohVal6 <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
         sp.ra [sp.ra > 0] <- 1
         sp.ra <- mask(sp.ra, sp.e)
       }
-    }
+      plot(sp.re)
+       }
 
     # download occurrences from gbif based on extent of EOO (to restrict the search to inside of original distribution)
-    plot(sp.re)
     ex <- extent(sp.re)
     occ <- gbif(as.character(sp.names[i]), ext=ex, geo=T)
 
@@ -239,46 +317,7 @@ aohVal6 <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
       pp <- as.numeric(match.aoh) / as.numeric(match.eoo)
       mp <- cellStats(sp.ra, sum) /cellStats(sp.re, sum)
     }
-
-    # Input data based on shape analysis
-    # Input eoo and aoh as SpatialPolygonsDataFrame
-    if(class(eoo.sp) == "SpatialPolygonsDataFrame" # can be generated with 'readShp' function)
-       & (class(aoh.sp) == "SpatialPolygonsDataFrame" | class(aoh.sp) == "habitaR" &
-          class(aoh.sp$Data[[1]]) == "SpatialPolygonsDataFrame")){ # can be generated with 'readShp' or 'aoh' function)
-
-      sp.e <- eoo.sp[i, ]
-      plot(sp.e)
-      occ <- gbif(as.character(sp.e@data[,2]), ext=sp.e@bbox, geo=T)
-
-      if (is.null(occ)){
-        warning(paste('No occurrence records found inside of the searched extent for',sp.names[i]))
-        match.eoo <- NA
-        match.aoh <- NA
-        pp <- NA
-        mp <- NA
-      }
-
-      if (is.null(occ) == FALSE){
-        pts <- as.data.frame(cbind(occ$lon, occ$lat)) # coordinates corresponding to specified extent
-        coordinates(pts) <- ~ V1 + V2
-        proj4string(pts)<-crs(sp.e)
-        plot(pts, add=T)
-        match.eoo <- poly.counts (pts, sp.e)
-      }
-
-      if(class(aoh.sp) == "SpatialPolygonsDataFrame"){
-        sp.a <- aoh.sp[i, ]
-        match.aoh <- poly.counts(pts, sp.a)
-      }
-
-      if(class(aoh.sp) == "habitaR" & class(aoh.sp$Data[[1]]) == "SpatialPolygonsDataFrame"){
-        sp.a <- aoh.sp$Data[[i]]
-        match.aoh <- poly.counts(pts, sp.a)
-      }
-
-      pp <- as.numeric(match.aoh) / as.numeric(match.eoo)
-      mp <- poly.areas(sp.a) / poly.areas(sp.e)
-    }
+  }
 
     # Summarizing the validation results
     if (sum(match.eoo, na.rm=T) != 0){
