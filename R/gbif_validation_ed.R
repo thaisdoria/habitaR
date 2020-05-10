@@ -77,7 +77,13 @@
 #' birdVal3<-aohVal(eoo = eoo_birdShp, aoh = aoh_birdShp, plot = TRUE, progress = TRUE)
 #' amphVal3<-aohVal(eoo = eoo_amphShp, aoh = aoh_amphShp, plot = TRUE, progress = TRUE)
 #'
-#'#' @references
+#'#'# Example for signature 'RasterLayer' or 'RasterStack' (eoo) and 'aoh' (aoh) with
+#' a 'SpatialPolygonsDataFrame' class of features.
+#'
+#' birdVal4<-aohVal(eoo = eoo_birdRas, aoh = aoh_birdShp, plot = TRUE, progress = TRUE)
+#' amphVal4<-aohVal(eoo = eoo_amphRas, aoh = aoh_amphShp, plot = TRUE, progress = TRUE)
+#'
+#'  @references
 #' 1. Rondinini, C., Di Marco, M., Chiozza, F., Santulli, G., Baisero, D., Visconti,
 #' P., Boitani, L. (2011). Global habitat suitability models of terrestrial mammals.
 #' Philosophical Transactions of the Royal Society B, 366, 2633–2641.
@@ -99,7 +105,7 @@
 #' @import GISTools
 #' @importFrom utils txtProgressBar setTxtProgressBar
 
-aohVal9 <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
+aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
 
   # Warning messages
   {
