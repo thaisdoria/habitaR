@@ -51,14 +51,14 @@ preferred output for the rasters. Optional.}
 \item{progress}{(logical) A bar showing the progress of the function.}
 }
 \value{
-\code{aoh} returns a list with two elements. The first element is a
-data.frame detailing if the function was able (1) or not (0) to refinate the
-species distribution. The second element is a list of 'RasterLayer' or
-'SpatialPolygons' object representing the refined distribution of the species.
-For the 'RasterLayer' the value of 0 indicates the cells where the species
-were considered as present before the refinement. Values higher than 0 indicates
-the coverage of cell by the spatial distribution after the species habitat's
-mapping.
+\code{aoh} returns 'aoh' object corresponding to a list with two
+elements. The first element is a #' data.frame detailing if the function was
+able (1) or not (0) to refinate the species distribution. The second element
+is a list of 'RasterLayer' or 'SpatialPolygons' object representing the refined
+distribution of the species. For the 'RasterLayer' the value of 0 indicates the
+cells where the species were considered as present before the refinement.
+Values higher than 0 indicates the coverage of cell by the spatial distribution
+after the species habitat's mapping.
 }
 \description{
 Provide the area of habitat (AOH) of a given species through refinement of its
@@ -84,7 +84,7 @@ load(birds)
 aoh_amphRas<-aoh(eoo_amphShp, lc, habpref_amph, al, alpref_amph, shp.out = F,
 resolution = 0.1, continuous = T)
 
-aoh_birdRas<-aoh(eoo_birdShp, lc, habpref_bird, al, alpref_bird, shp.out=F,
+aoh_birdRas<-aoh(eoo_birdShp, lc, habpref_bird, al, alpref_bird, shp.out = F,
 resolution = 0.1, continuous = T)
 
 # Resolution of 0.05
@@ -93,25 +93,25 @@ aoh_amphRas<-aoh(eoo_amphShp, lc, habpref_amph, shp.out = F, resolution = 0.05,
 continuous = T)
 
 aoh_birdRas<-aoh(eoo_birdShp, lc, habpref_bird, shp.out=F, resolution = 0.05,
-continuous=T)
+continuous = T)
 
-### SpatialPolygonsDataFrame Output (shapefile) ###
+### Shapefile Output ###
 
 # Resolution of 0.1
 
 aoh_amphShp<-aoh(eoo_amphShp, lc, habpref_amph, al, alpref_amph, shp.out = T,
-resolution = 0.1, continuous = F, threshold=0.2)
+resolution = 0.1, continuous = F, threshold = 0.2)
 
-aoh_birdShp<-aoh(eoo_birdShp, lc, habpref_bird, al, alpref_bird, shp.out=T,
-resolution = 0.1, continuous=F, threshold=0.5)
+aoh_birdShp<-aoh(eoo_birdShp, lc, habpref_bird, al, alpref_bird, shp.out = T,
+resolution = 0.1, continuous = F, threshold = 0.5)
 
 # Resolution of 0.05
 
 aoh_amphShp<-aoh(eoo_amphShp, lc, habpref_amph, shp.out = T, resolution = 0.05,
-continuous = F, threshold=0.2)
+continuous = F, threshold = 0.2)
 
 aoh_birdShp<-aoh(eoo_birdShp, lc, habpref_bird, shp.out=T, resolution = 0.05,
-continuous=F, threshold=0.5)
+continuous = F, threshold = 0.5)
 
 }
 \author{
