@@ -104,7 +104,7 @@
 #' @import GISTools
 #' @importFrom utils txtProgressBar setTxtProgressBar
 
-aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
+aohValant <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
 
   # Warning messages
   {
