@@ -2,25 +2,25 @@
 #'
 #' Provide the area of habitat (AOH) of a given species through refinement of its
 #' known geographic distribution
-#' @usage aoh(eoo.sp = NULL, lc = NULL, alt = NULL, altpref = NULL,
-#' habpref = NULL, adq = NULL, threshold = 0.5, resolution = NULL,
+#' @usage aoh(eoo.sp = NULL, lc = NULL, alt = NULL, altPref = NULL,
+#' habPref = NULL, climSuit = NULL, threshold = 0.5, resolution = NULL,
 #' continuous = FALSE, shp.out = FALSE, extent.out = NULL,
 #' progress = FALSE)
 #' @param eoo.sp SpatialPolygons of the spatial distribution of the species or path
 #'  for a folder with spatial distribution shapefiles (ESRI shapefile format) .
 #'  The name of the species must be on the second column of the attribute table
 #'  of the shapefile.
-#' @param lc RasterLayer, RasterBrick or RasterStack object of the land use map reclassified for the
-#' categories of habitat.
-#' @param habpref Data frame 0/1 of habitat preference of the species.
+#' @param lc RasterLayer, RasterBrick or RasterStack object of the land use map
+#' reclassified for the categories of habitat.
+#' @param habPref Data frame 0/1 of habitat preference of the species.
 #'  First column must be the species name. The posterior columns must be named
 #'  after the categories of habitat as following the lc classification.
 #'  \code{\link[habitaR]{prefHab}} can help obtain this data.
 #' @param alt RasterLayer object of the elevation map. Optional.
-#' @param altpref Data frame with altitudinal range of species. First
+#' @param altPref Data frame with altitudinal range of species. First
 #' column must be the species name, second column the minimum value of altitude
 #' and the third column the maximum value of altitude
-#' @param adq List containing RasterLayers objects of the climatic adequability
+#' @param climSuit List containing RasterLayers objects of the climatic suitability
 #' of the species. The itens of the list must be named after their
 #' corresponding species. Optional.
 #' @param shp.out (logical) Whether the output should be a shapefile as opposed
@@ -53,8 +53,8 @@
 #' (EOO). This mapping is made considering the specific preference for habitats
 #' of a given species.
 #' @examples
-#' ref_data <- aoh(eoo.sp = eoo_amphShp, lc = lc , habpref = habpref,
-#' alt.map = al, altpref = alpref)
+#' ref_data <- aoh(eoo.sp = eoo_amphShp, lc = lc , habPref = habPref,
+#' alt.map = al, altPref = alpref)
 #' @encoding UTF-8
 #' @author Daniel Gonçalves-Souza & Thaís Dória
 #' @export aoh
@@ -62,16 +62,17 @@
 #' @import rgeos
 #' @importFrom utils txtProgressBar setTxtProgressBar
 
-aoh <- function(eoo.sp = NULL, lc = NULL, alt = NULL, altpref = NULL,
-                habpref = NULL, adq = NULL, threshold = 0.5, resolution = NULL,
+aoh <- function(eoo.sp = NULL, lc = NULL, alt = NULL, altPref = NULL,
+                habPref = NULL, climSuit = NULL, threshold = 0.5, resolution = NULL,
                 continuous = FALSE, shp.out = FALSE, extent.out = NULL,
                 progress = FALSE){
 
   # Data frame of resuts
-  df <- data.frame(matrix(ncol = 3, nrow = length(eoo.sp)))
-  names(df) <- c('Species', 'Vegetation', 'Altitude')
+  df <- data.frame(matrix(ncol = 4, nrow = length(eoo.sp)))
+  names(df) <- c('Species', 'Vegetation', 'Altitude', 'Climatic suitability')
   df[, 1] <- eoo.sp@data[, 2]
   df[, 2:3] <- 1
+  df[, 4] <- 0
 
   # Checklist
   {
@@ -81,16 +82,16 @@ aoh <- function(eoo.sp = NULL, lc = NULL, alt = NULL, altpref = NULL,
       stop('You have to provide at least lc or alt')
     if(is.null(lc))
       df[, 2] <- 0
-    if(!is.null(habpref) & is.null(lc))
+    if(!is.null(habPref) & is.null(lc))
       stop('lc is missing')
-    if(is.null(habpref) & !is.null(lc))
-      stop('habpref is missing')
+    if(is.null(habPref) & !is.null(lc))
+      stop('habPref is missing')
     if(is.null(alt))
       df[, 3] <- 0
-    if(!is.null(altpref) & is.null(alt))
+    if(!is.null(altPref) & is.null(alt))
       stop('alt is missing')
-    if(is.null(altpref) & !is.null(alt))
-      stop('altpref is missing')
+    if(is.null(altPref) & !is.null(alt))
+      stop('altPref is missing')
     if(!is.null(extent.out) & shp.out == TRUE)
       stop('extent.out can be only used when shp.out = FALSE')
     if(continuous == TRUE & shp.out == TRUE)
@@ -103,8 +104,8 @@ aoh <- function(eoo.sp = NULL, lc = NULL, alt = NULL, altpref = NULL,
   }
 
   # List of maps
-  maps.names <- c('adq', 'lc', 'alt')
-  present <- c(!is.null(adq), !is.null(lc), !is.null(alt))
+  maps.names <- c('lc', 'alt')
+  present <- c(!is.null(lc), !is.null(alt))
   maps <- mget(maps.names[present])
 
   if(diff.crs(maps)){
@@ -117,20 +118,30 @@ aoh <- function(eoo.sp = NULL, lc = NULL, alt = NULL, altpref = NULL,
     pb <- txtProgressBar(min = 0, max = length(eoo.sp), style = 3)
   }
   for(i in 1:length(eoo.sp)){
-    maps.eoo <- lapply(maps, function(x) crop(x, eoo.sp[i, ]))
+    maps.eoo <- maps
+
+    if(!is.null(climSuit)){
+      if(eoo.sp@data[i, 2] %in% names(climSuit)){
+        climSuit.eoo <- climSuit[names(climSuit) == eoo.sp@data[i, 2]]
+        maps.eoo <- c(climSuit.eoo, maps.eoo)
+        names(maps.eoo) <- c('climSuit', names(maps.eoo)[2:3])
+        df[i, 4] <- 1
+      }
+    }
+    maps.eoo <- lapply(maps.eoo, function(x) crop(x, eoo.sp[i, ]))
 
     # Refinament of lc
     if(any(names(maps.eoo) == 'lc')){
-      sp.habpref <- habpref[as.character(eoo.sp[i, ]@data[, 2]) == as.character(habpref[, 1]),
-                            2:ncol(habpref)]
-      sp.habpref <- cbind(as.numeric(names(sp.habpref)), t(sp.habpref))
-      if (nrow(sp.habpref) > 0){
-        hab.cat <- as.numeric(colnames(sp.habpref)[as.vector(sp.habpref[1, ] == 1)])
+      sp.habPref <- habPref[as.character(eoo.sp[i, ]@data[, 2]) == as.character(habPref[, 1]),
+                            2:ncol(habPref)]
+      sp.habPref <- cbind(as.numeric(names(sp.habPref)), t(sp.habPref))
+      if (nrow(sp.habPref) > 0){
+        hab.cat <- as.numeric(colnames(sp.habPref)[as.vector(sp.habPref[1, ] == 1)])
         hab.ref <- reclassify(maps.eoo[[which(names(maps.eoo) == 'lc')]],
-                              sp.habpref)
+                              sp.habPref)
         maps.eoo[[which(names(maps.eoo) == 'lc')]] <- mask(hab.ref, eoo.sp[i, ])
       }
-      if (nrow(sp.habpref) == 0){
+      if (nrow(sp.habPref) == 0){
         hab.ref <- maps.eoo[[which(names(maps.eoo) == 'lc')]] > 0
         maps.eoo[[which(names(maps.eoo) == 'lc')]] <- mask(hab.ref, eoo.sp[i, ])
         df[i, 2] <- 0
@@ -139,24 +150,24 @@ aoh <- function(eoo.sp = NULL, lc = NULL, alt = NULL, altpref = NULL,
 
     # Refinament of al
     if(any(names(maps.eoo) == 'alt')){
-      sp.altpref <- altpref[as.character(eoo.sp[i, ]@data[, 2]) == as.character(altpref[, 1]), 2:3]
+      sp.altPref <- altPref[as.character(eoo.sp[i, ]@data[, 2]) == as.character(altPref[, 1]), 2:3]
       alt.crop <- maps.eoo[[which(names(maps.eoo) == 'alt')]]
-      if (nrow(sp.altpref) > 0){
-        if(sum(is.na(sp.altpref)) != 2){
-          if(sum(is.na(sp.altpref)) == 1){
-            if(is.na(sp.altpref[1])){
-              alt.ref <- alt.crop <= sp.altpref[1, 2]          }
-            if(is.na(sp.altpref[2])){
-              alt.ref <- alt.crop >= sp.altpref[1, 1]
+      if (nrow(sp.altPref) > 0){
+        if(sum(is.na(sp.altPref)) != 2){
+          if(sum(is.na(sp.altPref)) == 1){
+            if(is.na(sp.altPref[1])){
+              alt.ref <- alt.crop <= sp.altPref[1, 2]          }
+            if(is.na(sp.altPref[2])){
+              alt.ref <- alt.crop >= sp.altPref[1, 1]
             }
           }
-          if(sum(is.na(sp.altpref)) == 0){
-            alt.crop <- alt.crop >= sp.altpref[1, 1] & alt.crop <= sp.altpref[1, 2]
+          if(sum(is.na(sp.altPref)) == 0){
+            alt.crop <- alt.crop >= sp.altPref[1, 1] & alt.crop <= sp.altPref[1, 2]
           }
           maps.eoo[[which(names(maps.eoo) == 'alt')]] <- mask(alt.crop, eoo.sp[i, ])
         }
       }
-      if (nrow(sp.altpref) == 0){
+      if (nrow(sp.altPref) == 0){
         df[i, 3] <- 0
       }
     }
@@ -166,9 +177,12 @@ aoh <- function(eoo.sp = NULL, lc = NULL, alt = NULL, altpref = NULL,
       # Resample maps
       res.all <- sapply(maps.eoo, xres)
       maps.eoo.mod <- maps.eoo[which(res.all != max(res.all))]
-      maps.eoo.mod <- lapply(maps.eoo.mod, resolucao,
-                             y = maps.eoo[[which.max(res.all)]])
-      maps.eoo.mod <- c(maps.eoo[which(res.all == max(res.all))], maps.eoo.mod)
+      temp <- list()
+      for(j in 1:length(maps.eoo.mod)){
+        temp[[j]] <- resolucao(x = maps.eoo.mod[[j]], y = maps.eoo[[which.max(res.all)]],
+                               lbl = names(maps.eoo.mod[j]))
+      }
+      maps.eoo.mod <- c(maps.eoo[which(res.all == max(res.all))], temp)
       names(maps.eoo.mod) <- NULL
 
       # Refinament
@@ -193,10 +207,10 @@ aoh <- function(eoo.sp = NULL, lc = NULL, alt = NULL, altpref = NULL,
       res(base) <- resolution
       {
       if(!continuous)
-        ref <- resolucao(ref, base, mode = 2)
+        ref <- resolucao(ref, base, type = 2)
         ref <- ref > threshold
         if(continuous)
-        ref <- resolucao(ref, base, mode = 1)
+        ref <- resolucao(ref, base, type = 1)
       }
     }
 
@@ -240,6 +254,7 @@ aoh <- function(eoo.sp = NULL, lc = NULL, alt = NULL, altpref = NULL,
   }
 
   # Gathering data
+  names(result) <- eoo.sp@data[, 2]
   result.full <- list(Summary = df, Data = result)
   class(result.full) <- "aoh"
   return(result.full)
