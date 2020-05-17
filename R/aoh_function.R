@@ -202,6 +202,9 @@ aoh <- function(eoo.sp = NULL, lc = NULL, alt = NULL, altPref = NULL,
 
     # Change resolution
     if(!is.null(resolution)){
+      if (resolution < xres(ref)){
+        stop('Chosen resolution is smaller than the maps provided')
+      }
       base <- raster()
       extent(base) <- extent(ref)
       res(base) <- resolution
