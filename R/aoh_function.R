@@ -59,9 +59,9 @@
 #' @importFrom utils txtProgressBar setTxtProgressBar
 
 aoh <- function(eoo.sp = NULL, adq = NULL, lc = NULL, alt = NULL, altpref = NULL,
-                 habpref = NULL, threshold = 0.5, resolution = NULL,
-                 continuous = FALSE, shp.out = FALSE, extent.out = NULL,
-                 progress = FALSE){
+                habpref = NULL, threshold = 0.5, resolution = NULL,
+                continuous = FALSE, shp.out = FALSE, extent.out = NULL,
+                progress = FALSE){
   # Checklist
   {
     if (missing(eoo.sp))
@@ -113,9 +113,11 @@ aoh <- function(eoo.sp = NULL, adq = NULL, lc = NULL, alt = NULL, altpref = NULL
     if(any(names(maps.eoo) == 'lc')){
       sp.habpref <- habpref[as.character(eoo.sp[i, ]@data[, 2]) == as.character(habpref[, 1]),
                             2:ncol(habpref)]
+      sp.habpref <- cbind(as.numeric(names(sp.habpref)), t(sp.habpref))
       if (nrow(sp.habpref) > 0){
         hab.cat <- as.numeric(colnames(sp.habpref)[as.vector(sp.habpref[1, ] == 1)])
-        hab.ref <- maps.eoo[[which(names(maps.eoo) == 'lc')]] %in% hab.cat
+        hab.ref <- reclassify(maps.eoo[[which(names(maps.eoo) == 'lc')]],
+                              sp.habpref)
         maps.eoo[[which(names(maps.eoo) == 'lc')]] <- mask(hab.ref, eoo.sp[i, ])
       }
       if (nrow(sp.habpref) == 0){
@@ -127,6 +129,7 @@ aoh <- function(eoo.sp = NULL, adq = NULL, lc = NULL, alt = NULL, altpref = NULL
 
     # Refinament of al
     if(any(names(maps.eoo) == 'alt')){
+      sp.altpref <- altpref[as.character(eoo.sp[i, ]@data[, 2]) == as.character(altpref[, 1]), 2:3]
       alt.crop <- maps.eoo[[which(names(maps.eoo) == 'alt')]]
       if (nrow(sp.altpref) > 0){
         if(sum(is.na(sp.altpref)) != 2){
@@ -155,11 +158,12 @@ aoh <- function(eoo.sp = NULL, adq = NULL, lc = NULL, alt = NULL, altpref = NULL
       maps.eoo.mod <- maps.eoo[which(res.all != max(res.all))]
       maps.eoo.mod <- lapply(maps.eoo.mod, resolucao,
                              y = maps.eoo[[which.max(res.all)]])
+      maps.eoo.mod <- c(maps.eoo[which(res.all == max(res.all))], maps.eoo.mod)
       names(maps.eoo.mod) <- NULL
 
       # Refinament
       ref <- suppressWarnings(do.call(overlay,
-                                      c(lista,
+                                      c(maps.eoo.mod,
                                         fun =  function(x) Reduce('*', x))))
     }
 
@@ -182,7 +186,6 @@ aoh <- function(eoo.sp = NULL, adq = NULL, lc = NULL, alt = NULL, altpref = NULL
 
     # Shapefile output
     if(shp.out){
-      ref <- ref >= threshold
       if(sum(values(ref > 0), na.rm = T) == 0){
         warning(paste('Cannot return shapefile of', eoo.sp[i, ]@data[, 2],
                       'because there is no cells left after the refinement'))
