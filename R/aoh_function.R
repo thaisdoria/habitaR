@@ -108,10 +108,6 @@ aoh <- function(eoo.sp = NULL, lc = NULL, alt = NULL, altPref = NULL,
   present <- c(!is.null(lc), !is.null(alt))
   maps <- mget(maps.names[present])
 
-  if(diff.crs(maps)){
-    warning('CRS of the maps are different')
-  }
-
   # Looping for refinament
   result <- list()
   if(progress){
@@ -128,6 +124,7 @@ aoh <- function(eoo.sp = NULL, lc = NULL, alt = NULL, altPref = NULL,
         df[i, 4] <- 1
       }
     }
+
     maps.eoo <- lapply(maps.eoo, function(x) crop(x, eoo.sp[i, ]))
 
     # Refinament of lc
