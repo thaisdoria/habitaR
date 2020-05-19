@@ -13,11 +13,11 @@ readShp (path)
 column of the attribute table of the shapefile.}
 }
 \value{
-A object from a class of 'SpatialPolygonDataFrame'
+A object from a class of 'SpatialPolygonsDataFrame'
 }
 \description{
 Read the spatial distribution shapefiles (ESRI shapefile format) of species
-from a specified folder and provide a SpatialPolygonDataFrame object.
+from a specified folder and provide a SpatialPolygonsDataFrame object.
 }
 \author{
 Thaís Dória & Daniel Gonçalves-Souza
