@@ -10,7 +10,7 @@
 #' and must have be 3 columns identified as "species" (species names or other
 #' identification of taxa), "long" (longitude), "lat" (latitude).
 #' @param crs The Coordinate Reference System (CRS) specifing the projection and
-#' datum of dataset. Could be a CRS object or a character string
+#' datum of dataset. Could be a CRS object or a character string.
 #' @param dist A value corresponding to the minimum distance assgined to consider
 #' two coordinates as not duplicate. Values up to this distance will be considered
 #' as duplicates and, then, will be removed. Default is 0.0 (in this case, only
