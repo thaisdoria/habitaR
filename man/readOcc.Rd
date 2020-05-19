@@ -22,7 +22,7 @@ are defined to be longitude/latitude. For more details, see "remove.duplicates"
 function.}
 
 \item{crs}{The Coordinate Reference System (CRS) specifing the projection and
-datum of dataset. Could be a CRS object or a character string}
+datum of dataset. Could be a CRS object or a character string.}
 }
 \value{
 \code{readOcc} returns a 'sp.occ' object corresponding to a list of species
