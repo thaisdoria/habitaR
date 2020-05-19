@@ -13,13 +13,13 @@ readOcc (occ, crs, dist)
 and must have be 3 columns identified as "species" (species names or other
 identification of taxa), "long" (longitude), "lat" (latitude).}
 
-\item{dist}{A value corresponding to the minimum distance assgined to consider
-two coordinates as not duplicate. Values up to this distance will be considered
-as duplicates and, then, will be removed. Default is 0.0 (in this case, only
-exactly coincindent coordinates will be removed). Units of this values must be
-the same as those of the coordinates for projected data or in km if coordinates
-are defined to be longitude/latitude. For more details, see "remove.duplicates"
-function.}
+\item{dist}{A value corresponding to the minimum distance assigned to consider
+two coordinates as not duplicate. Values up to this distance will be consider
+as duplicates and removed. Default is zero (i.e. only exactly coincindent
+coordinates will be removed). Units of this value must be the same as those of
+the coordinates for projected data or in km if coordinates are defined to be
+longitude/latitude. For more details, see \code{\link[sp:remove.duplicates]
+{remove.duplicates}}.}
 
 \item{crs}{The Coordinate Reference System (CRS) specifing the projection and
 datum of dataset. Could be a CRS object or a character string.}
