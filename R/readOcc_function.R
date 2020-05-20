@@ -11,7 +11,7 @@
 #' identification of taxa), "long" (longitude), "lat" (latitude).
 #' @param crs The Coordinate Reference System (CRS) specifing the projection and
 #' datum of dataset. Could be a CRS object or a character string.
-#' @param dist A value corresponding to the minimum distance assigned to consider
+#' @param dist Optional. A value corresponding to the minimum distance assigned to consider
 #' two coordinates as not duplicate. Values up to this distance will be consider
 #' as duplicates and removed. Default is zero (i.e. only exactly coincindent
 #' coordinates will be removed). Units of this value must be the same as those of
