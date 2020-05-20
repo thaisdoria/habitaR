@@ -5,24 +5,40 @@
 \alias{checkOcc}
 \title{checkOcc function}
 \usage{
-checkOcc (poly, sp.occ)
+checkOcc (occ, dist = NULL, poly)
 }
 \arguments{
-\item{poly}{A polygon (ESRI shapefile format) of the specific area to be checked in 
-'SpatialPolygonsDataFrame' class.}
+\item{occ}{Occurrences records of the species. It might be a 'sp.occ'
+object corresponding to a list of 'SpatialPoints' for multiple species
+(see \code{\link[aoh]{readOcc}} to obtain such class of object), a 'list' of
+'data.frames' with the occurrences from multiple species, or a path for a folder
+with the species occurrences files (.csv format). Each file, corresponding to
+only one species and named with the corresponding species names, must have be 3
+columns identified as "species" (species names or other identification of taxa),
+"long" (longitude), "lat" (latitude).}
 
-\item{sp.occ}{A list of 'SpatialPoints' for multiple species. \code{\link[habitaR]
-{readOcc}} can help obtain this data.}
+\item{dist}{A value corresponding to the minimum distance assigned to consider
+two coordinates as not duplicated SpatialPoints. Values up to this distance will
+be consider as duplicates and removed. Default is zero (i.e. only exactly coincindent
+coordinates will be removed). Units of this value must be the same as those of
+the coordinates for projected data or in km if coordinates are defined to be
+longitude/latitude. Default is zero (i.e. only exactly coincindent
+coordinates will be removed). For more details, see \code{\link[sp:remove.duplicates]
+{remove.duplicates}}.Optional and only used if 'occ' is a path for .csv files
+or a list of' data.frame. If 'occ' correspond to 'SpatialPoints', 'dist'
+should be ignored.}
+
+\item{poly}{A polygon (ESRI shapefile as 'SpatialPolygonsDataFrame' class) of
+the specific area to be checked.}
 }
 \value{
-\code{checkOcc} returns a list of species occurring inside of the provided 
-polygon with their respective number of ocurrences falling in this polygon. 
-total of occurrences inside of the polygon.
+\code{checkOcc} returns the species occurring inside of the polygon
+provided with the respective total of ocurrences falling in this polygon.
 }
 \description{
-From a list of 'SpatialPoints' for multiple species, gives the species and its 
-occurrences that are inside of a polygon (ESRI shapefile format) representing 
-a region of interest (e.g. study area, continent, country or other regions with 
+From a list of 'SpatialPoints' for multiple species, gives the species and its
+occurrences that are inside of a polygon (ESRI shapefile format) representing
+a region of interest (e.g. study area, continent, country or other regions with
 specific boundaries).
 }
 \author{
