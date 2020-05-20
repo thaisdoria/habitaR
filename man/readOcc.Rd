@@ -5,7 +5,8 @@
 \alias{readOcc}
 \title{readOcc function}
 \usage{
-readOcc (occ, crs, dist)
+readOcc (occ, crs = +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0",
+dist = 0.25)
 }
 \arguments{
 \item{occ}{Path for a folder with the species occurrences records files
