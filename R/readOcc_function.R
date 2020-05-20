@@ -11,12 +11,12 @@
 #' identification of taxa), "long" (longitude), "lat" (latitude).
 #' @param crs The Coordinate Reference System (CRS) specifing the projection and
 #' datum of dataset. Could be a CRS object or a character string.
-#' @param dist Optional. A value corresponding to the minimum distance assigned to consider
+#' @param dist A value corresponding to the minimum distance assigned to consider
 #' two coordinates as not duplicate. Values up to this distance will be consider
-#' as duplicates and removed. Default is zero (i.e. only exactly coincindent
-#' coordinates will be removed). Units of this value must be the same as those of
+#' as duplicates and removed. Units of this value must be the same as those of
 #' the coordinates for projected data or in km if coordinates are defined to be
-#' longitude/latitude. For more details, see \code{\link[sp:remove.duplicates]
+#' longitude/latitude. Optional. Default is zero (i.e. only exactly coincindent
+#' coordinates will be removed). For more details, see \code{\link[sp:remove.duplicates]
 #' {remove.duplicates}}.
 #' @import sp
 #' @return \code{readOcc} returns a 'sp.occ' object corresponding to a list of species
@@ -25,7 +25,7 @@
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export readOcc
 
-readOcc <- function(occ, dist, crs){
+readOcc <- function(occ, crs, dist = NULL){
 
     if(substr(occ, nchar(occ), nchar(occ)) == '/'){
     path <- substr(occ, 1, nchar(occ) - 1)
