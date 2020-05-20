@@ -1,10 +1,10 @@
-#' aHull function
+#' aHull: Generate alpha hull polygons for a multiple-species
 #'
 #' From the raw occurrences records of multiple species, provides the alpha hull
 #' polygon to represent the extent of occurrence (EOO) of each species which have
 #' a minimun of 3 not duplicate records. It is build based on the original function
 #' \code{\link[rangeBuilder:getDynamicAlphaHull]{getDynamicAlphaHull}}
-#' (rangeBuilder package), that determines the parameter alpha by the spatial
+#' (rangeBuilder package), that determines the α parameter by the spatial
 #' distribution of the coordinates.
 #'
 #' @usage aHull (occ, crs, dist = 0.25, poly = NULL, fraction = 1.0, partCount = 2,
@@ -43,10 +43,11 @@
 #' species and the respective alpha value assigned to build the provided polygon.
 #' If a \emph{poly} is provided and \emph{cropToPoly} is \code{TRUE}, \code{aHull}
 #' also returns the cropped alpha hull.
-#' #' @details The function generate an alpha hull polygon from a set of occurrences
-#' records of multiple based on derivate ahull by sequentially increasing α parameter
-#' (starting from 0 in steps of 0.01) until find the smallest value that returned one
-#' single contiguous polygon encompassing all occurrences recordsincrease
+#' @details The function generate an alpha hull polygon from the occurrences
+#' records of multiple species by sequentially increasing α parameter (starting from 0
+#' in steps of defined \emph{alphaIncrease} until find the smallest value that return the
+#' \emph{partCount} polygon
+#' encompassing the fraction of occurrences provided.
 #' If \emph{poly} is provided, the function filter the original species dataset by
 #' keeping only those species occurring inside of the polygon. In this case, the
 #' alpha hull construction is restrict to those filtered species, but the extend of
@@ -55,13 +56,14 @@
 #' generated
 #' , even if there are records
 #' besides this area
-#' @seealso Dynamic Alpha hulls based on increase of alpha values are created with
+#' @seealso Dynamic alpha hulls from increasing alpha values are created with
+#' \code{\link[rangeBuilder:getDynamicAlphaHull]{getDynamicAlphaHull}}
 #' @encoding UTF-8
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export aHull
 
-aHull2 <- function(occ, crs, dist = NULL, poly = NULL, fraction, partCount, buff,
-                  alphaIncrement =  NULL, clipToPoly = FALSE){
+aHull <- function(occ, crs, dist = NULL, poly = NULL, fraction, partCount, buff,
+                  alphaIncrement =  NULL, cropToPoly = FALSE){
 
   # Warning messages
   if (missing(occ))
@@ -108,7 +110,7 @@ aHull2 <- function(occ, crs, dist = NULL, poly = NULL, fraction, partCount, buff
   # Checking and filtering the species occurring in a specified area (if 'poly is provided)
   if (class(occ) == "sp.occ" & !is.null(poly) | class(occ) == "list" &
       class(occ[[1]]) =="data.frame" & !is.null(poly)){
-  spcheck<-checkOcc(poly, occ)
+  spcheck<-checkOcc(occ, poly)
   occ<-occ[match(names(occ), names(spcheck))]
   occ<-list.clean(occ, fun = is.null, recursive = TRUE)
   }
@@ -123,7 +125,7 @@ aHull2 <- function(occ, crs, dist = NULL, poly = NULL, fraction, partCount, buff
 
   # Function to automatize the bulding of ahull to multiple-species
     f.ahull <-function(occ.ahul, spp.names){
-    al <- getDynamicAlphaHull(occ.ahul@coords, fraction= fraction, partCount= partCound,
+    al <- getDynamicAlphaHull(occ.ahul@coords, fraction=fraction, partCount=partCound,
                               initialAlpha = 0.0, alphaIncrement=alphaIncrement,
                               clipToCoast='no', verbose=T)
     al1 <- data.frame(matrix(unlist(al[[2]])),stringsAsFactors=FALSE)
@@ -131,9 +133,9 @@ aHull2 <- function(occ, crs, dist = NULL, poly = NULL, fraction, partCount, buff
     al2=al[[1]]
     ahul<-shapefile(al2, filename = paste(spp.names,"AHULL", sep=""), overwrite=TRUE)
 
-    if (clipToPoly == TRUE){
-      cliped<-crop(ahul, poly)
-      return(cliped)
+    if (cropToPoly == TRUE){
+      croped<-crop(ahul, poly)
+      return(croped)
     }
   return(al1)
     }
