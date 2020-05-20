@@ -16,7 +16,7 @@
 #' identification of taxa), "long" (longitude), "lat" (latitude).
 #' @param poly A polygon (ESRI shapefile as 'SpatialPolygonsDataFrame' class) of
 #' the specific area to be checked.
-#' @param dist A value corresponding to the minimum distance assigned to consider
+#' #' @param dist A value corresponding to the minimum distance assigned to consider
 #' two coordinates as not duplicate. Values up to this distance will be consider
 #' as duplicates and removed. Units of this value must be in km. Default is zero
 #' (i.e. only exactly coincindent coordinates will be removed). For more details,
@@ -31,7 +31,7 @@
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export checkOcc
 
-checkOcc<-function(occ, dist = NULL, poly){
+checkOcc<-function(occ, poly, dist = NULL){
 
   # Warning messages
   if (missing(occ))
@@ -39,13 +39,7 @@ checkOcc<-function(occ, dist = NULL, poly){
   if (missing(poly))
     stop("poly is missing")
 
-  # Identifying spatial limits of the extent of interest (research area)
-  lin <- as(poly, "SpatialLinesDataFrame")
-  pts <- as.data.frame(as(lin, "SpatialPointsDataFrame"))
-  pol.x<-pts$coords.x1
-  pol.y<-pts$coords.x2
-
-  # Possibilities of input data
+   # Possibilities of input data
   # 1. Occurrences as .csv files or list of data.frame
   {
     # Path for a folder
@@ -54,7 +48,7 @@ checkOcc<-function(occ, dist = NULL, poly){
         occ <- substr(occ, 1, nchar(occ) - 1)
       }
       files.sp <- list.files(occ, pattern = ".csv$")
-      sd <- do.call("list", lapply (files.sp, read.csv, header = TRUE))
+      sd <- do.call("list", lapply (files.sp, read.csv, header = TRUE, sep=";"))
       names(sd) <- gsub(".csv", " ", files.sp)
     }
 
@@ -67,21 +61,6 @@ checkOcc<-function(occ, dist = NULL, poly){
     # Warning message
     if (is.null(dist))
       warning("dist is missing, so zero (default) is used")
-
-    f.clean1 <- function(sd){
-      long=as.numeric(as.character(sd$long))
-      lat=as.numeric(as.character(sd$lat))
-      c=cbind(as.numeric(as.character(long)), as.numeric(as.character(lat)))
-      c=data.frame(c)
-      options(digits=4)
-      if (is.character(crs)){
-        sp=SpatialPoints(c, proj4string = CRS(crs))
-      }
-      if (class(crs) == "CRS"){
-        sp=SpatialPoints(c, proj4string = crs)
-      }
-      sp2=remove.duplicates(sp, zerodist(sp, zero=as.numeric(dist)))
-    }
     occ <- lapply(sd, f.clean1)
     class(occ) <- "sp.occ" # a 'sp.occ' object
   }
@@ -95,10 +74,11 @@ checkOcc<-function(occ, dist = NULL, poly){
 
     # List with occurrences data from a multiple species in a 'SpatialPoints' class
     if (class(occ) == "sp.occ"){
-      f.cf.occ<-function(y){
-        cf.occ=point.in.polygon(y@coords[,1], y@coords[,2], pol.x, pol.y,
-                                mode.checked=FALSE)
-      }
+      # Identifying spatial limits of the extent of interest (research area)
+      lin <- as(poly, "SpatialLinesDataFrame")
+      pts <- as.data.frame(as(lin, "SpatialPointsDataFrame"))
+      pol.x<-pts$coords.x1
+      pol.y<-pts$coords.x2
       cf.occ<-lapply(occ, f.cf.occ) # object with occurrences checked (0 represents absence inside of biome and 1 represents presence inside of biome)
       cf.occsum<- lapply(cf.occ, sum) # object with the sum of the checked records (0 represents complete absence of species inside of biome)
       cf.occsum[cf.occsum==0] <- NA
