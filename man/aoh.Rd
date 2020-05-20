@@ -71,47 +71,16 @@ geographical distribution (SpatialPolygon) representing the 'extent of occurrenc
 of a given species.
 }
 \examples{
-ref_data <- aoh(eoo.sp = eoo_amphShp, lc.rec = lc , matrix.hab.pref = habpref,
-alt.map = al, matrix.alt.pref = alpref)
-
-load(amphs)
-load(birds)
 
 ### Raster Output
 
-# Resolution of 0.1
-
-aoh_amphRas<-aoh(eoo_amphShp, lc, habpref_amph, al, alpref_amph, shp.out = F,
-resolution = 0.1, continuous = T)
-
 aoh_birdRas<-aoh(eoo_birdShp, lc, habpref_bird, al, alpref_bird, shp.out = F,
-resolution = 0.1, continuous = T)
-
-# Resolution of 0.05
-
-aoh_amphRas<-aoh(eoo_amphShp, lc, habpref_amph, shp.out = F, resolution = 0.05,
-continuous = T)
-
-aoh_birdRas<-aoh(eoo_birdShp, lc, habpref_bird, shp.out=F, resolution = 0.05,
-continuous = T)
+resolution = 0.05, continuous = T)
 
 ### Shapefile Output ###
 
-# Resolution of 0.1
-
-aoh_amphShp<-aoh(eoo_amphShp, lc, habpref_amph, al, alpref_amph, shp.out = T,
-resolution = 0.1, continuous = F, threshold = 0.2)
-
 aoh_birdShp<-aoh(eoo_birdShp, lc, habpref_bird, al, alpref_bird, shp.out = T,
-resolution = 0.1, continuous = F, threshold = 0.5)
-
-# Resolution of 0.05
-
-aoh_amphShp<-aoh(eoo_amphShp, lc, habpref_amph, shp.out = T, resolution = 0.05,
-continuous = F, threshold = 0.2)
-
-aoh_birdShp<-aoh(eoo_birdShp, lc, habpref_bird, shp.out=T, resolution = 0.05,
-continuous = F, threshold = 0.5)
+resolution = 0.05, continuous = F, threshold = 0.5)
 
 }
 \author{
