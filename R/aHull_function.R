@@ -2,7 +2,9 @@
 #'
 #' Provide the alpha hull polygon to represent the extent of occurrence (EOO) of
 #' species from the occurrence records of multiple species. It is build based on
-#' the original function 'getDynamicAlphaHull' from 'rangeBuilder' package.
+#' the original function \code{\link[rangeBuilder:getDynamicAlphaHull]
+#' {getDynamicAlphaHull}} (rangeBuilder package), that determines parameter
+#' alpha by the spatial distribution of the coordinates.
 #'
 #' @usage aHull (occ, crs, dist)
 #' @param occ Occurrences records of the species. It might be a 'sp.occ'
@@ -24,10 +26,12 @@
 #' {remove.duplicates}}.
 #' @param poly Optional. A polygon (ESRI shapefile as 'SpatialPolygonsDataFrame'
 #' class) of the specific area to be checked.
+#' @param fraction The minimum fraction of occurrences that must be included in polygon.
+#' @param partCount The maximum number of disjunct polygons that are allowed.
 #' @import rangeBuilder
 #' @return \code{aHull} returns the alpha hull polygon (ESRI shapefile as
 #' 'SpatialPolygonsDataFrame') representing the extent of occurrence (EOO) of
-#' species and the respective alpha value assigned to build the provided range.
+#' species and the respective alpha value assigned to build the provided polygon.
 #' @encoding UTF-8
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export aHull
