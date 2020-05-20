@@ -1,4 +1,4 @@
-#'  AOH function
+#'  AOH Mapping
 #'
 #' Provide the area of habitat (AOH) of a given species through refinement of its
 #' known geographic distribution
