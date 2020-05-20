@@ -5,7 +5,7 @@
 \alias{checkOcc}
 \title{checkOcc function}
 \usage{
-checkOcc (occ, dist = NULL, poly)
+checkOcc (occ, dist = 0.25, poly)
 }
 \arguments{
 \item{occ}{Occurrences records of the species (coordinates in decimal degrees).
@@ -17,16 +17,15 @@ corresponding to only one species and named with the corresponding species names
 This file must have be 3 columns identified as "species" (species names or other
 identification of taxa), "long" (longitude), "lat" (latitude).}
 
-\item{dist}{A value corresponding to the minimum distance assigned to consider
+\item{poly}{A polygon (ESRI shapefile as 'SpatialPolygonsDataFrame' class) of
+the specific area to be checked.
+#' @param dist A value corresponding to the minimum distance assigned to consider
 two coordinates as not duplicate. Values up to this distance will be consider
 as duplicates and removed. Units of this value must be in km. Default is zero
 (i.e. only exactly coincindent coordinates will be removed). For more details,
 see \code{\link[sp:remove.duplicates]{remove.duplicates}}. Optional and only
 used if 'occ' is a path for .csv files or a list of' data.frame.
 If 'occ' correspond to 'SpatialPoints', 'dist' should be ignored.}
-
-\item{poly}{A polygon (ESRI shapefile as 'SpatialPolygonsDataFrame' class) of
-the specific area to be checked.}
 }
 \value{
 \code{checkOcc} returns the species occurring inside of the polygon
