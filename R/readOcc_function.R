@@ -32,22 +32,8 @@ readOcc <- function(occ, crs, dist = NULL){
   }
 
   files.sp <- list.files(occ, pattern = ".csv$")
-  sd <- do.call("list", lapply (files.sp, read.csv, header = TRUE))
+  sd <- do.call("list", lapply (files.sp, read.csv, header = TRUE, sep=";"))
   names(sd) <- gsub(".csv", " ", files.sp)
-  f.clean1 <- function(sd){
-  long=as.numeric(as.character(sd$long))
-  lat=as.numeric(as.character(sd$lat))
-  c=cbind(as.numeric(as.character(long)), as.numeric(as.character(lat)))
-  c=data.frame(c)
-  options(digits=4)
-  if (is.character(crs)){
-  sp=SpatialPoints(c, proj4string = CRS(crs))
-  }
-  if (class(crs) == "CRS"){
-  sp=SpatialPoints(c, proj4string = crs)
-  }
-  sp2=remove.duplicates(sp, zerodist(sp, zero=as.numeric(dist)))
-  }
   sp.pointsclean <- lapply(sd, f.clean1)
   class(sp.pointsclean) <- "sp.occ"
   return(sp.pointsclean)
