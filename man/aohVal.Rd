@@ -27,10 +27,10 @@ of habitat (AOH). It might correspond to 'SpatialPolygonsDataFrame'
 
 \item{plot}{(logical) Whether the output should also return a plot
 representing the graphical result of validation (see Rondinini et al. 2011).
-Default is TRUE.}
+Default is \code{TRUE}.}
 
 \item{progress}{(logical) A bar showing the progress of the function.
-Default is FALSE.}
+Default is \code{FALSE}.}
 }
 \value{
 \code{aohVal} returns a data.frame with a summary of results for each species which aoh was evaluated.
@@ -44,8 +44,9 @@ The evaluation of AOHs performance is based on difference between PP and MP.
 If PP > MP, AOH performs better than EOO in predict presences (Ficetola et al.
 2015).
 
-If plot=TRUE, the function return also a plot with a graphical representation
-of validation results (see Rondinini et al. 2011).
+If plot is \code{TRUE}, the function return also a plot with a graphical representation
+of validation results (see Rondinini et al. 2011). If plot \code{FALSE}, the function
+return a data.frame
 }
 \description{
 Provide the summary of validation results based on comparison between an
@@ -54,9 +55,8 @@ and area of habitat (AOH) following Rondinini et al. (2011)
 }
 \details{
 The function gives the summary of validation steps followed to evaluate
-the quality of models as described and performed by Rondidini et al. (2011).
-If plot=FALSE, the function return a data.frame
-and Ficetola et al. (2015)
+the quality of models as described and performed by Rondidini et al. (2011) and
+Ficetola et al. (2015).
 }
 \examples{
 
