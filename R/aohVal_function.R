@@ -26,10 +26,10 @@
 #'
 #' @param plot (logical) Whether the output should also return a plot
 #' representing the graphical result of validation (see Rondinini et al. 2011).
-#' Default is TRUE.
+#' Default is \code{TRUE}.
 #'
 #' @param progress (logical) A bar showing the progress of the function.
-#' Default is FALSE.
+#' Default is \code{FALSE}.
 #'
 #' @return \code{aohVal} returns a data.frame with a summary of results for each species which aoh was evaluated.
 #' It gives the number of records matching with the EOO ("MATCH.EOO) and with the
@@ -42,13 +42,13 @@
 #' If PP > MP, AOH performs better than EOO in predict presences (Ficetola et al.
 #' 2015).
 #'
-#' If plot=TRUE, the function return also a plot with a graphical representation
-#' of validation results (see Rondinini et al. 2011).
+#' If plot is \code{TRUE}, the function return also a plot with a graphical representation
+#' of validation results (see Rondinini et al. 2011). If plot \code{FALSE}, the function
+#' return a data.frame
 #'
 #' @details The function gives the summary of validation steps followed to evaluate
-#' the quality of models as described and performed by Rondidini et al. (2011).
-#' If plot=FALSE, the function return a data.frame
-#' and Ficetola et al. (2015)
+#' the quality of models as described and performed by Rondidini et al. (2011) and
+#' Ficetola et al. (2015).
 #'
 #' @examples
 #'
