@@ -5,27 +5,24 @@
 #' a region of interest (e.g. study area, continent, country or other regions with
 #' specific boundaries).
 #'
-#' @usage checkOcc (occ, dist = NULL, poly)
-#' @param occ Occurrences records of the species. It might be a 'sp.occ'
-#' object corresponding to a list of 'SpatialPoints' for multiple species
-#' (see \code{\link[aoh]{readOcc}} to obtain such class of object), a 'list' of
-#' 'data.frames' with the occurrences from multiple species, or a path for a folder
-#' with the species occurrences files (.csv format). Each file, corresponding to
-#' only one species and named with the corresponding species names, must have be 3
-#' columns identified as "species" (species names or other identification of taxa),
-#' "long" (longitude), "lat" (latitude).
+#' @usage checkOcc (occ, dist = 0.25, poly)
+#' @param occ Occurrences records of the species (coordinates in decimal degrees).
+#' It might be a 'sp.occ' object corresponding to a list of 'SpatialPoints' for
+#' multiple species (see \code{\link[aoh]{readOcc}} to obtain such class of object),
+#' a 'list' of 'data.frames' with the occurrences from multiple species, or a path
+#' for a folder with the species occurrences files (.csv format). Each file should
+#' corresponding to only one species and named with the corresponding species names.
+#' This file must have be 3 columns identified as "species" (species names or other
+#' identification of taxa), "long" (longitude), "lat" (latitude).
 #' @param poly A polygon (ESRI shapefile as 'SpatialPolygonsDataFrame' class) of
 #' the specific area to be checked.
 #' @param dist A value corresponding to the minimum distance assigned to consider
-#' two coordinates as not duplicated SpatialPoints. Values up to this distance will
-#' be consider as duplicates and removed. Default is zero (i.e. only exactly coincindent
-#' coordinates will be removed). Units of this value must be the same as those of
-#' the coordinates for projected data or in km if coordinates are defined to be
-#' longitude/latitude. Default is zero (i.e. only exactly coincindent
-#' coordinates will be removed). For more details, see \code{\link[sp:remove.duplicates]
-#' {remove.duplicates}}.Optional and only used if 'occ' is a path for .csv files
-#' or a list of' data.frame. If 'occ' correspond to 'SpatialPoints', 'dist'
-#' should be ignored.
+#' two coordinates as not duplicate. Values up to this distance will be consider
+#' as duplicates and removed. Units of this value must be in km. Default is zero
+#' (i.e. only exactly coincindent coordinates will be removed). For more details,
+#' see \code{\link[sp:remove.duplicates]{remove.duplicates}}. Optional and only
+#' used if 'occ' is a path for .csv files or a list of' data.frame.
+#' If 'occ' correspond to 'SpatialPoints', 'dist' should be ignored.
 #' @import sp
 #' @import rlist
 #' @return \code{checkOcc} returns the species occurring inside of the polygon
