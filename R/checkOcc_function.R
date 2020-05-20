@@ -11,19 +11,21 @@
 #' (see \code{\link[aoh]{readOcc}} to obtain such class of object), a 'list' of
 #' 'data.frames' with the occurrences from multiple species, or a path for a folder
 #' with the species occurrences files (.csv format). Each file, corresponding to
-#' only one species and named with the corresponding species names, must have be 3 columns
-#' identified as "species" (species names or other identification of taxa), "long"
-#' (longitude), "lat" (latitude).
-#' @param poly A polygon (ESRI shapefile format) of the specific area to be checked in
-#' 'SpatialPolygonsDataFrame' class.
+#' only one species and named with the corresponding species names, must have be 3
+#' columns identified as "species" (species names or other identification of taxa),
+#' "long" (longitude), "lat" (latitude).
+#' @param poly A polygon (ESRI shapefile as 'SpatialPolygonsDataFrame' class) of
+#' the specific area to be checked.
 #' @param dist A value corresponding to the minimum distance assigned to consider
-#' two coordinates as not duplicated. Values up to this distance will be consider
-#' as duplicates and removed. Default is zero (i.e. only exactly coincindent
+#' two coordinates as not duplicated SpatialPoints. Values up to this distance will
+#' be consider as duplicates and removed. Default is zero (i.e. only exactly coincindent
 #' coordinates will be removed). Units of this value must be the same as those of
 #' the coordinates for projected data or in km if coordinates are defined to be
-#' longitude/latitude. For more details, see \code{\link[sp:remove.duplicates]
-#' {remove.duplicates}}.Optional (and only if 'occ' is a path for .csv files or a list of
-#' data.frame).
+#' longitude/latitude. Default is zero (i.e. only exactly coincindent
+#' coordinates will be removed). For more details, see \code{\link[sp:remove.duplicates]
+#' {remove.duplicates}}.Optional and only used if 'occ' is a path for .csv files
+#' or a list of' data.frame. If 'occ' correspond to 'SpatialPoints', 'dist'
+#' should be ignored.
 #' @import sp
 #' @import rlist
 #' @return \code{checkOcc} returns the species occurring inside of the polygon
@@ -32,7 +34,7 @@
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export checkOcc
 
-checkOcc<-function(occ, dist=NULL, poly){
+checkOcc<-function(occ, dist = NULL, poly){
 
   # Warning messages
   if (missing(occ))
