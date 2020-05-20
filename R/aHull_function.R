@@ -22,8 +22,15 @@
 #' the coordinates for projected data or in km if coordinates are defined to be
 #' longitude/latitude. For more details, see \code{\link[sp:remove.duplicates]
 #' {remove.duplicates}}.
-#' @param poly Optional. A polygon (ESRI shapefile in 'SpatialPolygonsDataFrame'
+#' @param poly Optional. A polygon (ESRI shapefile as 'SpatialPolygonsDataFrame'
 #' class) of the specific area to be checked.
+#' @import rangeBuilder
+#' @return \code{aHull} returns the alpha hull polygon (ESRI shapefile as
+#' 'SpatialPolygonsDataFrame') representing the extent of occurrence (EOO) of
+#' species and the respective alpha value assigned to build the provided range.
+#' @encoding UTF-8
+#' @author Thaís Dória & Daniel Gonçalves-Souza
+#' @export aHull
 
 aHull <- function(occ, crs, dist = NULL, poly = NULL, fraction, partCount,
                   initialAlpha, alphaIncrement, clipToCoast, verbose = TRUE){
@@ -51,7 +58,7 @@ aHull <- function(occ, crs, dist = NULL, poly = NULL, fraction, partCount,
   # To convert occurrences in data.frame into 'SpatialPoints'
 
   # Warning messages
-  if (missing(dist))
+  if (is.null(dist))
     warning("dist is missing, so zero (default) is used")
 
     f.clean1 <- function(sd){
