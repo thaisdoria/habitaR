@@ -8,21 +8,20 @@
 readOcc (occ, crs, dist)
 }
 \arguments{
-\item{occ}{Path for a folder with the species occurrence records files
-(.csv format). The files names should correspond to the species names
-and must have be 3 columns identified as "species" (species names or other
-identification of taxa), "long" (longitude), "lat" (latitude).}
+\item{occ}{Path for a folder with the species occurrences records files
+(.csv format). Coordinates should be in decimal degrees. The files names should
+correspond to the species names and must have be 3 columns identified as
+"species" (species names or other identification of taxa), "long" (longitude),
+"lat" (latitude).}
 
 \item{crs}{The Coordinate Reference System (CRS) specifing the projection and
 datum of dataset. Could be a CRS object or a character string.}
 
 \item{dist}{A value corresponding to the minimum distance assigned to consider
 two coordinates as not duplicate. Values up to this distance will be consider
-as duplicates and removed. Units of this value must be the same as those of
-the coordinates for projected data or in km if coordinates are defined to be
-longitude/latitude. Optional. Default is zero (i.e. only exactly coincindent
-coordinates will be removed). For more details, see \code{\link[sp:remove.duplicates]
-{remove.duplicates}}.}
+as duplicates and removed. Units of this value must be in km. Optional.
+Default is zero (i.e. only exactly coincindent coordinates will be removed).
+For more details, see \code{\link[sp:remove.duplicates]{remove.duplicates}}.}
 }
 \value{
 \code{readOcc} returns a 'sp.occ' object corresponding to a list of species
