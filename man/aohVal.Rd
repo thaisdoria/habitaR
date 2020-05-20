@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{aohVal}
 \alias{aohVal}
-\title{Validation function}
+\title{AOH Validation function}
 \usage{
 # method for signature 'SpatialPolygonsDataFrame', 'RasterLayer',
 'RasterStack', a 'list' of 'RasterLayer' or 'aoh' object (see
@@ -60,36 +60,26 @@ Ficetola et al. (2015).
 }
 \examples{
 
-### Fictitious amphibians and birds data
-
-data(birds_val)
-data(amphs_val)
+### Fictitious birds data
 
 # Example for signature 'SpatialPolygonsDataFrame' (eoo) and 'aoh' (aoh) with
 a 'RasterLayer' class of features.
 
 birdVal1<-aohVal(eoo = eoo_birdShp, aoh = aoh_birdRas, plot = TRUE, progress = TRUE)
-amphVal1<-aohVal(eoo = eoo_amphShp, aoh = aoh_amphRas, plot = TRUE, progress = TRUE)
-
-
 # Example for signature 'RasterLayer' or 'RasterStack' (eoo) and 'aoh' (aoh) with
 a 'RasterLayer' class of features.
 
 birdVal2<-aohVal(eoo = eoo_birdRas, aoh = aoh_birdRas, plot = TRUE, progress = TRUE)
-amphVal2<-aohVal(eoo = eoo_amphRas, aoh = aoh_amphRas, plot = TRUE, progress = TRUE)
-
 
 # Example for signature 'SpatialPolygonsDataFrame' (eoo) and 'aoh' (aoh) with
 a 'SpatialPolygonsDataFrame' class of features.
 
 birdVal3<-aohVal(eoo = eoo_birdShp, aoh = aoh_birdShp, plot = TRUE, progress = TRUE)
-amphVal3<-aohVal(eoo = eoo_amphShp, aoh = aoh_amphShp, plot = TRUE, progress = TRUE)
 
 # Example for signature 'RasterLayer' or 'RasterStack' (eoo) and 'aoh' (aoh) with
 a 'SpatialPolygonsDataFrame' class of features.
 
 birdVal4<-aohVal(eoo = eoo_birdRas, aoh = aoh_birdShp, plot = TRUE, progress = TRUE)
-amphVal4<-aohVal(eoo = eoo_amphRas, aoh = aoh_amphShp, plot = TRUE, progress = TRUE)
 
 }
 \references{
