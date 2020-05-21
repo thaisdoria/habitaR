@@ -2,34 +2,38 @@
 #'
 #' Provide the area of habitat (AOH) of a given species through refinement of its
 #' known geographic distribution
-#' @usage aoh(eoo.sp, lc.rec, matrix.hab.pref, alt.map = NULL, matrix.alt.pref = NULL,
-#' shp.out = FALSE, resolution = NULL, continuous = FALSE, threshold = 0.5,
-#' extent.out = NULL, progress = FALSE)
+#' @usage aoh(eoo.sp = NULL, lc = NULL, alt = NULL, altPref = NULL,
+#' habPref = NULL, climSuit = NULL, threshold = 0.5, resolution = NULL,
+#' continuous = FALSE, shp.out = FALSE, extent.out = NULL,
+#' progress = FALSE)
 #' @param eoo.sp SpatialPolygons of the spatial distribution of the species or path
 #'  for a folder with spatial distribution shapefiles (ESRI shapefile format) .
 #'  The name of the species must be on the second column of the attribute table
 #'  of the shapefile.
-#' @param lc.rec RasterLayer object of the land use map reclassified for the
-#' categories of habitat.
-#' @param matrix.hab.pref Data frame 0/1 of habitat preference of the species.
+#' @param lc RasterLayer, RasterBrick or RasterStack object of the land use map
+#' reclassified for the categories of habitat.
+#' @param habPref Data frame 0/1 of habitat preference of the species.
 #'  First column must be the species name. The posterior columns must be named
-#'  after the categories of habitat as following the lc.rec classification.
+#'  after the categories of habitat as following the lc classification.
 #'  \code{\link[habitaR]{prefHab}} can help obtain this data.
-#' @param alt.map RasterLayer object of the elevation map. Optional.
-#' @param matrix.alt.pref Data frame with altitudinal range of species. First
+#' @param alt RasterLayer object of the elevation map. Optional.
+#' @param altPref Data frame with altitudinal range of species. First
 #' column must be the species name, second column the minimum value of altitude
 #' and the third column the maximum value of altitude
+#' @param climSuit List containing RasterLayers objects of the climatic suitability
+#' of the species. The itens of the list must be named after their
+#' corresponding species. Optional.
 #' @param shp.out (logical) Whether the output should be a shapefile as opposed
 #' to a raster.
 #' @param resolution Numeric value indicating the preferred resolution for the
-#' rasters. Resolution must coarser than the resolution of lc.rec and alt.map.
+#' rasters. Resolution must coarser than the resolution of lc and alt.
 #' @param continuous (logical) Whether the output should be binary or continuous
 #' for the rasters. Only used if resolution provided or when the resolution of
-#' lc.rec and alt.map are different.
+#' lc and alt are different.
 #' @param threshold Numeric value indicating the threshold of the cell coverage
 #' by the species to the species be considered present (values between 0 and 1).
 #' Only used if continuous = \code{FALSE} and a coarser resolution is provided or
-#' the resolution of lc.rec and alt.map are different or shp.out is
+#' the resolution of lc and alt are different or shp.out is
 #' \code{TRUE}.
 #' @param extent.out Extent object or a vector of four numbers indicating the
 #' preferred output for the rasters. Optional.
@@ -51,13 +55,15 @@
 #'
 #' ### Raster Output
 #'
-#' aoh_birdRas<-aoh(eoo_birdShp, lc, habpref_bird, al, alpref_bird, shp.out = F,
-#' resolution = 0.05, continuous = T)
+#' aoh_ras <- aoh(eoo.sp = NULL, lc = lc_map, alt = alt_map, altPref = alpref_bird,
+#' habPref = habpref_bird, climSuit = climSuit_bird, resolution = 0.05,
+#' continuous = TRUE, shp.out = FALSE, progress = FALSE)
 #'
 #' ### Shapefile Output ###
 #'
-#' aoh_birdShp<-aoh(eoo_birdShp, lc, habpref_bird, al, alpref_bird, shp.out = T,
-#' resolution = 0.05, continuous = F, threshold = 0.5)
+#' aoh_shp <- aoh(eoo.sp = NULL, lc = lc_map, alt = alt_map, altPref = alpref_bird,
+#' habPref = habpref_bird, climSuit = climSuit_bird, resolution = 0.05,
+#' shp.out = TRUE, progress = FALSE)
 #'
 #' @encoding UTF-8
 #' @author Daniel Gonçalves-Souza & Thaís Dória
@@ -66,245 +72,201 @@
 #' @import rgeos
 #' @importFrom utils txtProgressBar setTxtProgressBar
 
-
-aoh <- function(eoo.sp, lc.rec, matrix.hab.pref, alt.map = NULL,
-                matrix.alt.pref = NULL, shp.out = FALSE, resolution = NULL,
-                continuous = FALSE, threshold = 0.5, extent.out = NULL,
+aoh <- function(eoo.sp = NULL, lc = NULL, alt = NULL, altPref = NULL,
+                habPref = NULL, climSuit = NULL, threshold = 0.5, resolution = NULL,
+                continuous = FALSE, shp.out = FALSE, extent.out = NULL,
                 progress = FALSE){
+
+  # Data frame of resuts
+  df <- data.frame(matrix(ncol = 4, nrow = length(eoo.sp)))
+  names(df) <- c('Species', 'Vegetation', 'Altitude', 'Climatic suitability')
+  df[, 1] <- eoo.sp@data[, 2]
+  df[, 2:3] <- 1
+  df[, 4] <- 0
+
+  # Checklist
   {
     if (missing(eoo.sp))
       stop("eoo.sp is missing")
-    if (missing(lc.rec))
-      stop("lc.rec is missing")
-    if (missing(matrix.hab.pref))
-      stop("matrix.hab.pref is missing")
+    if(is.null(lc) & is.null(alt))
+      stop('You have to provide at least lc or alt')
+    if(is.null(lc))
+      df[, 2] <- 0
+    if(!is.null(habPref) & is.null(lc))
+      stop('lc is missing')
+    if(is.null(habPref) & !is.null(lc))
+      stop('habPref is missing')
+    if(is.null(alt))
+      df[, 3] <- 0
+    if(!is.null(altPref) & is.null(alt))
+      stop('alt is missing')
+    if(is.null(altPref) & !is.null(alt))
+      stop('altPref is missing')
     if(!is.null(extent.out) & shp.out == TRUE)
       stop('extent.out can be only used when shp.out = FALSE')
     if(continuous == TRUE & shp.out == TRUE)
       stop('shp.out can be only be true when continuous = FALSE')
-    if(!is.null(alt.map))
-    if(compareCRS(alt.map, lc.rec) == FALSE)
-      warning('CRS from lc.rec e alt.map are different')
-    if(!is.null(matrix.alt.pref) & is.null(alt.map))
-      stop('alt.map is missing')
-    if(is.null(matrix.alt.pref) & !is.null(alt.map))
-      stop('matrix.alt.pref is missing')
-    if(is.null(matrix.alt.pref))
-      sp.altpref <- matrix(nrow = 0, ncol = 1)
   }
 
+  # Read shapes in directory
   if(is.character(eoo.sp)){
-    if(substr(eoo.sp, nchar(eoo.sp), nchar(eoo.sp)) == '/'){
-      eoo.sp <- substr(eoo.sp, 1, nchar(eoo.sp) - 1)
-    }
-    files.sp <- list.files(eoo.sp, pattern = ".shp$")
-    files.sp <- gsub(".shp","", files.sp)
-    sps <- list()
-    for (i in 1:length(files.sp)){
-      sps[[i]] <- readOGR(dsn = eoo.sp,
-                          layer = files.sp[i])
-    }
-
-    if(length(sps) > 1){
-      eoo.sp <- do.call(bind, sps)
-    }
-    if(length(sps) == 1){
-      eoo.sp <- sps[[1]]
-    }
+    eoo.sp <- readShp(eoo.sp)
   }
 
-  #Summary data frame
-  df <- data.frame(matrix(ncol = 3, nrow = length(eoo.sp)))
-  names(df) <- c('Species', 'Vegetation', 'Altitude')
-  df[, 1] <- eoo.sp@data[, 2]
-  df[, 2:3] <- 1
+  # List of maps
+  maps.names <- c('lc', 'alt')
+  present <- c(!is.null(lc), !is.null(alt))
+  maps <- mget(maps.names[present])
 
-  if (is.null(alt.map)) {
-    warning('No altitude map was provided, therefore the refined shapes
-                will be based on vegetation preference only')
-    df[, 3] <- 0
-  }
-
-  # Looping para sd
-  if(progress == TRUE){
+  # Looping for refinament
+  result <- list()
+  if(progress){
     pb <- txtProgressBar(min = 0, max = length(eoo.sp), style = 3)
   }
-  result <- list()
-  for (i in 1:length(eoo.sp)){
-    sd <- eoo.sp[i, ]
-    sd <- crop(sd, lc.rec)
-    lc.crop <- crop(lc.rec, sd)
-    lc.crop <- mask(lc.crop, sd)
-    sp.habpref <- matrix.hab.pref[as.character(sd@data[, 2]) == as.character(matrix.hab.pref[, 1]),
-                                  2:ncol(matrix.hab.pref)]
-    if (nrow(sp.habpref) > 0){
-      hab.cat <- as.numeric(colnames(sp.habpref)[as.vector(sp.habpref[1, ] == 1)])
-      hab.ref <- lc.crop %in% hab.cat
-      hab.ref <- mask(hab.ref, sd)
+  for(i in 1:length(eoo.sp)){
+    maps.eoo <- maps
+
+    if(!is.null(climSuit)){
+      if(eoo.sp@data[i, 2] %in% names(climSuit)){
+        climSuit.eoo <- climSuit[names(climSuit) == eoo.sp@data[i, 2]]
+        maps.eoo <- c(climSuit.eoo, maps.eoo)
+        names(maps.eoo) <- c('climSuit', names(maps.eoo)[2:3])
+        df[i, 4] <- 1
+      }
     }
-    if (nrow(sp.habpref) == 0){
-      hab.ref <- lc.crop > 0
-      hab.ref <- mask(hab.ref, sd)
-      df[i, 2] <- 0
+
+    maps.eoo <- lapply(maps.eoo, function(x) crop(x, eoo.sp[i, ]))
+
+    # Refinament of lc
+    if(any(names(maps.eoo) == 'lc')){
+      sp.habPref <- habPref[as.character(eoo.sp[i, ]@data[, 2]) == as.character(habPref[, 1]),
+                            2:ncol(habPref)]
+      sp.habPref <- cbind(as.numeric(names(sp.habPref)), t(sp.habPref))
+      if (nrow(sp.habPref) > 0){
+        hab.cat <- as.numeric(colnames(sp.habPref)[as.vector(sp.habPref[1, ] == 1)])
+        hab.ref <- reclassify(maps.eoo[[which(names(maps.eoo) == 'lc')]],
+                              sp.habPref)
+        maps.eoo[[which(names(maps.eoo) == 'lc')]] <- mask(hab.ref, eoo.sp[i, ])
+      }
+      if (nrow(sp.habPref) == 0){
+        hab.ref <- maps.eoo[[which(names(maps.eoo) == 'lc')]] > 0
+        maps.eoo[[which(names(maps.eoo) == 'lc')]] <- mask(hab.ref, eoo.sp[i, ])
+        df[i, 2] <- 0
+      }
     }
-    names(hab.ref) <- sd@data[, 2]
-    # Refinamento de altitude
-    if (!is.null(alt.map)){
-      if(is.null(matrix.alt.pref)){
-        stop('No matrix of altitude preference provided')
+
+    # Refinament of al
+    if(any(names(maps.eoo) == 'alt')){
+      sp.altPref <- altPref[as.character(eoo.sp[i, ]@data[, 2]) == as.character(altPref[, 1]), 2:3]
+      alt.crop <- maps.eoo[[which(names(maps.eoo) == 'alt')]]
+      if (nrow(sp.altPref) > 0){
+        if(sum(is.na(sp.altPref)) != 2){
+          if(sum(is.na(sp.altPref)) == 1){
+            if(is.na(sp.altPref[1])){
+              alt.ref <- alt.crop <= sp.altPref[1, 2]          }
+            if(is.na(sp.altPref[2])){
+              alt.ref <- alt.crop >= sp.altPref[1, 1]
+            }
+          }
+          if(sum(is.na(sp.altPref)) == 0){
+            alt.crop <- alt.crop >= sp.altPref[1, 1] & alt.crop <= sp.altPref[1, 2]
+          }
+          maps.eoo[[which(names(maps.eoo) == 'alt')]] <- mask(alt.crop, eoo.sp[i, ])
+        }
       }
-      alt.crop <- crop(alt.map, sd)
-      alt.crop <- mask(alt.crop, sd)
-
-      if(is.factor(matrix.alt.pref[, 2])){
-        matrix.alt.pref[, 2] <- as.numeric(levels(matrix.alt.pref[, 2]))[matrix.alt.pref[, 2]]
+      if (nrow(sp.altPref) == 0){
+        df[i, 3] <- 0
       }
-      if(is.factor(matrix.alt.pref[, 3])){
-        matrix.alt.pref[, 3] <- as.numeric(levels(matrix.alt.pref[, 3]))[matrix.alt.pref[, 3]]
+    }
+
+    # Overlay
+    if(length(maps.eoo) > 1){
+      # Resample maps
+      res.all <- sapply(maps.eoo, xres)
+      maps.eoo.mod <- maps.eoo[which(res.all != max(res.all))]
+      temp <- list()
+      for(j in 1:length(maps.eoo.mod)){
+        temp[[j]] <- resolucao(x = maps.eoo.mod[[j]], y = maps.eoo[[which.max(res.all)]],
+                               lbl = names(maps.eoo.mod[j]))
       }
-      if(is.character(matrix.alt.pref[, 2])){
-        matrix.alt.pref[, 2] <- as.numeric(matrix.alt.pref[, 2])
+      maps.eoo.mod <- c(maps.eoo[which(res.all == max(res.all))], temp)
+      names(maps.eoo.mod) <- NULL
+
+      # Refinament
+      ref <- suppressWarnings(do.call(overlay,
+                                      c(maps.eoo.mod,
+                                        fun =  function(x) Reduce('*', x))))
+    }
+
+    if(length(maps.eoo) == 1){
+      ref <- maps.eoo[[1]]
+    }
+
+    # Continuous
+    if(!continuous){
+      ref <- ref > threshold
+    }
+
+    # Change resolution
+    if(!is.null(resolution)){
+      if (resolution < xres(ref)){
+        stop('Chosen resolution is smaller than the maps provided')
       }
-      if(is.character(matrix.alt.pref[, 3])){
-        matrix.alt.pref[, 3] <- as.numeric(matrix.alt.pref[, 3])
+      base <- raster()
+      extent(base) <- extent(ref)
+      res(base) <- resolution
+      {
+        if(!continuous)
+          ref <- resolucao(ref, base, type = 2)
+        ref <- ref > threshold
+        if(continuous)
+          ref <- resolucao(ref, base, type = 1)
       }
+    }
 
-      if(sum(matrix.alt.pref[, 3] < matrix.alt.pref[, 2], na.rm = T) > 0){
-        stop(paste('Some maximum values are smaller than minimum in the matrix.alt.pref'))
-      }
-
-      sp.altpref <- matrix.alt.pref[as.character(sd@data[, 2]) == as.character(matrix.alt.pref[, 1]), 2:3]
-      if (nrow(sp.altpref) > 0){
-        if(sum(is.na(sp.altpref)) != 2){
-          if(sum(is.na(sp.altpref)) == 1){
-            if(is.na(sp.altpref[1])){
-              alt.ref <- alt.crop <= sp.altpref[1, 2]          }
-            if(is.na(sp.altpref[2])){
-              alt.ref <- alt.crop >= sp.altpref[1, 1]
-            }
-          }
-          if(sum(is.na(sp.altpref)) == 0){
-            alt.ref <- alt.crop >= sp.altpref[1, 1] & alt.crop <= sp.altpref[1, 2]
-          }
-
-          alt.ref <- crop(alt.ref, sd)
-          alt.ref <- mask(alt.ref, sd)
-          # In case of different resolutions (not defined)
-          if(res(lc.rec)[1] > res(alt.map)[1]){
-            factor <- round(res(lc.rec)[1] / res(alt.map)[1])
-            alt.ref <- aggregate(alt.ref, fact = factor, fun = sum)
-            alt.ref <- alt.ref / (factor^2)
-            alt.ref <- resample(alt.ref, hab.ref)
-          }
-          if(res(lc.rec)[1] <= res(alt.map)[1]){
-            factor <- round(res(alt.map)[1] / res(lc.rec)[1])
-            hab.ref <- aggregate(hab.ref, fact = factor, fun = sum)
-            hab.ref <- hab.ref / (factor^2)
-            hab.ref <- resample(hab.ref, alt.ref)
-          }
-          # Overlay refinement by altitude and by land cover
-          over <- overlay(hab.ref, alt.ref, fun = function(x, y) x * y)
-
-
-          # Custom resolution
-          if (!is.null(resolution)) {
-            r <- raster()
-            extent(r) <- extent(over)
-            res(r) <- resolution
-            if (resolution < res(over)[1]){
-              stop('Chosen resolution is smaller than the maps provided')
-            }
-            if (resolution > res(over)[1]){
-              factor <- round(resolution / res(over)[1])
-              over <- aggregate(over, fact = factor, fun = sum)
-              over <- over / (factor^2)
-              over <- resample(over, r)
-            }
-            if (continuous == FALSE){
-              over <- over >= threshold
-            }
-
-          }
-
-          if(shp.out == TRUE) {
-            over <- over >= threshold
-            if(sum(values(over > 0), na.rm = T) == 0){
-              warning(paste('Cannot return shapefile of', sd@data[, 2],
-                            'because there is no cells left after the refinement'))
-              result[[i]] <- NA
-            }
-            if(sum(values(over > 0), na.rm = T) > 0){
-              result[[i]] <- rasterToPolygons(over, fun = function(x) x > 0,
-                                              dissolve = T)
-              names(result[[i]]@data) <- sd@data[, 2]
-            }
-          }
-          if(shp.out == FALSE){
-            if(continuous == FALSE){
-              over <- over >= threshold
-            }
-            names(over) <- sd@data[, 2]
-            result[[i]] <- over
-          }
+    # Shapefile output
+    if(shp.out){
+      if(minValue(ref) == 0 & maxValue(ref) == 0){
+        warning(paste('Cannot return shapefile of', eoo.sp[i, ]@data[, 2],
+                      'because there is no cells left after the refinement'))
+        ref <- NA
+      } else {
+        if(class(ref) %in% c('RasterBrick', 'RasterStack')){
+          ref <- lapply(as.list(ref),
+                        function(x) rasterToPolygons(x,
+                                                     fun = function(y) y > 0,
+                                                     dissolve = T))
+          ref <- do.call(bind, ref)
+        } else {
+          ref <- rasterToPolygons(ref, fun = function(x) x > 0,
+                                  dissolve = T)
+          names(ref@data) <- eoo.sp[i, ]@data[, 2]
         }
       }
     }
 
-    if (is.null(alt.map) | nrow(sp.altpref) == 0 | sum(is.na(sp.altpref)) == 2) {
-      df[i, 3] <- 0
-      # Custom resolution
-      if (!is.null(resolution)) {
-        r <- raster()
-        extent(r) <- extent(hab.ref)
-        res(r) <- resolution
-        if (resolution < res(hab.ref)[1]){
-          stop('Chosen resolution is smaller than the maps provided')
-        }
-        if (resolution > res(hab.ref)[1]){
-          factor <- round((resolution / res(hab.ref)[1]))
-          hab.ref <- aggregate(hab.ref, fact = factor, fun = sum)
-          hab.ref <- hab.ref / (factor^2)
-          hab.ref <- resample(hab.ref, r)
-          if (continuous == FALSE){
-            hab.ref <- hab.ref >= threshold
-          }
-        }
-      }
-      if(shp.out == TRUE) {
-        hab.ref <- hab.ref >= threshold
-        if(sum(values(hab.ref > 0), na.rm = T) == 0){
-          warning(paste('Cannot return shapefile of', sd@data[, 2],
-                        'because there is no cells left after the refinement'))
-          result[[i]] <- NA
-        }
-        if(sum(values(hab.ref > 0), na.rm = T) > 0){
-          result[[i]] <- rasterToPolygons(hab.ref, fun = function(x) x > 0,
-                                          dissolve = T)
-          names(result[[i]]@data) <- sd@data[, 2]        }
-      }
-      if(shp.out == FALSE){
-        result[[i]] <- hab.ref
-      }
+    if(!shp.out){
+      names(ref) <- eoo.sp@data[i, 2]
     }
+
+    result[[i]] <- ref
     if(progress == TRUE){
       setTxtProgressBar(pb, i)
     }
   }
 
+  # Extent.out
   if(!is.null(extent.out)){
     r <- raster()
     extent(r) <- extent.out
     res(r) <- res(result[[i]])
-
-    if(continuous == FALSE){
-      result <- lapply(result, resample, r, method = 'ngb')
-    }
-    if(continuous == TRUE){
-      result <- lapply(result, resample, r)
-    }
+    result <- lapply(result, resample, r, method = 'ngb')
   }
+
+  # Gathering data
   names(result) <- eoo.sp@data[, 2]
   result.full <- list(Summary = df, Data = result)
   class(result.full) <- "aoh"
   return(result.full)
+
 }
