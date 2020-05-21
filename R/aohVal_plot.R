@@ -1,4 +1,4 @@
-#' Plotting 'aohVal' objects
+#' Plot 'aohVal' objects
 #'
 #' Provide a \code{\link[graphisc]{plot}} of the graphical representation of
 #' validation results from the species AOH mapping.
