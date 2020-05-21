@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{readOcc}
 \alias{readOcc}
-\title{readOcc function}
+\title{readOcc: read species occurrences}
 \usage{
 readOcc (occ, crs = +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0",
 dist = 0.25)
