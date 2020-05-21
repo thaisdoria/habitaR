@@ -1,4 +1,4 @@
-#'  AOH function
+#' aoh: mapping the AOH of species
 #'
 #' Provide the area of habitat (AOH) of a given species through refinement of its
 #' known geographic distribution
@@ -26,22 +26,21 @@
 #' @param shp.out (logical) Whether the output should be a shapefile as opposed
 #' to a raster.
 #' @param resolution Numeric value indicating the preferred resolution for the
-#' rasters. Resolution must coarser than the resolution of lc and alt.map.
+#' rasters. Resolution must coarser than the resolution of lc and alt.
 #' @param continuous (logical) Whether the output should be binary or continuous
 #' for the rasters. Only used if resolution provided or when the resolution of
-#' lc and alt.map are different.
+#' lc and alt are different.
 #' @param threshold Numeric value indicating the threshold of the cell coverage
 #' by the species to the species be considered present (values between 0 and 1).
 #' Only used if continuous = \code{FALSE} and a coarser resolution is provided or
-#' the resolution of lc and alt.map are different or shp.out is
+#' the resolution of lc and alt are different or shp.out is
 #' \code{TRUE}.
 #' @param extent.out Extent object or a vector of four numbers indicating the
 #' preferred output for the rasters. Optional.
 #' @param progress (logical) A bar showing the progress of the function.
-#'
 #' @import raster
-#' @return \code{aoh} @return \code{aoh} returns 'aoh' object corresponding to a
-#' list with two elements. The first element is a data.frame detailing if the function was
+#' @return \code{aoh} returns 'aoh' object corresponding to a list with two
+#' elements. The first element is a #' data.frame detailing if the function was
 #' able (1) or not (0) to refinate the species distribution. The second element
 #' is a list of 'RasterLayer' or 'SpatialPolygons' object representing the refined
 #' distribution of the species. For the 'RasterLayer' the value of 0 indicates the
@@ -53,8 +52,19 @@
 #' (EOO). This mapping is made considering the specific preference for habitats
 #' of a given species.
 #' @examples
-#' ref_data <- aoh(eoo.sp = eoo_amphShp, lc = lc , habPref = habPref,
-#' alt.map = al, altPref = alpref)
+#'
+#' ### Raster Output
+#'
+#' aoh_ras <- aoh(eoo.sp = NULL, lc = lc_map, alt = alt_map, altPref = alpref_bird,
+#' habPref = habpref_bird, climSuit = climSuit_bird, resolution = 0.05,
+#' continuous = TRUE, shp.out = FALSE, progress = FALSE)
+#'
+#' ### Shapefile Output ###
+#'
+#' aoh_shp <- aoh(eoo.sp = NULL, lc = lc_map, alt = alt_map, altPref = alpref_bird,
+#' habPref = habpref_bird, climSuit = climSuit_bird, resolution = 0.05,
+#' shp.out = TRUE, progress = FALSE)
+#'
 #' @encoding UTF-8
 #' @author Daniel Gonçalves-Souza & Thaís Dória
 #' @export aoh
