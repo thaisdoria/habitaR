@@ -1,4 +1,4 @@
-#' aHull: Generate alpha hull polygons for a multiple-species
+#' aHull: generate alpha hull polygons for a multiple-species
 #'
 #' From the raw occurrences records of multiple species, provides the alpha hull
 #' polygon to represent the extent of occurrence (EOO) of each species which have
