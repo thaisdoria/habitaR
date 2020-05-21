@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{aohVal}
 \alias{aohVal}
-\title{AOH Validation function}
+\title{aohVal: evaluate the AOH mapping}
 \usage{
 # method for signature 'SpatialPolygonsDataFrame', 'RasterLayer',
 'RasterStack', a 'list' of 'RasterLayer' or 'aoh' object (see
