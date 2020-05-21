@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{plot.aohVal}
 \alias{plot.aohVal}
-\title{Plotting 'aohVal' objects}
+\title{Plot 'aohVal' objects}
 \usage{
 plot(aohVal)
 }
