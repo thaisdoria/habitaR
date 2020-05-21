@@ -4,7 +4,7 @@
 #' from a specified folder and provide a list of 'SpatialPoints' of species through
 #' the removal of duplicates coordinates.
 #'
-#' @usage readOcc (occ, crs = "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" ,
+#' @usage readOcc (occ, crs = "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0",
 #' dist = 0.25)
 #' @param occ Path for a folder with the species occurrences records files
 #' (.csv format). Coordinates should be in decimal degrees. The files names should
