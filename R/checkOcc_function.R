@@ -1,4 +1,4 @@
-#' checkOcc function
+#' checkOcc: check if occurrences fall inside of an specific are
 #'
 #' From a list of 'SpatialPoints' for multiple species, gives the species and its
 #' occurrences that are inside of a polygon (ESRI shapefile format) representing
