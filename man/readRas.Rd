@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{readRas}
 \alias{readRas}
-\title{readRAS function}
+\title{readRAS: read raster files}
 \usage{
 readRas (path)
 }
