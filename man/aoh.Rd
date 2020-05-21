@@ -5,9 +5,10 @@
 \alias{aoh}
 \title{aoh: mapping the AOH of species}
 \usage{
-aoh(eoo.sp, lc.rec, matrix.hab.pref, alt.map = NULL, matrix.alt.pref = NULL,
-shp.out = FALSE, resolution = NULL, continuous = FALSE, threshold = 0.5,
-extent.out = NULL, progress = FALSE)
+aoh(eoo.sp = NULL, lc = NULL, alt = NULL, altPref = NULL,
+habPref = NULL, climSuit = NULL, threshold = 0.5, resolution = NULL,
+continuous = FALSE, shp.out = FALSE, extent.out = NULL,
+progress = FALSE)
 }
 \arguments{
 \item{eoo.sp}{SpatialPolygons of the spatial distribution of the species or path
@@ -15,35 +16,39 @@ for a folder with spatial distribution shapefiles (ESRI shapefile format) .
 The name of the species must be on the second column of the attribute table
 of the shapefile.}
 
-\item{lc.rec}{RasterLayer object of the land use map reclassified for the
-categories of habitat.}
+\item{lc}{RasterLayer, RasterBrick or RasterStack object of the land use map
+reclassified for the categories of habitat.}
 
-\item{matrix.hab.pref}{Data frame 0/1 of habitat preference of the species.
-First column must be the species name. The posterior columns must be named
-after the categories of habitat as following the lc.rec classification.
-\code{\link[habitaR]{prefHab}} can help obtain this data.}
+\item{alt}{RasterLayer object of the elevation map. Optional.}
 
-\item{alt.map}{RasterLayer object of the elevation map. Optional.}
-
-\item{matrix.alt.pref}{Data frame with altitudinal range of species. First
+\item{altPref}{Data frame with altitudinal range of species. First
 column must be the species name, second column the minimum value of altitude
 and the third column the maximum value of altitude}
 
-\item{shp.out}{(logical) Whether the output should be a shapefile as opposed
-to a raster.}
+\item{habPref}{Data frame 0/1 of habitat preference of the species.
+First column must be the species name. The posterior columns must be named
+after the categories of habitat as following the lc classification.
+\code{\link[habitaR]{prefHab}} can help obtain this data.}
 
-\item{resolution}{Numeric value indicating the preferred resolution for the
-rasters. Resolution must coarser than the resolution of lc.rec and alt.map.}
-
-\item{continuous}{(logical) Whether the output should be binary or continuous
-for the rasters. Only used if resolution provided or when the resolution of
-lc.rec and alt.map are different.}
+\item{climSuit}{List containing RasterLayers objects of the climatic suitability
+of the species. The itens of the list must be named after their
+corresponding species. Optional.}
 
 \item{threshold}{Numeric value indicating the threshold of the cell coverage
 by the species to the species be considered present (values between 0 and 1).
 Only used if continuous = \code{FALSE} and a coarser resolution is provided or
-the resolution of lc.rec and alt.map are different or shp.out is
+the resolution of lc and alt are different or shp.out is
 \code{TRUE}.}
+
+\item{resolution}{Numeric value indicating the preferred resolution for the
+rasters. Resolution must coarser than the resolution of lc and alt.}
+
+\item{continuous}{(logical) Whether the output should be binary or continuous
+for the rasters. Only used if resolution provided or when the resolution of
+lc and alt are different.}
+
+\item{shp.out}{(logical) Whether the output should be a shapefile as opposed
+to a raster.}
 
 \item{extent.out}{Extent object or a vector of four numbers indicating the
 preferred output for the rasters. Optional.}
@@ -74,13 +79,15 @@ of a given species.
 
 ### Raster Output
 
-aoh_birdRas<-aoh(eoo_birdShp, lc, habpref_bird, al, alpref_bird, shp.out = F,
-resolution = 0.05, continuous = T)
+aoh_ras <- aoh(eoo.sp = NULL, lc = lc_map, alt = alt_map, altPref = alpref_bird,
+habPref = habpref_bird, climSuit = climSuit_bird, resolution = 0.05,
+continuous = TRUE, shp.out = FALSE, progress = FALSE)
 
 ### Shapefile Output ###
 
-aoh_birdShp<-aoh(eoo_birdShp, lc, habpref_bird, al, alpref_bird, shp.out = T,
-resolution = 0.05, continuous = F, threshold = 0.5)
+aoh_shp <- aoh(eoo.sp = NULL, lc = lc_map, alt = alt_map, altPref = alpref_bird,
+habPref = habpref_bird, climSuit = climSuit_bird, resolution = 0.05,
+shp.out = TRUE, progress = FALSE)
 
 }
 \author{
