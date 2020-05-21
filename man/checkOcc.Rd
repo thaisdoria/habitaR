@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{checkOcc}
 \alias{checkOcc}
-\title{checkOcc function}
+\title{checkOcc: check if occurrences fall inside of an specific are}
 \usage{
 checkOcc (occ, dist = 0.25, poly)
 }
