@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{aHull}
 \alias{aHull}
-\title{aHull: generate alpha hull polygons for a multiple-species}
+\title{aHull: generate alpha hull polygons for multiple-species}
 \usage{
 aHull (occ, crs, dist = 0.25, poly = NULL, fraction = 1.0, partCount = 2,
 buff = 1000, alphaIncrement = 0.01, cropToPoly = FALSE)
@@ -48,32 +48,28 @@ hull cropped by the provided poly. Only used if poly provided.}
 \value{
 \code{aHull} returns the alpha hull polygon (ESRI shapefile as
 'SpatialPolygonsDataFrame') representing the extent of occurrence (EOO) of
-species and the respective alpha value assigned to build the provided polygon.
+species and the respective alpha value assigned to build the alpha hull.
 If a \emph{poly} is provided and \emph{cropToPoly} is \code{TRUE}, \code{aHull}
 also returns the cropped alpha hull.
 }
 \description{
 From the raw occurrences records of multiple species, provides the alpha hull
-polygon to represent the extent of occurrence (EOO) of each species which have
+polygon representing the extent of occurrence (EOO) of each species which have
 a minimun of 3 not duplicate records. It is build based on the original function
-\code{\link[rangeBuilder:getDynamicAlphaHull]{getDynamicAlphaHull}}
-(rangeBuilder package), that determines the α parameter by the spatial
-distribution of the coordinates.
+\code{\link[rangeBuilder]{getDynamicAlphaHull}} (rangeBuilder package), that
+determines the α parameter by the spatial distribution of the coordinates.
 }
 \details{
 The function generate an alpha hull polygon from the occurrences
 records of multiple species by sequentially increasing α parameter (starting from 0
 in steps of defined \emph{alphaIncrease} until find the smallest value that return the
-\emph{partCount} polygon
-encompassing the fraction of occurrences provided.
+\emph{partCount} polygon encompassing the \emph{fraction} of occurrences provided.
 If \emph{poly} is provided, the function filter the original species dataset by
-keeping only those species occurring inside of the polygon. In this case, the
-alpha hull construction is restrict to those filtered species, but the extend of
-these polygons can extrapolate the area of polygon if are occurrences beyond the boundaries of 'poly' objetc. If the
-spatial is desired, assign TRUE to 'clipToPoly'.
-generated
-, even if there are records
-besides this area
+keeping only those species occurring inside of the specified polygon. In this case, the
+alpha hull construction is restrict to the filtered species, but the extension of
+these polygons can extrapolate the area of polygon if there are occurrences beyond
+the boundaries of 'poly' object. If the user want also have the alpha hull cropped
+by the area of \emph{poly}, assign \code{TRUE} to 'cropToPoly'.
 }
 \seealso{
 Dynamic alpha hulls from increasing alpha values are created with
