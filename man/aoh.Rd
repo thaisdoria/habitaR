@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{aoh}
 \alias{aoh}
-\title{AOH Mapping}
+\title{aoh: mapping the AOH of species}
 \usage{
 aoh(eoo.sp, lc.rec, matrix.hab.pref, alt.map = NULL, matrix.alt.pref = NULL,
 shp.out = FALSE, resolution = NULL, continuous = FALSE, threshold = 0.5,
