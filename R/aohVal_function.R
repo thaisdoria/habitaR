@@ -1,4 +1,4 @@
-#' AOH Validation function
+#' aohVal: evaluate the AOH mapping
 #'
 #' Provide the summary of validation results based on comparison between an
 #' independent occurrence records of species and the extent of occurrence (EOO)
