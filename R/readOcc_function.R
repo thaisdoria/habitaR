@@ -1,4 +1,4 @@
-#'  readOcc function
+#' readOcc: read species occurrences
 #'
 #' Read and clean the occurrences records files (.csv format) of multiples species
 #' from a specified folder and provide a list of 'SpatialPoints' of species through
