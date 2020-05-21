@@ -1,4 +1,4 @@
-#'  AOH Mapping
+#' aoh: mapping the AOH of species
 #'
 #' Provide the area of habitat (AOH) of a given species through refinement of its
 #' known geographic distribution
