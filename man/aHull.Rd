@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{aHull}
 \alias{aHull}
-\title{aHull: Generate alpha hull polygons for a multiple-species}
+\title{aHull: generate alpha hull polygons for a multiple-species}
 \usage{
 aHull (occ, crs, dist = 0.25, poly = NULL, fraction = 1.0, partCount = 2,
 buff = 1000, alphaIncrement = 0.01, cropToPoly = FALSE)

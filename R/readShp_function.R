@@ -1,4 +1,4 @@
-#'  readSHP function
+#' readSHP: read shapefiles
 #'
 #' Read the spatial distribution shapefiles (ESRI shapefile format) of species
 #' from a specified folder and provide a SpatialPolygonsDataFrame object.
