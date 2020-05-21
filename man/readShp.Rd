@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{readShp}
 \alias{readShp}
-\title{readSHP function}
+\title{readSHP: read shapefiles}
 \usage{
 readShp (path)
 }
