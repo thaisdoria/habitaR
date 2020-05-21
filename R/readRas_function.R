@@ -1,4 +1,4 @@
-#' readRAS: read raster files
+#' readRas: read raster files
 #'
 #' Read the spatial distribution raster files (.tif or .asc format) of species
 #' from a specified folder and provide a list with the raster files.
