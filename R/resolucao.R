@@ -1,4 +1,4 @@
-resolucao <- function(x, y, type = 0, lbl = NULL){
+resolucao <- function(x, y, type = 0, lbl = 'blank'){
   #RasterStack or #RasterBrick
   if(class(x) %in% c('RasterBrick', 'RasterStack')){
     new.x <- list()

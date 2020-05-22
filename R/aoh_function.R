@@ -55,15 +55,15 @@
 #'
 #' ### Raster Output
 #'
-#' aoh_ras <- aoh(eoo.sp = NULL, lc = lc_map, alt = alt_map, altPref = alpref_bird,
-#' habPref = habpref_bird, climSuit = climSuit_bird, resolution = 0.05,
+#' aoh_ras <- aoh(eoo.sp = eoo_birdShp, lc = lc_map, alt = alt_map,
+#' altPref = alpref_bird, habPref = habpref_bird, climSuit = climSuit_bird,
 #' continuous = TRUE, shp.out = FALSE, progress = FALSE)
 #'
 #' ### Shapefile Output ###
 #'
-#' aoh_shp <- aoh(eoo.sp = NULL, lc = lc_map, alt = alt_map, altPref = alpref_bird,
-#' habPref = habpref_bird, climSuit = climSuit_bird, resolution = 0.05,
-#' shp.out = TRUE, progress = FALSE)
+#' aoh_shp <- aoh(eoo.sp = eoo_birdShp, lc = lc_map, alt = alt_map,
+#' altPref = alpref_bird,habPref = habpref_bird, climSuit = climSuit_bird,
+#' resolution = 0.05, shp.out = TRUE, progress = FALSE)
 #'
 #' @encoding UTF-8
 #' @author Daniel Gonçalves-Souza & Thaís Dória
@@ -84,7 +84,7 @@ aoh <- function(eoo.sp = NULL, lc = NULL, alt = NULL, altPref = NULL,
   df[, 2:3] <- 1
   df[, 4] <- 0
 
-  # Checklist
+    # Checklist
   {
     if (missing(eoo.sp))
       stop("eoo.sp is missing")
@@ -209,7 +209,7 @@ aoh <- function(eoo.sp = NULL, lc = NULL, alt = NULL, altPref = NULL,
 
     # Change resolution
     if(!is.null(resolution)){
-      if (resolution < xres(ref)){
+      if (resolution < xres(ref) & isFALSE(all.equal(resolution, xres(ref)))){
         stop('Chosen resolution is smaller than the maps provided')
       }
       base <- raster()
