@@ -1,6 +1,6 @@
-#' Convert the occurrences records in dataframe to 'SpatialPoints' and clean the
-#' data by removal of duplicates records based on a specified distance to consider
-#' two coordinates as coincident.
+#' Internal function to convert the occurrences records in dataframe to 'SpatialPoints'
+#' and clean the data by removal of duplicates records based on a specified distance to
+#' consider two coordinates as coincident.
 #'
 #' @param sd A list of dataframes with occurrences records in coordinates degrees
 #' (longitude and latitude).
