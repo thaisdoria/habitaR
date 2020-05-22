@@ -4,7 +4,9 @@
 \name{aoh_birdShp}
 \alias{aoh_birdShp}
 \title{AOH shapefile for Birds}
-\format{A SpatialPolygons with 3 features.}
+\format{
+A SpatialPolygons with 3 features.
+}
 \usage{
 data(aoh_birdShp)
 }

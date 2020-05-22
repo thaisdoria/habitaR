@@ -44,7 +44,8 @@ given class of land use while 0 indicates that it has not.
 \description{
 Obtains the habitat preference of species in IUCN's database and put in the
 format required to the function \code{aoh}, based on the classification scheme of
-the user's land use map.
+the user's land use map. The habitat preference is obtained through the
+\code{rredlist} package
 }
 \examples{
 \donttest{

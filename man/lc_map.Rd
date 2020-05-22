@@ -4,8 +4,10 @@
 \name{lc_map}
 \alias{lc_map}
 \title{Land Cover}
-\format{A RasterLayer with 1198 rows, 841 columns and resolution of
-0.01 x 0.01 degrees}
+\format{
+A RasterLayer with 1198 rows, 841 columns and resolution of
+0.01 x 0.01 degrees
+}
 \usage{
 data(lc_map)
 }

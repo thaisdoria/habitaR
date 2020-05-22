@@ -79,15 +79,15 @@ of a given species.
 
 ### Raster Output
 
-aoh_ras <- aoh(eoo.sp = NULL, lc = lc_map, alt = alt_map, altPref = alpref_bird,
-habPref = habpref_bird, climSuit = climSuit_bird, resolution = 0.05,
+aoh_ras <- aoh(eoo.sp = eoo_birdShp, lc = lc_map, alt = alt_map,
+altPref = alpref_bird, habPref = habpref_bird, climSuit = climSuit_bird,
 continuous = TRUE, shp.out = FALSE, progress = FALSE)
 
 ### Shapefile Output ###
 
-aoh_shp <- aoh(eoo.sp = NULL, lc = lc_map, alt = alt_map, altPref = alpref_bird,
-habPref = habpref_bird, climSuit = climSuit_bird, resolution = 0.05,
-shp.out = TRUE, progress = FALSE)
+aoh_shp <- aoh(eoo.sp = eoo_birdShp, lc = lc_map, alt = alt_map,
+altPref = alpref_bird,habPref = habpref_bird, climSuit = climSuit_bird,
+resolution = 0.05, shp.out = TRUE, progress = FALSE)
 
 }
 \author{
