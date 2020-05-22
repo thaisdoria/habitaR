@@ -6,7 +6,7 @@
 #' \code{\link[rangeBuilder]{getDynamicAlphaHull}} (rangeBuilder package), that
 #' determines the α parameter by the spatial distribution of the coordinates.
 #'
-#' @usage aHull (occ, crs, dist = 0.25, poly = NULL, fraction = 1.0, partCount = 2,
+#' @usage aHull (occ, crs, distOcc = 0.25, poly = NULL, fraction = 1.0, partCount = 2,
 #' buff = 1000, alphaIncrement = 0.01, cropToPoly = FALSE)
 #'
 #' @param occ Occurrences records of the species. It might be a 'sp.occ'
@@ -19,7 +19,7 @@
 #' (longitude), "lat" (latitude).
 #' @param crs The Coordinate Reference System (CRS) specifing the projection and
 #' datum of dataset. Could be a CRS object or a character string.
-#' @param dist A value corresponding to the minimum distance assigned to consider
+#' @param distOcc A value corresponding to the minimum distance assigned to consider
 #' two coordinates as not duplicate. Values up to this distance will be consider
 #' as duplicates and removed. Default is zero (i.e. only exactly coincindent
 #' coordinates will be removed). Units of this value must be the same as those of
@@ -58,8 +58,8 @@
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export aHull
 
-aHull <- function(occ, crs, dist = NULL, poly = NULL, fraction, partCount, buff,
-                  alphaIncrement =  NULL, cropToPoly = FALSE){
+aHull <- function(occ, crs, alphaIncrement, fraction, partCount, distOcc = NULL, buff = NULL,
+                  poly = NULL, cropToPoly = FALSE){
 
   # Warning messages
   if (missing(occ))
@@ -84,8 +84,8 @@ aHull <- function(occ, crs, dist = NULL, poly = NULL, fraction, partCount, buff,
   # To convert occurrences in data.frame into 'SpatialPoints'
 
   # Warning messages
-  if (is.null(dist))
-    warning("dist is missing, so zero (default) is used")
+  if (is.null(distOcc))
+    warning("distOcc is missing, so default (zero) is used")
 
     f.clean1 <- function(sd){
       long=as.numeric(as.character(sd$long))
@@ -99,7 +99,7 @@ aHull <- function(occ, crs, dist = NULL, poly = NULL, fraction, partCount, buff,
       if (class(crs) == "CRS"){
         sp=SpatialPoints(c, proj4string = crs)
       }
-      sp2=remove.duplicates(sp, zerodist(sp, zero=as.numeric(dist)))
+      sp2=remove.duplicates(sp, zerodist(sp, zero=as.numeric(distOcc)))
     }
     occ <- lapply(sd, f.clean1) # a 'sp.occ' object
 
