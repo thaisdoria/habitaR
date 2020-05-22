@@ -10,7 +10,7 @@
 #' (.csv format). Coordinates should be in decimal degrees. The files names should
 #' correspond to the species names and must have be 3 columns identified as
 #' "species" (species names or other identification of taxa), "long" (longitude),
-#' "lat" (latitude).
+#' "lat" (latitude). NOTE: Longitude must be at a column before the latitude column.
 #' @param crs The Coordinate Reference System (CRS) specifing the projection and
 #' datum of dataset. Could be a CRS object or a character string.
 #' @param distOcc A value corresponding to the minimum distance assigned to consider
@@ -35,6 +35,9 @@ readOcc <- function(occ, crs, distOcc = NULL){
   occ <- do.call("list", lapply (files.sp, read.csv, header = TRUE, sep=";"))
   names(occ) <- gsub(".csv", " ", files.sp)
   sp.pointsclean <- lapply(occ, f.clean1)
+  for (i in 1:length(sp.pointsclean)){
+  colnames(sp.pointsclean[[i]]@coords) <- c("long", "lat")
+  }
   class(sp.pointsclean) <- "spOcc"
   return(sp.pointsclean)
 }
