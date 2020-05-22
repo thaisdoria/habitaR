@@ -6,17 +6,23 @@
 #' (longitude and latitude).
 #' @noRd
 
-f.clean1 <- function(sd){
-  long=as.numeric(as.character(sd$long))
-  lat=as.numeric(as.character(sd$lat))
-  c=cbind(as.numeric(as.character(long)), as.numeric(as.character(lat)))
-  c=data.frame(c)
+f.clean1 <- function(occ, distOcc = NULL){
+  long<-as.numeric(as.character(occ$long))
+  lat<-as.numeric(as.character(occ$lat))
+  c<-cbind(as.numeric(as.character(long)), as.numeric(as.character(lat)))
+  c<-data.frame(c)
   options(digits=4)
   if (is.character(crs)){
-    sp=SpatialPoints(c, proj4string = CRS(crs))
+    sp<-SpatialPoints(c, proj4string = CRS(crs))
   }
   if (class(crs) == "CRS"){
-    sp=SpatialPoints(c, proj4string = crs)
+    sp<-SpatialPoints(c, proj4string = crs)
   }
-  sp2=remove.duplicates(sp, zerodist(sp, zero=as.numeric(dist)))
+  if (!is.null(distOcc)){
+    sp<-remove.duplicates(sp, zerodist(sp, zero=as.numeric(distOcc)))
+  }
+  if (is.null(distOcc)){
+    sp<-remove.duplicates(sp)
+  }
 }
+
