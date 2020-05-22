@@ -13,7 +13,8 @@
 #' for a folder with the species occurrences files (.csv format). Each file should
 #' corresponding to only one species and named with the corresponding species names.
 #' This file must have be 3 columns identified as "species" (species names or other
-#' identification of taxa), "long" (longitude), "lat" (latitude).
+#' identification of taxa), "long" (longitude), "lat" (latitude). NOTE: Longitude
+#' must be at a column before the latitude column.
 #' @param poly A polygon (ESRI shapefile as 'SpatialPolygonsDataFrame' class) of
 #' the specific area to be checked.
 #' #' @param distOcc A value corresponding to the minimum distance assigned to consider
@@ -54,14 +55,17 @@ checkOcc<-function(occ, poly, distOcc){
 
     # List with occurrences data from a multiple species in a 'data.frame' class
     if (class(occ) == "list" & class(occ[[1]]) =="data.frame"){
-      sd <- occ
+      occ <- occ
     }
 
     # To convert occurrences in data.frame into 'SpatialPoints'
     # Warning message
     if (is.null(distOcc))
       warning("distOcc is not provided, so default (zero) is used")
-    occ <- lapply(sd, f.clean1)
+    occ <- lapply(occ, f.clean1)
+    for (i in 1:length(occ)){
+      colnames(occ[[i]]@coords) <- c("long", "lat")
+    }
     class(occ) <- "spOcc" # a 'spOcc' object
   }
 
@@ -69,6 +73,9 @@ checkOcc<-function(occ, poly, distOcc){
   {
     # List with occurrences data from a multiple species in a 'data.frame' class
     if (class(occ) == "list" & class(occ[[1]]) =="SpatialPoints"){
+      for (i in 1:length(occ)){
+        colnames(occ[[i]]@coords) <- c("long", "lat")
+      }
       class(occ) <- "spOcc"
     }
 
