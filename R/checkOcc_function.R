@@ -5,9 +5,9 @@
 #' a region of interest (e.g. study area, continent, country or other regions with
 #' specific boundaries).
 #'
-#' @usage checkOcc (occ, dist = 0.25, poly)
+#' @usage checkOcc (occ, distOcc = 0.25, poly)
 #' @param occ Occurrences records of the species (coordinates in decimal degrees).
-#' It might be a 'sp.occ' object corresponding to a list of 'SpatialPoints' for
+#' It might be a 'spOcc' object corresponding to a list of 'SpatialPoints' for
 #' multiple species (see \code{\link[aoh]{readOcc}} to obtain such class of object),
 #' a 'list' of 'data.frames' with the occurrences from multiple species, or a path
 #' for a folder with the species occurrences files (.csv format). Each file should
@@ -16,13 +16,13 @@
 #' identification of taxa), "long" (longitude), "lat" (latitude).
 #' @param poly A polygon (ESRI shapefile as 'SpatialPolygonsDataFrame' class) of
 #' the specific area to be checked.
-#' #' @param dist A value corresponding to the minimum distance assigned to consider
+#' #' @param distOcc A value corresponding to the minimum distance assigned to consider
 #' two coordinates as not duplicate. Values up to this distance will be consider
 #' as duplicates and removed. Units of this value must be in km. Default is zero
 #' (i.e. only exactly coincindent coordinates will be removed). For more details,
 #' see \code{\link[sp:remove.duplicates]{remove.duplicates}}. Optional and only
 #' used if 'occ' is a path for .csv files or a list of' data.frame.
-#' If 'occ' correspond to 'SpatialPoints', 'dist' should be ignored.
+#' If 'occ' correspond to 'SpatialPoints', 'distOcc' should be ignored.
 #' @import sp
 #' @import rlist
 #' @return \code{checkOcc} returns the species occurring inside of the polygon
@@ -31,7 +31,7 @@
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export checkOcc
 
-checkOcc<-function(occ, poly, dist = NULL){
+checkOcc<-function(occ, poly, distOcc){
 
   # Warning messages
   if (missing(occ))
@@ -48,8 +48,8 @@ checkOcc<-function(occ, poly, dist = NULL){
         occ <- substr(occ, 1, nchar(occ) - 1)
       }
       files.sp <- list.files(occ, pattern = ".csv$")
-      sd <- do.call("list", lapply (files.sp, read.csv, header = TRUE, sep=";"))
-      names(sd) <- gsub(".csv", " ", files.sp)
+      occ <- do.call("list", lapply (files.sp, read.csv, header = TRUE, sep=";"))
+      names(occ) <- gsub(".csv", " ", files.sp)
     }
 
     # List with occurrences data from a multiple species in a 'data.frame' class
@@ -59,21 +59,21 @@ checkOcc<-function(occ, poly, dist = NULL){
 
     # To convert occurrences in data.frame into 'SpatialPoints'
     # Warning message
-    if (is.null(dist))
-      warning("dist is missing, so zero (default) is used")
+    if (is.null(distOcc))
+      warning("distOcc is not provided, so default (zero) is used")
     occ <- lapply(sd, f.clean1)
-    class(occ) <- "sp.occ" # a 'sp.occ' object
+    class(occ) <- "spOcc" # a 'spOcc' object
   }
 
-  # 2. Ocurrences as 'SpatialPoints' or 'sp.occ' (obtained with readOcc function)
+  # 2. Ocurrences as 'SpatialPoints' or 'spOcc' (obtained with readOcc function)
   {
     # List with occurrences data from a multiple species in a 'data.frame' class
     if (class(occ) == "list" & class(occ[[1]]) =="SpatialPoints"){
-      class(occ) <- "sp.occ"
+      class(occ) <- "spOcc"
     }
 
     # List with occurrences data from a multiple species in a 'SpatialPoints' class
-    if (class(occ) == "sp.occ"){
+    if (class(occ) == "spOcc"){
       # Identifying spatial limits of the extent of interest (research area)
       lin <- as(poly, "SpatialLinesDataFrame")
       pts <- as.data.frame(as(lin, "SpatialPointsDataFrame"))
