@@ -1,5 +1,5 @@
-#' Applied the point.in.polygon function based on boundaries of polygon provided
-#' by user to check if the occurrences from its dataset are inside of this area.
+#' Internal function to apply the point.in.polygon function based on boundaries of polygon
+#' provided by user to check if the occurrences from its dataset are inside of this area.
 #'
 #' @param occ A list of dataframes with occurrences records in coordinates degrees
 #' (longitude and latitude).
