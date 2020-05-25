@@ -74,7 +74,7 @@ prefHab <- function(sp, key = NULL, cat = NULL,
   }
 
   for (i in 1:length(sp)){
-    hab.spp <- rl_habitats(sp[i], key = key)
+    hab.spp <- tryPrefHab(sp[i], key = key)
     if(length(hab.spp$result) == 0){
       warning(paste('No habitat information was found for', sp[i]))
       df[i, 2:ncol(df)] <- rep(0, length(2:ncol(df)))
