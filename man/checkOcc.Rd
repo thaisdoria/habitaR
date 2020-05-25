@@ -5,27 +5,28 @@
 \alias{checkOcc}
 \title{checkOcc: check if occurrences fall inside of an specific are}
 \usage{
-checkOcc (occ, dist = 0.25, poly)
+checkOcc (occ, distOcc = 0.25, poly)
 }
 \arguments{
 \item{occ}{Occurrences records of the species (coordinates in decimal degrees).
-It might be a 'sp.occ' object corresponding to a list of 'SpatialPoints' for
+It might be a 'spOcc' object corresponding to a list of 'SpatialPoints' for
 multiple species (see \code{\link[aoh]{readOcc}} to obtain such class of object),
 a 'list' of 'data.frames' with the occurrences from multiple species, or a path
 for a folder with the species occurrences files (.csv format). Each file should
 corresponding to only one species and named with the corresponding species names.
 This file must have be 3 columns identified as "species" (species names or other
-identification of taxa), "long" (longitude), "lat" (latitude).}
+identification of taxa), "long" (longitude), "lat" (latitude). NOTE: Longitude
+must be at a column before the latitude column.}
 
 \item{poly}{A polygon (ESRI shapefile as 'SpatialPolygonsDataFrame' class) of
 the specific area to be checked.
-#' @param dist A value corresponding to the minimum distance assigned to consider
+#' @param distOcc A value corresponding to the minimum distance assigned to consider
 two coordinates as not duplicate. Values up to this distance will be consider
 as duplicates and removed. Units of this value must be in km. Default is zero
 (i.e. only exactly coincindent coordinates will be removed). For more details,
 see \code{\link[sp:remove.duplicates]{remove.duplicates}}. Optional and only
 used if 'occ' is a path for .csv files or a list of' data.frame.
-If 'occ' correspond to 'SpatialPoints', 'dist' should be ignored.}
+If 'occ' correspond to 'SpatialPoints', 'distOcc' should be ignored.}
 }
 \value{
 \code{checkOcc} returns the species occurring inside of the polygon

@@ -5,13 +5,13 @@
 \alias{aoh}
 \title{aoh: mapping the AOH of species}
 \usage{
-aoh(eoo.sp = NULL, lc = NULL, alt = NULL, altPref = NULL,
+aoh(eooSp = NULL, lc = NULL, alt = NULL, altPref = NULL,
 habPref = NULL, climSuit = NULL, threshold = 0.5, resolution = NULL,
-continuous = FALSE, shp.out = FALSE, extent.out = NULL,
+continuous = FALSE, shpOut = FALSE, extentOut = NULL,
 progress = FALSE)
 }
 \arguments{
-\item{eoo.sp}{SpatialPolygons of the spatial distribution of the species or path
+\item{eooSp}{SpatialPolygons of the spatial distribution of the species or path
 for a folder with spatial distribution shapefiles (ESRI shapefile format) .
 The name of the species must be on the second column of the attribute table
 of the shapefile.}
@@ -37,7 +37,7 @@ corresponding species. Optional.}
 \item{threshold}{Numeric value indicating the threshold of the cell coverage
 by the species to the species be considered present (values between 0 and 1).
 Only used if continuous = \code{FALSE} and a coarser resolution is provided or
-the resolution of lc and alt are different or shp.out is
+the resolution of lc and alt are different or shpOut is
 \code{TRUE}.}
 
 \item{resolution}{Numeric value indicating the preferred resolution for the
@@ -47,10 +47,10 @@ rasters. Resolution must coarser than the resolution of lc and alt.}
 for the rasters. Only used if resolution provided or when the resolution of
 lc and alt are different.}
 
-\item{shp.out}{(logical) Whether the output should be a shapefile as opposed
+\item{shpOut}{(logical) Whether the output should be a shapefile as opposed
 to a raster.}
 
-\item{extent.out}{Extent object or a vector of four numbers indicating the
+\item{extentOut}{Extent object or a vector of four numbers indicating the
 preferred output for the rasters. Optional.}
 
 \item{progress}{(logical) A bar showing the progress of the function.}
@@ -79,15 +79,15 @@ of a given species.
 
 ### Raster Output
 
-aoh_ras <- aoh(eoo.sp = eoo_birdShp, lc = lc_map, alt = alt_map,
+aoh_ras <- aoh(eooSp = eoo_birdShp, lc = lc_map, alt = alt_map,
 altPref = alpref_bird, habPref = habpref_bird, climSuit = climSuit_bird,
-continuous = TRUE, shp.out = FALSE, progress = FALSE)
+continuous = TRUE, shpOut = FALSE, progress = FALSE)
 
 ### Shapefile Output ###
 
-aoh_shp <- aoh(eoo.sp = eoo_birdShp, lc = lc_map, alt = alt_map,
+aoh_shp <- aoh(eooSp = eoo_birdShp, lc = lc_map, alt = alt_map,
 altPref = alpref_bird,habPref = habpref_bird, climSuit = climSuit_bird,
-resolution = 0.05, shp.out = TRUE, progress = FALSE)
+resolution = 0.05, shpOut = TRUE, progress = FALSE)
 
 }
 \author{
