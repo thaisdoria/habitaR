@@ -135,7 +135,7 @@ aoh <- function(eooSp = NULL, lc = NULL, alt = NULL, altPref = NULL,
       }
     }
 
-    maps.eoo <- lapply(maps.eoo, function(x) raster::crop(x, eooSp[i, ]))
+    maps.eoo <- lapply(maps.eoo, function(x) crop(x, eooSp[i, ]))
 
     # Refinament of lc
     if (any(names(maps.eoo) == 'lc')) {
@@ -144,13 +144,13 @@ aoh <- function(eooSp = NULL, lc = NULL, alt = NULL, altPref = NULL,
       sp.habPref <- cbind(as.numeric(names(sp.habPref)), t(sp.habPref))
       if (nrow(sp.habPref) > 0) {
         hab.cat <- as.numeric(colnames(sp.habPref)[as.vector(sp.habPref[1, ] == 1)])
-        hab.ref <- raster::reclassify(maps.eoo[[which(names(maps.eoo) == 'lc')]],
+        hab.ref <- reclassify(maps.eoo[[which(names(maps.eoo) == 'lc')]],
                               sp.habPref)
-        maps.eoo[[which(names(maps.eoo) == 'lc')]] <- raster::mask(hab.ref, eooSp[i, ])
+        maps.eoo[[which(names(maps.eoo) == 'lc')]] <- mask(hab.ref, eooSp[i, ])
       }
       if (nrow(sp.habPref) == 0) {
         hab.ref <- maps.eoo[[which(names(maps.eoo) == 'lc')]] > 0
-        maps.eoo[[which(names(maps.eoo) == 'lc')]] <- raster::mask(hab.ref, eooSp[i, ])
+        maps.eoo[[which(names(maps.eoo) == 'lc')]] <- mask(hab.ref, eooSp[i, ])
         df[i, 2] <- 0
       }
     }
