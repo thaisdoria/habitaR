@@ -38,7 +38,6 @@
 #' @param extentOut Extent object or a vector of four numbers indicating the
 #' preferred output for the rasters. Optional.
 #' @param progress (logical) A bar showing the progress of the function.
-#' @import raster
 #' @return \code{aoh} returns 'aoh' object corresponding to a list with two
 #' elements. The first element is a #' data.frame detailing if the function was
 #' able (1) or not (0) to refinate the species distribution. The second element
@@ -68,6 +67,7 @@
 #' @encoding UTF-8
 #' @author Daniel Gonçalves-Souza & Thaís Dória
 #' @export aoh
+#' @import raster
 #' @import rgdal
 #' @import rgeos
 #' @importFrom utils txtProgressBar setTxtProgressBar
@@ -88,28 +88,28 @@ aoh <- function(eooSp = NULL, lc = NULL, alt = NULL, altPref = NULL,
   {
     if (missing(eooSp))
       stop("eooSp is missing")
-    if(is.null(lc) & is.null(alt))
+    if (is.null(lc) & is.null(alt))
       stop('You have to provide at least lc or alt')
-    if(is.null(lc))
+    if (is.null(lc))
       df[, 2] <- 0
-    if(!is.null(habPref) & is.null(lc))
+    if (!is.null(habPref) & is.null(lc))
       stop('lc is missing')
-    if(is.null(habPref) & !is.null(lc))
+    if (is.null(habPref) & !is.null(lc))
       stop('habPref is missing')
-    if(is.null(alt))
+    if (is.null(alt))
       df[, 3] <- 0
-    if(!is.null(altPref) & is.null(alt))
+    if (!is.null(altPref) & is.null(alt))
       stop('alt is missing')
-    if(is.null(altPref) & !is.null(alt))
+    if (is.null(altPref) & !is.null(alt))
       stop('altPref is missing')
-    if(!is.null(extentOut) & shpOut == TRUE)
+    if (!is.null(extentOut) & shpOut == TRUE)
       stop('extentOut can be only used when shpOut = FALSE')
-    if(continuous == TRUE & shpOut == TRUE)
+    if (continuous == TRUE & shpOut == TRUE)
       stop('shpOut can be only be true when continuous = FALSE')
   }
 
   # Read shapes in directory
-  if(is.character(eooSp)){
+  if (is.character(eooSp)) {
     eooSp <- readShp(eooSp)
   }
 
@@ -120,14 +120,14 @@ aoh <- function(eooSp = NULL, lc = NULL, alt = NULL, altPref = NULL,
 
   # Looping for refinament
   result <- list()
-  if(progress){
+  if (progress) {
     pb <- txtProgressBar(min = 0, max = length(eooSp), style = 3)
   }
-  for(i in 1:length(eooSp)){
+  for (i in 1:length(eooSp)) {
     maps.eoo <- maps
 
-    if(!is.null(climSuit)){
-      if(eooSp@data[i, 2] %in% names(climSuit)){
+    if (!is.null(climSuit)) {
+      if (eooSp@data[i, 2] %in% names(climSuit)) {
         climSuit.eoo <- climSuit[names(climSuit) == eooSp@data[i, 2]]
         maps.eoo <- c(climSuit.eoo, maps.eoo)
         names(maps.eoo) <- c('climSuit', names(maps.eoo)[2:3])
@@ -135,40 +135,40 @@ aoh <- function(eooSp = NULL, lc = NULL, alt = NULL, altPref = NULL,
       }
     }
 
-    maps.eoo <- lapply(maps.eoo, function(x) crop(x, eooSp[i, ]))
+    maps.eoo <- lapply(maps.eoo, function(x) raster::crop(x, eooSp[i, ]))
 
     # Refinament of lc
-    if(any(names(maps.eoo) == 'lc')){
+    if (any(names(maps.eoo) == 'lc')) {
       sp.habPref <- habPref[as.character(eooSp[i, ]@data[, 2]) == as.character(habPref[, 1]),
                             2:ncol(habPref)]
       sp.habPref <- cbind(as.numeric(names(sp.habPref)), t(sp.habPref))
-      if (nrow(sp.habPref) > 0){
+      if (nrow(sp.habPref) > 0) {
         hab.cat <- as.numeric(colnames(sp.habPref)[as.vector(sp.habPref[1, ] == 1)])
-        hab.ref <- reclassify(maps.eoo[[which(names(maps.eoo) == 'lc')]],
+        hab.ref <- raster::reclassify(maps.eoo[[which(names(maps.eoo) == 'lc')]],
                               sp.habPref)
-        maps.eoo[[which(names(maps.eoo) == 'lc')]] <- mask(hab.ref, eooSp[i, ])
+        maps.eoo[[which(names(maps.eoo) == 'lc')]] <- raster::mask(hab.ref, eooSp[i, ])
       }
-      if (nrow(sp.habPref) == 0){
+      if (nrow(sp.habPref) == 0) {
         hab.ref <- maps.eoo[[which(names(maps.eoo) == 'lc')]] > 0
-        maps.eoo[[which(names(maps.eoo) == 'lc')]] <- mask(hab.ref, eooSp[i, ])
+        maps.eoo[[which(names(maps.eoo) == 'lc')]] <- raster::mask(hab.ref, eooSp[i, ])
         df[i, 2] <- 0
       }
     }
 
     # Refinament of al
-    if(any(names(maps.eoo) == 'alt')){
+    if (any(names(maps.eoo) == 'alt')) {
       sp.altPref <- altPref[as.character(eooSp[i, ]@data[, 2]) == as.character(altPref[, 1]), 2:3]
       alt.crop <- maps.eoo[[which(names(maps.eoo) == 'alt')]]
-      if (nrow(sp.altPref) > 0){
-        if(sum(is.na(sp.altPref)) != 2){
-          if(sum(is.na(sp.altPref)) == 1){
-            if(is.na(sp.altPref[1])){
+      if (nrow(sp.altPref) > 0) {
+        if (sum(is.na(sp.altPref)) != 2) {
+          if (sum(is.na(sp.altPref)) == 1) {
+            if (is.na(sp.altPref[1])) {
               alt.ref <- alt.crop <= sp.altPref[1, 2]          }
-            if(is.na(sp.altPref[2])){
+            if (is.na(sp.altPref[2])) {
               alt.ref <- alt.crop >= sp.altPref[1, 1]
             }
           }
-          if(sum(is.na(sp.altPref)) == 0){
+          if (sum(is.na(sp.altPref)) == 0) {
             alt.crop <- alt.crop >= sp.altPref[1, 1] & alt.crop <= sp.altPref[1, 2]
           }
           maps.eoo[[which(names(maps.eoo) == 'alt')]] <- mask(alt.crop, eooSp[i, ])
