@@ -52,50 +52,59 @@ prefHab <- function(sp, key = NULL, cat = NULL,
                     season = c('Resident', 'Breeding','Non-breeding', 'Passage',
                                            'Unknown'), progress = FALSE){
   {
-  if(mi == TRUE & sum(suitability %in% c('Marginal', 'Unknown')) > 0)
+  if (mi & sum(suitability %in% c('Marginal', 'Unknown')) > 0)
     stop('It is not possible to simultaneously include Marginal e Unknown habitat
          suitability and major importance habitats only')
-    if(!is.null(cat))
-       if(!ncol(cat) == 2)
-      stop('cat has to have 2 columns')
+    if (!is.null(cat))
+       if (!ncol(cat) == 2)
+      stop('cat must have 2 columns')
   }
-
-  if(is.null(cat) == TRUE){
+  # If no cat provided, use class_ref
+  if (is.null(cat)) {
     cat <- class_ref
   }
-  if(ncol(cat) == 2){
+  # If use provide cat, it would have 2 columns
+  if (ncol(cat) == 2) {
     colnames(cat)[2] <- 'User_code'
   }
-
+  # Df of results
   df <- data.frame(matrix(nrow = length(sp), ncol = length(unique(cat$User_code)) + 1))
   colnames(df) <- c('species', unique(cat$User_code))
-  if(progress == TRUE) {
+  # Progress bar
+  if (progress) {
     pb <- txtProgressBar(min = 0, max = length(sp), style = 3)
   }
-
-  for (i in 1:length(sp)){
-    hab.spp <- rl_habitats(sp[i], key = key)
-    if(length(hab.spp$result) == 0){
+  # Looping for each sp
+  for (i in 1:length(sp)) {
+    # Searching data in IUCN
+    hab.spp <- "tryPrefHab(sp[i], key = key)"
+    hab.spp <- tryFun(hab.spp)
+    # If no data for sp
+    if (length(hab.spp$result) == 0) {
       warning(paste('No habitat information was found for', sp[i]))
       df[i, 2:ncol(df)] <- rep(0, length(2:ncol(df)))
       df[i, 1] <- sp[i]
     }
-    if(length(hab.spp$result) > 0){
+    # If data found
+    if (length(hab.spp$result) > 0) {
       pref.tab <- hab.spp$result
       pref.tab <- pref.tab[pref.tab$suitability %in% suitability, ]
       pref.tab <- pref.tab[pref.tab$season %in% season, ]
-      ifelse(mi, pref.tab <- pref.tab[is.na(pref.tab$majorimportance) == FALSE, ],
+      ifelse(mi,
+             pref.tab <- pref.tab[is.na(pref.tab$majorimportance) == FALSE, ],
              pref.tab <- pref.tab)
       code <- hab.spp$result$code
+      # Comparing IUCN's Habitat code with user code
       yes.hab <- cat[, 1] %in% code
       cat.hab <- names(df)[2:ncol(df)] %in% unique(cat$User_code[yes.hab])
       df[i, 2:ncol(df)] <- as.numeric(cat.hab)
       df[i, 1] <- sp[i]
     }
-    if(progress == TRUE) {
+    if (progress) {
       setTxtProgressBar(pb, i)
     }
   }
+  # Excluding classes without correspondence
   df <- df[, colnames(df) != 0]
   return(df)
 }

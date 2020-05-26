@@ -5,7 +5,7 @@
 \alias{aHull}
 \title{aHull: generate alpha hull polygons for multiple-species}
 \usage{
-aHull (occ, crs, dist = 0.25, poly = NULL, fraction = 1.0, partCount = 2,
+aHull (occ, crs, distOcc = 0.25, poly = NULL, fraction = 1.0, partCount = 2,
 buff = 1000, alphaIncrement = 0.01, cropToPoly = FALSE)
 }
 \arguments{
@@ -21,7 +21,13 @@ identified as "species" (species names or other identification of taxa), "long"
 \item{crs}{The Coordinate Reference System (CRS) specifing the projection and
 datum of dataset. Could be a CRS object or a character string.}
 
-\item{dist}{A value corresponding to the minimum distance assigned to consider
+\item{alphaIncrement}{The amount to increase alpha with each iteration.}
+
+\item{fraction}{The minimum fraction of occurrences that must be included in polygon.}
+
+\item{partCount}{The maximum number of disjunct polygons that are allowed.}
+
+\item{distOcc}{A value corresponding to the minimum distance assigned to consider
 two coordinates as not duplicate. Values up to this distance will be consider
 as duplicates and removed. Default is zero (i.e. only exactly coincindent
 coordinates will be removed). Units of this value must be the same as those of
@@ -29,18 +35,12 @@ the coordinates for projected data or in km if coordinates are defined to be
 longitude/latitude. For more details, see \code{\link[sp:remove.duplicates]
 {remove.duplicates}}.}
 
+\item{buff}{A buffer distance in meters to increase boundaries of alpha hull.}
+
 \item{poly}{Optional. A polygon (ESRI shapefile as 'SpatialPolygonsDataFrame'
 class) of the specific area to be checked for occurrences of species and to
 restrict alpha hull development only to the species occurring inside of the polygon.
 See details.}
-
-\item{fraction}{The minimum fraction of occurrences that must be included in polygon.}
-
-\item{partCount}{The maximum number of disjunct polygons that are allowed.}
-
-\item{buff}{A buffer distance in meters to increase boundaries of alpha hull.}
-
-\item{alphaIncrement}{The amount to increase alpha with each iteration.}
 
 \item{cropToPoly}{(logical) Whether the output should also include the alpha
 hull cropped by the provided poly. Only used if poly provided.}
