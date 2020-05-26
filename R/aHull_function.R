@@ -6,17 +6,17 @@
 #' \code{\link[rangeBuilder]{getDynamicAlphaHull}} (rangeBuilder package), that
 #' determines the α parameter by the spatial distribution of the coordinates.
 #'
-#' @usage aHull (occ, crs, distOcc = 0.25, poly = NULL, fraction = 1.0, partCount = 2,
-#' buff = 1000, alphaIncrement = 0.01, cropToPoly = FALSE)
+#' @usage aHull (occ, crs, alphaIncrement = 0.01, fraction = 1.0, partCount = 2, buff = 1000, distOcc = 0.25, poly = NULL, cropToPoly = FALSE)
 #'
-#' @param occ Occurrences records of the species. It might be a 'sp.occ'
+#' @param occ Occurrences records of the species. It might be a 'spOcc'
 #' object corresponding to a list of 'SpatialPoints' for multiple species
 #' (see \code{\link[aoh]{readOcc}} to obtain such class of object), a 'list' of
 #' 'data.frames' with the occurrences from multiple species, or a path for a folder
 #' with the species occurrences files (.csv format). Each file, corresponding to
 #' only one species and named with the corresponding species names, must have be 3 columns
 #' identified as "species" (species names or other identification of taxa), "long"
-#' (longitude), "lat" (latitude).
+#' (longitude), "lat" (latitude). NOTE: Longitude must be at a column before the
+#' latitude column.
 #' @param crs The Coordinate Reference System (CRS) specifing the projection and
 #' datum of dataset. Could be a CRS object or a character string.
 #' @param distOcc A value corresponding to the minimum distance assigned to consider
@@ -58,86 +58,80 @@
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export aHull
 
-aHull <- function(occ, crs, alphaIncrement, fraction, partCount, distOcc = NULL, buff = NULL,
-                  poly = NULL, cropToPoly = FALSE){
+aHullt2 <- function(occ, crs, fraction = NULL, partCount = NULL, alphaIncrement = NULL,
+                   buff = NULL, distOcc = NULL, poly = NULL, cropToPoly = FALSE){
 
   # Warning messages
-  if (missing(occ))
+  {
+   if (missing(occ))
     stop("occ is missing")
   if (missing(crs))
     stop("crs is missing")
+  }
 
-  # Reading .csv files with geo-referenced records of multiple species to generate a 'sp.occ' object
+  # Input data as 'data.frame' will be converted into a 'spOcc' object
+  {
+  # If ocurrences records are in .csv files of multiple species:
+  # To read the files and create a list of data.frames
   if (is.character(occ)){
       if(substr(occ, nchar(occ), nchar(occ)) == '/'){
       occ <- substr(occ, 1, nchar(occ) - 1)
     }
       files.sp <- list.files(occ, pattern = ".csv$")
-      sd <- do.call("list", lapply (files.sp, read.csv, header = TRUE))
-      names(sd) <- gsub(".csv", " ", files.sp)
+      occ <- do.call("list", lapply (files.sp, read.csv, header = TRUE))
+      names(occ) <- gsub(".csv", " ", files.sp)
     }
 
-  # Reading a list object with occurrences data from a multiple species in a 'data.frame' class
+    # If ocurrences records of multiple species are already in a list of 'data.frames
   if (class(occ) == "list" & class(occ[[1]]) =="data.frame"){
-    sd <- occ
-  }
-  # To convert occurrences in data.frame into 'SpatialPoints'
-
-  # Warning messages
+        occ <- occ
+     # Converting data.frame occurrences into 'SpatialPoints'
+     # Warning messages
+     {
   if (is.null(distOcc))
     warning("distOcc is missing, so default (zero) is used")
+  }
+     occ <- lapply(occ, f.clean1) # a 'spOcc' object
+       for (i in 1:length(occ)){
+       colnames(occ[[i]]@coords) <- c("long", "lat")
+       }
+     class(occ) <- "spOcc"
+  }
 
-    f.clean1 <- function(sd){
-      long=as.numeric(as.character(sd$long))
-      lat=as.numeric(as.character(sd$lat))
-      c=cbind(as.numeric(as.character(long)), as.numeric(as.character(lat)))
-      c=data.frame(c)
-      options(digits=4)
-      if (is.character(crs)){
-        sp=SpatialPoints(c, proj4string = CRS(crs))
-      }
-      if (class(crs) == "CRS"){
-        sp=SpatialPoints(c, proj4string = crs)
-      }
-      sp2=remove.duplicates(sp, zerodist(sp, zero=as.numeric(distOcc)))
-    }
-    occ <- lapply(sd, f.clean1) # a 'sp.occ' object
-
-  # Checking and filtering the species occurring in a specified area (if 'poly is provided)
-  if (class(occ) == "sp.occ" & !is.null(poly) | class(occ) == "list" &
-      class(occ[[1]]) =="data.frame" & !is.null(poly)){
+  # Checking and filtering the species occurrences based on a specified area (if 'poly is provided)
+  if (class(occ) == "spOcc" & !is.null(poly) | class(occ) == "list" &
+      class(occ[[1]]) =="SpatialPoints" & !is.null(poly)){
   spcheck<-checkOcc(occ, poly)
   occ<-occ[match(names(occ), names(spcheck))]
   occ<-list.clean(occ, fun = is.null, recursive = TRUE)
   }
-
- # To identify and subset the species with less than 3 records
-    f.clean2 <- function (y){
-    options(digits=4)
-    sp.clean <- nrow(coordinates(y@coords)) < 3
-    }
-    occ.ahul <- list.clean(occ, fun = f.clean2, recursive = TRUE) # List with SpatialPoints of species with, at least, 3 occurrences records not duplicated (4913 spp)
+    # ALPHA HULL CONSTRUCTION
+{
+    # Removing from the dataset those species with less than 3 records
+    occ.ahul <- list.clean(occ, fun = f.clean2, recursive = TRUE) # List with SpatialPoints of species with, at least, 3 occurrences records not duplicated
     spp.names <- names(occ.ahul)
 
-  # Function to automatize the bulding of ahull to multiple-species
-    f.ahull <-function(occ.ahul, spp.names){
-    al <- getDynamicAlphaHull(occ.ahul@coords, fraction=fraction, partCount=partCound,
-                              initialAlpha = 0.0, alphaIncrement=alphaIncrement,
-                              clipToCoast='no', verbose=T)
-    al1 <- data.frame(matrix(unlist(al[[2]])),stringsAsFactors=FALSE)
-    write.table(al1, file=paste(spp.names,"alpha.csv", sep=";"))
-    al2=al[[1]]
-    ahul<-shapefile(al2, filename = paste(spp.names,"AHULL", sep=""), overwrite=TRUE)
+    # Data frame of results
+    df <- data.frame (matrix(ncol = 2, nrow = length(occ.ahul)))
+    names(df) <- c('Species', 'Alpha')
+    df[, 1] <- spp.names
 
-    if (cropToPoly == TRUE){
-      croped<-crop(ahul, poly)
-      return(croped)
-    }
-  return(al1)
-    }
+    # Building the alpha hull for each species
+    sp.ahull <- mapply(f.ahull, occ.ahul, fraction, partCount, buff, alphaIncrement)
+    names(sp.ahull) <- spp.names
+  }
 
-    # Applying the function
-    sp.ahull <- mapply(f.ahull, occ.ahul, spp.names)
+    spp.ahulls <- do.call(bind, sp.ahull) # a 'SpatialPolygonsDataFrame' object
+
+    # Results
+    ahull.result <- list(AlphaValues = df, AhullShps = spp.ahulls)
+    class(ahull.result) <- "aHull"
+    return(ahull.result)
+  }
 }
+
+
+
+
 
 
