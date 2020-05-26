@@ -49,13 +49,13 @@ spRecords <- function(sp, ex = NULL, dataBase = c('GBIF', 'VertNet', 'BISON'),
 
     # GBIF
     if (any(dataBase %in% 'GBIF')) {
-    occ.gb <- gbif(gen, es, ext = ex[[i]], geo = T)
+    occ.gb <- suppressMessages(gbif(gen, es, ext = ex[[i]], geo = T))
     occ.all[[1]] <- data.frame(lon = occ.gb$lon, lat = occ.gb$lat)
     }
 
     # VetNet
     if (any(dataBase %in% 'VertNet')) {
-      occ.vn <- searchbyterm(genus = gen, specificepithet = es)
+      occ.vn <- suppressMessages(searchbyterm(genus = gen, specificepithet = es))
       occ.vn <- occ.vn$data
       occ.all[[2]] <- data.frame(lon = as.numeric(occ.vn$decimallongitude),
                       lat = as.numeric(occ.vn$decimallatitude),
@@ -64,7 +64,7 @@ spRecords <- function(sp, ex = NULL, dataBase = c('GBIF', 'VertNet', 'BISON'),
 
     # BISON
     if (any(dataBase %in% 'BISON')) {
-      occ.bs <- bison(sp[i])
+      occ.bs <- suppressMessages(bison(sp[i]))
       occ.all[[3]] <- data.frame(lon = occ.bs$points$decimalLongitude,
                       lat = occ.bs$points$decimalLatitude,
                       stringsAsFactors = FALSE)
