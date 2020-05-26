@@ -34,7 +34,7 @@
 
 checkOcc<-function(occ, poly, distOcc){
 
-  # Warning messages
+  # Checklist and warning messages
   if (missing(occ))
     stop("occ is missing")
   if (missing(poly))
