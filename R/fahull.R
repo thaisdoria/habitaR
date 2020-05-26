@@ -10,12 +10,5 @@ f.ahull <-function(occ.ahul, fraction, partCount, buff, alphaIncrement){
                             initialAlpha = 0.0, clipToCoast='no',
                             alphaIncrement = alphaIncrement,
                             verbose = TRUE)
-  ahul<-ah[[1]]
-  alpha <- data.frame(matrix(unlist(ah[[2]])), stringsAsFactors=FALSE)
-  return(resul)
+  return(ah)
   }
-
-
-
-
-
