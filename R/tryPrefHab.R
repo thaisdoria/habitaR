@@ -1,7 +1,11 @@
-tryPrefHab <- function(spp, key){
+tryFun <- function(fun){
+  if (is.character(fun)) {
+    fun <- parse(text = fun)
+  }
+
   index <- 1
-  while(index <= 3){
-    result <- try(rl_habitats(spp, key = key), silent = T)
+  while (index <= 3) {
+    result <- try(eval(fun), silent = T)
     if (inherits(result, "try-error")) {
       index <- index + 1
       Sys.sleep(10)

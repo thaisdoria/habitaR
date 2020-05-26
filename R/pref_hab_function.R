@@ -77,7 +77,8 @@ prefHab <- function(sp, key = NULL, cat = NULL,
   # Looping for each sp
   for (i in 1:length(sp)) {
     # Searching data in IUCN
-    hab.spp <- tryPrefHab(sp[i], key = key)
+    hab.spp <- "tryPrefHab(sp[i], key = key)"
+    hab.spp <- tryFun(hab.spp)
     # If no data for sp
     if (length(hab.spp$result) == 0) {
       warning(paste('No habitat information was found for', sp[i]))
