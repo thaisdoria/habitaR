@@ -18,12 +18,12 @@
 #' as duplicates and removed. Units of this value must be in km. Optional.
 #' Default is zero (i.e. only exactly coincindent coordinates will be removed).
 #' For more details, see \code{\link[sp:remove.duplicates]{remove.duplicates}}.
-#' @import sp
 #' @return \code{readOcc} returns a 'sp.occ' object corresponding to a list of species
 #' with features from a class of 'SpatialPoints'.
 #' @encoding UTF-8
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export readOcc
+#' @import sp
 
 readOcc <- function(occ, crs, distOcc = NULL){
 
