@@ -9,15 +9,15 @@
 #' 'RasterStack', a 'list' of 'RasterLayer' or 'aoh' object (see
 #'  \code{\link[aoh]{aoh}} to generate the latter object)
 #'
-#' aohVal(eoo.sp, aoh.sp, plot=TRUE, progress=FALSE)
+#' aohVal(eooSp, aohSp, plot=TRUE, progress=FALSE)
 #'
-#' @param eoo.sp Spatial distribution data of the species representing the
+#' @param eooSp Spatial distribution data of the species representing the
 #' original (i.e. not refined) extent of occurrence (EOO). It might correspond to
 #' 'SpatialPolygonsDataFrame' (see \code{\link[aoh]{readShp}} to obtain such
 #' class of object), a 'RasterLayer', a 'RasterStack', or a 'list' with 'RasterLayer'
 #' class of features (see \code{\link[aoh]{readRas}} to obtain such object).
 #'
-#' @param aoh.sp Spatial distribution data of the species representing the area
+#' @param aohSp Spatial distribution data of the species representing the area
 #' of habitat (AOH). It might correspond to 'SpatialPolygonsDataFrame'
 #' (see \code{\link[aoh]{readShp}} to obtain such class of object), a
 #' 'RasterLayer', a 'RasterStack', a 'list' with 'RasterLayer' class of features
@@ -96,28 +96,28 @@
 #' @import GISTools
 #' @importFrom utils txtProgressBar setTxtProgressBar
 
-aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
+aohVal <- function (eooSp, aohSp, plot = TRUE, progress = TRUE){
 
-  # Warning messages
+  # Checklist and warning messages
   {
-    if (missing(eoo.sp))
-      stop("eoo.sp is missing")
-    if (missing(aoh.sp))
-      stop("aoh.sp is missing")
+    if (missing(eooSp))
+      stop("eooSp is missing")
+    if (missing(aohSp))
+      stop("aohSp is missing")
   }
 
   # Extracting the name of species from input data
-  if(class(eoo.sp) == "SpatialPolygonsDataFrame"){ # can be generated with 'readShp' function)
-    sp.names <- eoo.sp@data[,2]
+  if(class(eooSp) == "SpatialPolygonsDataFrame"){ # can be generated with 'readShp' function)
+    sp.names <- eooSp@data[,2]
   }
-  if(class(eoo.sp) %in% c("RasterLayer", "RasterStack")
-  | (class(eoo.sp) == "list" & class(eoo.sp[[1]]) == "RasterLayer")) { # a 'list' of rasters can be generated with 'readRas' function)
-    sp.names <- gsub("[.]", " ", names(eoo.sp))
+  if(class(eooSp) %in% c("RasterLayer", "RasterStack")
+  | (class(eooSp) == "list" & class(eooSp[[1]]) == "RasterLayer")) { # a 'list' of rasters can be generated with 'readRas' function)
+    sp.names <- gsub("[.]", " ", names(eooSp))
   }
 
   # Summary data frame of results
   dfRes <- data.frame(matrix(ncol = 6, nrow = length(sp.names)))
-  colnames(dfRes) <- c("Species", "MATCH.EOO", "MATCH.AOH", "PP", "MP", "PP-MP")
+  colnames(dfRes) <- c("Species", "MatchEoo", "MatchAoh", "PP", "MP", "PP-MP")
   dfRes[,1] <- sp.names
 
   # Enabling the progress bar
@@ -135,11 +135,11 @@ aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
     # Input data based on shape analysis - it is not the best recomended
     {
       # Input eoo and aoh as SpatialPolygonsDataFrame
-      if(class(eoo.sp) == "SpatialPolygonsDataFrame" # can be generated with 'readShp' function)
-         & (class(aoh.sp) == "SpatialPolygonsDataFrame" | class(aoh.sp) == "aoh" &
-            class(aoh.sp$Data[[1]]) == "SpatialPolygonsDataFrame")){ # can be generated with 'readShp' or 'aoh' function)
+      if(class(eooSp) == "SpatialPolygonsDataFrame" # can be generated with 'readShp' function)
+         & (class(aohSp) == "SpatialPolygonsDataFrame" | class(aohSp) == "aoh" &
+            class(aohSp$Data[[1]]) == "SpatialPolygonsDataFrame")){ # can be generated with 'readShp' or 'aoh' function)
 
-        sp.e <- eoo.sp[i, ]
+        sp.e <- eooSp[i, ]
         plot(sp.e)
         occ <- gbif(as.character(sp.e@data[,2]), ext=sp.e@bbox, geo=T)
 
@@ -159,13 +159,13 @@ aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
           match.eoo <- poly.counts (pts, sp.e)
         }
 
-        if(class(aoh.sp) == "SpatialPolygonsDataFrame"){
-          sp.a <- aoh.sp[i, ]
+        if(class(aohSp) == "SpatialPolygonsDataFrame"){
+          sp.a <- aohSp[i, ]
           match.aoh <- poly.counts(pts, sp.a)
         }
 
-        if(class(aoh.sp) == "aoh" & class(aoh.sp$Data[[1]]) == "SpatialPolygonsDataFrame"){
-          sp.a <- aoh.sp$Data[[i]]
+        if(class(aohSp) == "aoh" & class(aohSp$Data[[1]]) == "SpatialPolygonsDataFrame"){
+          sp.a <- aohSp$Data[[i]]
           match.aoh <- poly.counts(pts, sp.a)
         }
 
@@ -177,16 +177,16 @@ aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
     # Input data based on raster analysis
     {
     # Input 'eoo' and 'aoh' as Raster objects
-    if(class(eoo.sp) == "RasterLayer" | (class(eoo.sp) == "list" & # a 'list' of rasters can be generated with 'readRas' function)
-                                         class(eoo.sp[[1]]) == "RasterLayer") | class(eoo.sp) == "RasterStack"
-       & (class(aoh.sp) == "RasterLayer" | (class(aoh.sp) == "list" & # a 'list' of rasters can be generated with 'readRas' function)
-                                            class(aoh.sp[[1]]) == "RasterLayer") | class(aoh.sp) == "RasterStack" |
-          (class(aoh.sp) == "aoh" & class(aoh.sp$Data[[1]]) == "RasterLayer")))
+    if(class(eooSp) == "RasterLayer" | (class(eooSp) == "list" & # a 'list' of rasters can be generated with 'readRas' function)
+                                         class(eooSp[[1]]) == "RasterLayer") | class(eooSp) == "RasterStack"
+       & (class(aohSp) == "RasterLayer" | (class(aohSp) == "list" & # a 'list' of rasters can be generated with 'readRas' function)
+                                            class(aohSp[[1]]) == "RasterLayer") | class(aohSp) == "RasterStack" |
+          (class(aohSp) == "aoh" & class(aohSp$Data[[1]]) == "RasterLayer")))
     {
-      sp.re <- eoo.sp[[i]]
+      sp.re <- eooSp[[i]]
 
-      if(class(aoh.sp) %in% c("RasterLayer", "RasterStack")){
-        sp.ra <- aoh.sp[[i]]
+      if(class(aohSp) %in% c("RasterLayer", "RasterStack")){
+        sp.ra <- aohSp[[i]]
 
         if(res(sp.ra) > res(sp.re)){
           factor <- round((res(sp.ra) / res(sp.re)))
@@ -203,8 +203,8 @@ aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
         sp.ra [sp.ra > 0] <- 1
       }
 
-      if(class(aoh.sp) == "aoh" & class(aoh.sp$Data[[1]]) == "RasterLayer"){
-        sp.ra <- aoh.sp$Data[[i]]
+      if(class(aohSp) == "aoh" & class(aohSp$Data[[1]]) == "RasterLayer"){
+        sp.ra <- aohSp$Data[[i]]
 
         if(res(sp.ra) > res(sp.re)){
           factor <- round((res(sp.ra) / res(sp.re)))
@@ -224,17 +224,17 @@ aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
     }
 
     # Input 'eoo' object as Raster and 'aoh' object as SpatialPolygonsDataFrame
-    if(class(eoo.sp) == "RasterLayer" | (class(eoo.sp) == "list" & # a 'list' of rasters can be generated with 'readRas' function)
-                                         class(eoo.sp[[1]]) == "RasterLayer") | class(eoo.sp) == "RasterStack"
-       & (class(aoh.sp) == "SpatialPolygonsDataFrame" | (class(aoh.sp) == "aoh"
-                                                         & class(aoh.sp$Data[[1]]) == "SpatialPolygonsDataFrame")))
+    if(class(eooSp) == "RasterLayer" | (class(eooSp) == "list" & # a 'list' of rasters can be generated with 'readRas' function)
+                                         class(eooSp[[1]]) == "RasterLayer") | class(eooSp) == "RasterStack"
+       & (class(aohSp) == "SpatialPolygonsDataFrame" | (class(aohSp) == "aoh"
+                                                         & class(aohSp$Data[[1]]) == "SpatialPolygonsDataFrame")))
     {
-      sp.re <- eoo.sp[[i]]
+      sp.re <- eooSp[[i]]
 
 
-      if(class(aoh.sp) == "SpatialPolygonsDataFrame"){
+      if(class(aohSp) == "SpatialPolygonsDataFrame"){
         # rasterize the aoh based on resolution of eoo
-        sp.a <- aoh.sp[i,]
+        sp.a <- aohSp[i,]
         r <- raster()
         extent(r) <- extent(sp.re)
         res(r) <- res(sp.re)
@@ -244,9 +244,9 @@ aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
         sp.ra [sp.ra > 0] <- 1
       }
 
-      if(class(aoh.sp) == "aoh" & class(aoh.sp$Data[[1]]) == "SpatialPolygonsDataFrame"){
+      if(class(aohSp) == "aoh" & class(aohSp$Data[[1]]) == "SpatialPolygonsDataFrame"){
         # rasterize the aoh based on resolution of eoo
-        sp.a <- aoh.sp$Data[[i]]
+        sp.a <- aohSp$Data[[i]]
         r <- raster()
         extent(r) <- extent(sp.re)
         res(r) <- res(sp.re)
@@ -259,32 +259,32 @@ aohVal <- function (eoo.sp, aoh.sp, plot = TRUE, progress = TRUE){
        }
 
     # Input 'eoo' object as SpatialPolygonsDataFrame and 'aoh' object as Raster
-    if(class(eoo.sp) == "SpatialPolygonsDataFrame" & (class(aoh.sp) %in% c("RasterLayer", "RasterStack")
-      | (class(aoh.sp) == "list" & class(aoh.sp[[1]]) == "RasterLayer") | # a 'list' of rasters can be generated with 'readRas' function)
-      (class(aoh.sp) == "aoh" & class(aoh.sp$Data[[1]]) == "RasterLayer")))
+    if(class(eooSp) == "SpatialPolygonsDataFrame" & (class(aohSp) %in% c("RasterLayer", "RasterStack")
+      | (class(aohSp) == "list" & class(aohSp[[1]]) == "RasterLayer") | # a 'list' of rasters can be generated with 'readRas' function)
+      (class(aohSp) == "aoh" & class(aohSp$Data[[1]]) == "RasterLayer")))
       {
       # rasterize the eoo based on resolution of aoh
-      sp.e <- eoo.sp[i, ]
+      sp.e <- eooSp[i, ]
       r <- raster()
       extent(r) <- extent(sp.e)
 
-      if(class(aoh.sp) %in% c("RasterLayer", "RasterStack") | (class(aoh.sp) == "list" &
-        class(aoh.sp[[1]]) == "RasterLayer")) {
-        res(r) <- res(aoh.sp[[i]])
+      if(class(aohSp) %in% c("RasterLayer", "RasterStack") | (class(aohSp) == "list" &
+        class(aohSp[[1]]) == "RasterLayer")) {
+        res(r) <- res(aohSp[[i]])
         sp.re <- rasterize(sp.e, r)
         sp.re [sp.re > 1] <- 1
         sp.re <- mask(sp.re, sp.e)
-        sp.ra <- aoh.sp[[i]]
+        sp.ra <- aohSp[[i]]
         sp.ra [sp.ra > 0] <- 1
         sp.ra <- mask(sp.ra, sp.e)
       }
 
-      if(class(aoh.sp) == "aoh" & class(aoh.sp$Data[[1]]) == "RasterLayer"){
-        res(r) <- res(aoh.sp$Data[[i]])
+      if(class(aohSp) == "aoh" & class(aohSp$Data[[1]]) == "RasterLayer"){
+        res(r) <- res(aohSp$Data[[i]])
         sp.re <- rasterize(sp.e, r)
         sp.re [sp.re > 1] <- 1
         sp.re <- mask(sp.re, sp.e)
-        sp.ra <- aoh.sp$Data[[i]]
+        sp.ra <- aohSp$Data[[i]]
         sp.ra [sp.ra > 0] <- 1
         sp.ra <- mask(sp.ra, sp.e)
       }
