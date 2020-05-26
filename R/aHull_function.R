@@ -54,14 +54,54 @@
 #' by the area of \emph{poly}, assign \code{TRUE} to 'cropToPoly'.
 #' @seealso Dynamic alpha hulls from increasing alpha values are created with
 #' \code{\link[rangeBuilder:getDynamicAlphaHull]{getDynamicAlphaHull}}
+#' @return \code{aHull} returns a 'aHull' object
+#'
+#' If the conditions cannot be satisfied, then a minimum convex hull is returned
+#' .
+#' It gives the number of records matching with the EOO ("MATCH.EOO) and with the
+#' AOH ("MATCH.AOH) and the values of prevalence of points ("PP", Rondinini et al.
+#' 2011) through the proportion of occurrences spatially congruent with suitable
+#' cells, and of model prevalence ("MP", Rondinini et al. 2011), which represents
+#' EOOs proportion assigned as suitable). AOH predict species occurrences
+#' correctly when all available records match with its suitable cells (PP = 1).
+#' The evaluation of AOHs performance is based on difference between PP and MP.
+#' If PP > MP, AOH performs better than EOO in predict presences (Ficetola et al.
+#' 2015).
+#'
+#' If plot is \code{TRUE}, the function return also a plot with a graphical representation
+#' of validation results (see Rondinini et al. 2011). If plot \code{FALSE}, the function
+#' return a data.frame
+#'
+#' @details The function gives the summary of validation steps followed to evaluate
+#' the quality of models as described and performed by Rondidini et al. (2011) and
+#' Ficetola et al. (2015).
+#'
+#' @examples
+#'
+#' ### Fictitious plants data
+#'
+#' # Example for signature 'DataFrame' (occ).
+#'
+#' ahull_plants<-aHull(eoo = eoo_birdShp, aoh = aoh_birdRas, plot = TRUE, progress = TRUE)
+
+
+#' 2. Brooks, T. M, Fonseca, S.L. Pimm, Akçakaya, H.R., Buchanan, G.M., …,
+#' Rondinini C. (2019). Measuring Terrestrial Area of Habitat (AOH) and Its
+#' Utility for the IUCN Red List. Trends in Ecology &amp; Evolution, 34(11),
+#' 977–986.
+#'
+#' 3. Ficetola, G. F., Rondinini, C., Bonardi, A., Baisero, D., &amp;
+#' Padoa-Schippa, E. (2015).Habitat availability for amphibians and extinction
+#' threat: a global analysis. Diversity and Distributions, 21(3), 302–311.
+#'
 #' @encoding UTF-8
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export aHull
 
-aHullt2 <- function(occ, crs, fraction = NULL, partCount = NULL, alphaIncrement = NULL,
+aHull <- function(occ, crs, fraction = NULL, partCount = NULL, alphaIncrement = NULL,
                    buff = NULL, distOcc = NULL, poly = NULL, cropToPoly = FALSE){
 
-  # Warning messages
+  # Checking list and warning messages
   {
    if (missing(occ))
     stop("occ is missing")
@@ -106,7 +146,6 @@ aHullt2 <- function(occ, crs, fraction = NULL, partCount = NULL, alphaIncrement 
   occ<-list.clean(occ, fun = is.null, recursive = TRUE)
   }
     # ALPHA HULL CONSTRUCTION
-{
     # Removing from the dataset those species with less than 3 records
     occ.ahul <- list.clean(occ, fun = f.clean2, recursive = TRUE) # List with SpatialPoints of species with, at least, 3 occurrences records not duplicated
     spp.names <- names(occ.ahul)
@@ -118,13 +157,13 @@ aHullt2 <- function(occ, crs, fraction = NULL, partCount = NULL, alphaIncrement 
 
     # Building the alpha hull for each species
     sp.ahull <- mapply(f.ahull, occ.ahul, fraction, partCount, buff, alphaIncrement)
-    names(sp.ahull) <- spp.names
-  }
-
-    spp.ahulls <- do.call(bind, sp.ahull) # a 'SpatialPolygonsDataFrame' object
+    ahulls <- sp.ahull[1,] # a 'SpatialPolygonsDataFrame' object
+    alphas <- matrix(unlist(sp.ahull[2,]))
+    alphas <-gsub("alpha", "", alphas[,1])
+    df[,2]<- alphas
 
     # Results
-    ahull.result <- list(AlphaValues = df, AhullShps = spp.ahulls)
+    ahull.result <- list(AlphaValues = df, AhullShps = ahulls)
     class(ahull.result) <- "aHull"
     return(ahull.result)
   }
