@@ -1,12 +1,13 @@
 #' aHull: generate alpha hull polygons for multiple-species
 #'
-#' From the raw occurrences records of multiple species, provides the alpha hull
+#' From the occurrences records of multiple species, provides the alpha hull
 #' polygon representing the extent of occurrence (EOO) of each species which have
 #' a minimun of 3 not duplicate records. It is build based on the original function
 #' \code{\link[rangeBuilder]{getDynamicAlphaHull}} (rangeBuilder package), that
 #' determines the α parameter by the spatial distribution of the coordinates.
 #'
-#' @usage aHull (occ, crs, alphaIncrement = 0.01, fraction = 1.0, partCount = 2, buff = 1000, distOcc = 0.25, poly = NULL, cropToPoly = FALSE)
+#' @usage aHull (occ, crs, alphaIncrement = 0.01, fraction = 1.0, partCount = 2,
+#' buff = 1000, distOcc = 0.25, poly = NULL, cropToPoly = FALSE)
 #'
 #' @param occ Occurrences records of the species. It might be a 'spOcc'
 #' object corresponding to a list of 'SpatialPoints' for multiple species
@@ -83,23 +84,24 @@
 #' # Example for signature 'DataFrame' (occ).
 #'
 #' ahull_plants<-aHull(eoo = eoo_birdShp, aoh = aoh_birdRas, plot = TRUE, progress = TRUE)
-
-
-#' 2. Brooks, T. M, Fonseca, S.L. Pimm, Akçakaya, H.R., Buchanan, G.M., …,
+#'
+#' @references
+#' 1. Capinha Brooks, T. M, Fonseca, S.L. Pimm, Akçakaya, H.R., Buchanan, G.M., …,
 #' Rondinini C. (2019). Measuring Terrestrial Area of Habitat (AOH) and Its
 #' Utility for the IUCN Red List. Trends in Ecology &amp; Evolution, 34(11),
 #' 977–986.
 #'
-#' 3. Ficetola, G. F., Rondinini, C., Bonardi, A., Baisero, D., &amp;
-#' Padoa-Schippa, E. (2015).Habitat availability for amphibians and extinction
-#' threat: a global analysis. Diversity and Distributions, 21(3), 302–311.
+#' 2. CRIADOR DO RANGE BUILDER.
+#'
+#' 3. Meyer et al. (2018)
 #'
 #' @encoding UTF-8
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export aHull
 
 aHull <- function(occ, crs, fraction = NULL, partCount = NULL, alphaIncrement = NULL,
-                   buff = NULL, distOcc = NULL, poly = NULL, cropToPoly = FALSE){
+                   buff = NULL, distOcc = NULL, poly = NULL, cropToPoly = FALSE,
+                   occSum= FALSE){
 
   # Checking list and warning messages
   {
@@ -137,6 +139,7 @@ aHull <- function(occ, crs, fraction = NULL, partCount = NULL, alphaIncrement = 
        }
      class(occ) <- "spOcc"
   }
+}
 
   # Checking and filtering the species occurrences based on a specified area (if 'poly is provided)
   if (class(occ) == "spOcc" & !is.null(poly) | class(occ) == "list" &
@@ -145,8 +148,10 @@ aHull <- function(occ, crs, fraction = NULL, partCount = NULL, alphaIncrement = 
   occ<-occ[match(names(occ), names(spcheck))]
   occ<-list.clean(occ, fun = is.null, recursive = TRUE)
   }
-    # ALPHA HULL CONSTRUCTION
-    # Removing from the dataset those species with less than 3 records
+
+
+    # GENERATING THE ALPHA HULL
+    # Removing from dataset those species with less than 3 records
     occ.ahul <- list.clean(occ, fun = f.clean2, recursive = TRUE) # List with SpatialPoints of species with, at least, 3 occurrences records not duplicated
     spp.names <- names(occ.ahul)
 
@@ -163,11 +168,25 @@ aHull <- function(occ, crs, fraction = NULL, partCount = NULL, alphaIncrement = 
     df[,2]<- alphas
 
     # Results
+    if(occSum == FALSE){
     ahull.result <- list(AlphaValues = df, AhullShps = ahulls)
     class(ahull.result) <- "aHull"
     return(ahull.result)
+    }
+
+    if(occSum == TRUE){
+      df2 <- data.frame (matrix(ncol = 1, nrow = length(occ.ahul)))
+      names(df2) <- 'Occurrences'
+      for (i in 1:length(occ.ahul)){
+        df2[i,1] <- length(occ.ahul[[i]]@coords[,1])}
+      df<-cbind(df, df2)
+      ahull.result <- list(AlphaValues = df, AhullShps = ahulls)
+      class(ahull.result) <- "aHull"
+      return(ahull.result)
+          }
   }
-}
+
+
 
 
 
