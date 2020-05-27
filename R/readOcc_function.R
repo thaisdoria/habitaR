@@ -25,7 +25,7 @@
 #' @export readOcc
 #' @import sp
 
-readOcc <- function(occ, crs, distOcc = NULL){
+readOcc1 <- function(occ, crs, distOcc = NULL, occSum=FALSE){
 
     if(substr(occ, nchar(occ), nchar(occ)) == '/'){
     path <- substr(occ, 1, nchar(occ) - 1)
@@ -39,6 +39,18 @@ readOcc <- function(occ, crs, distOcc = NULL){
   colnames(sp.pointsclean[[i]]@coords) <- c("long", "lat")
   }
   class(sp.pointsclean) <- "spOcc"
+
+  if(occSum == FALSE){
   return(sp.pointsclean)
+  }
+  if(occSum == TRUE){
+  df <- data.frame (matrix(ncol = 2, nrow = length(sp.pointsclean)))
+  names(df) <- c('Species', 'OccSum')
+  df[,1] <- names(sp.pointsclean)
+  for (i in 1:length(sp.pointsclean)){
+  df[i,2] <- length(sp.pointsclean[[i]]@coords[,1])}
+  sp.pointsclean.l<-list(sp.pointsclean, df)
+  return(sp.pointsclean.l)
+  }
 }
 
