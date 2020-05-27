@@ -4,9 +4,7 @@
 \name{class_ref}
 \alias{class_ref}
 \title{Habitat classification reference}
-\format{
-A data frame with 6 rows and 125 variables
-}
+\format{A data frame with 6 rows and 125 variables}
 \usage{
 data(class_ref)
 }
