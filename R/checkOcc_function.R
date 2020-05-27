@@ -22,17 +22,20 @@
 #' as duplicates and removed. Units of this value must be in km. Default is zero
 #' (i.e. only exactly coincindent coordinates will be removed). For more details,
 #' see \code{\link[sp:remove.duplicates]{remove.duplicates}}. Optional and only
-#' used if 'occ' is a path for .csv files or a list of' data.frame.
-#' If 'occ' correspond to 'SpatialPoints', 'distOcc' should be ignored.
-#' @import sp
-#' @import rlist
+#' used if 'occ' is a path for .csv files or a list of 'data.frame'. If 'occ'
+#' correspond to 'SpatialPoints', 'distOcc' should be ignored.
+#' @param OccSum (logical) Whether the output should include also a data.frame
+#' with the number of occurrences records after the removal of duplicate coordinates.
+#' Default if \code{FALSE}.
 #' @return \code{checkOcc} returns the species occurring inside of the polygon
 #' provided with the respective total of ocurrences falling in this polygon.
 #' @encoding UTF-8
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export checkOcc
+#' @import sp
+#' @import rlist
 
-checkOcc<-function(occ, poly, distOcc){
+checkOcc<-function(occ, poly, distOcc = NULL, SpOcc=FALSE){
 
   # Checklist and warning messages
   if (missing(occ))
@@ -89,8 +92,18 @@ checkOcc<-function(occ, poly, distOcc){
       cf.occ<-lapply(occ, f.cf.occ) # object with occurrences checked (0 represents absence inside of biome and 1 represents presence inside of biome)
       cf.occsum<- lapply(cf.occ, sum) # object with the sum of the checked records (0 represents complete absence of species inside of biome)
       cf.occsum[cf.occsum==0] <- NA
-      cf.occclean<-list.clean(cf.occsum, fun = is.na, recursive = TRUE)
-      return(cf.occclean)
+      cf.occcheck<-list.clean(cf.occsum, fun = is.na, recursive = TRUE)
+
+      if(SpOcc == FALSE){
+        return(cf.occcheck)
+      }
+
+      if(SpOcc == TRUE){
+        sp.occcheck<-occ[match(names(occ), names(cf.occcheck))]
+        sp.occcheck<-list.clean(occ, fun = is.null, recursive = TRUE)
+        cf.occcheck.l<-list(CheckedOcc = cf.occcheck , CheckedSpatialPoints = sp.occcheck)
+        return(cf.occcheck.l)
+      }
     }
   }
 }
