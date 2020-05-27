@@ -4,9 +4,7 @@
 \name{aoh_birdRas}
 \alias{aoh_birdRas}
 \title{AOH raster for Birds}
-\format{
-A RasterStack with 3 layers.
-}
+\format{A RasterStack with 3 layers.}
 \usage{
 data(aoh_birdRas)
 }
