@@ -4,9 +4,7 @@
 \name{habpref_bird}
 \alias{habpref_bird}
 \title{Habitat preference for Birds}
-\format{
-A data frame with 4 rows and 4 variables
-}
+\format{A data frame with 4 rows and 4 variables}
 \usage{
 data(habpref_bird)
 }
