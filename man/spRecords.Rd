@@ -26,7 +26,7 @@ Gets occurrence data of species from databases and turn into a
 SpatialPoints object#'
 }
 \examples{
-name <- c('Orcinus orca', 'Bothrops jararaca',)
+name <- c('Orcinus orca', 'Bothrops jararaca')
 area <- list(extent(c(-179.8733, 79.3333, -8.6333, 8.65083 )), NULL)
 occ.shps <- spRecords(sp = name, ex = area, dataBase = c('GBIF', 'BISON'))
 
