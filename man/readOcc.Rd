@@ -29,7 +29,7 @@ with the number of occurrences records after the removal of duplicate coordinate
 Default if \code{FALSE}.}
 }
 \value{
-\code{readOcc} returns, by default, a 'spOcc' object corresponding to a
+By default, \code{readOcc} returns a 'spOcc' object corresponding to a
 species list with features from a class of 'SpatialPoints'.
 If occSum is \code{TRUE}, \code{readOcc} also returns a data.frame with the number
 of occurrences records after the cleaning step to remove duplicate coordinates.
@@ -38,6 +38,9 @@ of occurrences records after the cleaning step to remove duplicate coordinates.
 Read and clean the occurrences records files (.csv format) of multiples species
 from a specified folder and provide a list of 'SpatialPoints' of species through
 the removal of duplicates coordinates.
+}
+\seealso{
+\code{\link[sp:remove.duplicates]{remove.duplicates}}
 }
 \author{
 Thaís Dória & Daniel Gonçalves-Souza
