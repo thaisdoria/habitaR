@@ -57,7 +57,7 @@ preferred output for the rasters. Optional.}
 }
 \value{
 \code{aoh} returns 'aoh' object corresponding to a list with two
-elements. The first element is a #' data.frame detailing if the function was
+elements. The first element is a data.frame detailing if the function was
 able (1) or not (0) to refinate the species distribution. The second element
 is a list of 'RasterLayer' or 'SpatialPolygons' object representing the refined
 distribution of the species. For the 'RasterLayer' the value of 0 indicates the
