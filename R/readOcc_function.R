@@ -22,15 +22,15 @@
 #' with the number of occurrences records after the removal of duplicate coordinates.
 #' Default if \code{FALSE}.
 #' @return \code{readOcc} returns, by default, a 'spOcc' object corresponding to a
-#' list of species with features from a class of 'SpatialPoints'.
-#' If occSum is \code{TRUE}, \code{readOcc} returns also a data.frame with the number
-#' of occurrences records after the clean step to remove duplicate coordinates.
+#' species list with features from a class of 'SpatialPoints'.
+#' If occSum is \code{TRUE}, \code{readOcc} also returns a data.frame with the number
+#' of occurrences records after the cleaning step to remove duplicate coordinates.
 #' @encoding UTF-8
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export readOcc
 #' @import sp
 
-readOcc <- function(occ, crs, distOcc = NULL, occSum=FALSE){
+readOcc <- function(occ, crs, distOcc = NULL, occSum = FALSE){
 
     if(substr(occ, nchar(occ), nchar(occ)) == '/'){
     path <- substr(occ, 1, nchar(occ) - 1)
