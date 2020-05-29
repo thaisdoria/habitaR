@@ -39,7 +39,7 @@
 #' preferred output for the rasters. Optional.
 #' @param progress (logical) A bar showing the progress of the function.
 #' @return \code{aoh} returns 'aoh' object corresponding to a list with two
-#' elements. The first element is a #' data.frame detailing if the function was
+#' elements. The first element is a data.frame detailing if the function was
 #' able (1) or not (0) to refinate the species distribution. The second element
 #' is a list of 'RasterLayer' or 'SpatialPolygons' object representing the refined
 #' distribution of the species. For the 'RasterLayer' the value of 0 indicates the
@@ -77,7 +77,7 @@ aoh <- function(eooSp = NULL, lc = NULL, alt = NULL, altPref = NULL,
                 continuous = FALSE, shpOut = FALSE, extentOut = NULL,
                 progress = FALSE){
 
-  # Data frame of resuts
+  # Data frame of results
   df <- data.frame(matrix(ncol = 4, nrow = length(eooSp)))
   names(df) <- c('Species', 'Vegetation', 'Altitude', 'Climatic suitability')
   df[, 1] <- eooSp@data[, 2]
