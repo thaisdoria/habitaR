@@ -34,7 +34,7 @@ species filtered based on the poly area. Default if \code{FALSE}.}
 }
 \value{
 \code{checkOcc} returns the species occurring inside of the polygon
-provided with the respective total of ocurrences falling in this polygon.
+provided and their respective total of ocurrences falling in this polygon.
 If SpOcc is \code{TRUE}, \code{checkdOcc} also returns the 'SpatialPoints'
 of species filtered based on the poly area.
 }
