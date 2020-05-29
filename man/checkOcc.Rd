@@ -25,12 +25,18 @@ two coordinates as not duplicate. Values up to this distance will be consider
 as duplicates and removed. Units of this value must be in km. Default is zero
 (i.e. only exactly coincindent coordinates will be removed). For more details,
 see \code{\link[sp:remove.duplicates]{remove.duplicates}}. Optional and only
-used if 'occ' is a path for .csv files or a list of' data.frame.
-If 'occ' correspond to 'SpatialPoints', 'distOcc' should be ignored.}
+used if 'occ' is a path for .csv files or a list of 'data.frame'. If 'occ'
+correspond to 'SpatialPoints', 'distOcc' should be ignored.}
+
+\item{SpOcc}{(logical) Whether the output should also include a list with
+features from 'SpatialPoints' class corresponding only to the occurrences of
+species filtered based on the poly area. Default if \code{FALSE}.}
 }
 \value{
 \code{checkOcc} returns the species occurring inside of the polygon
 provided with the respective total of ocurrences falling in this polygon.
+If SpOcc is \code{TRUE}, \code{checkdOcc} also returns the 'SpatialPoints'
+of species filtered based on the poly area.
 }
 \description{
 From a list of 'SpatialPoints' for multiple species, gives the species and its
