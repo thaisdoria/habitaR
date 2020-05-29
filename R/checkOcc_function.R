@@ -24,11 +24,13 @@
 #' see \code{\link[sp:remove.duplicates]{remove.duplicates}}. Optional and only
 #' used if 'occ' is a path for .csv files or a list of 'data.frame'. If 'occ'
 #' correspond to 'SpatialPoints', 'distOcc' should be ignored.
-#' @param OccSum (logical) Whether the output should include also a data.frame
-#' with the number of occurrences records after the removal of duplicate coordinates.
-#' Default if \code{FALSE}.
+#' @param SpOcc (logical) Whether the output should also include a list with
+#' features from 'SpatialPoints' class corresponding only to the occurrences of
+#' species filtered based on the poly area. Default if \code{FALSE}.
 #' @return \code{checkOcc} returns the species occurring inside of the polygon
 #' provided with the respective total of ocurrences falling in this polygon.
+#' If SpOcc is \code{TRUE}, \code{checkdOcc} also returns the 'SpatialPoints'
+#' of species filtered based on the poly area.
 #' @encoding UTF-8
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export checkOcc
@@ -100,7 +102,7 @@ checkOcc<-function(occ, poly, distOcc = NULL, SpOcc=FALSE){
 
       if(SpOcc == TRUE){
         sp.occcheck<-occ[match(names(occ), names(cf.occcheck))]
-        sp.occcheck<-list.clean(occ, fun = is.null, recursive = TRUE)
+        sp.occcheck<-list.clean(sp.occcheck, fun = is.null, recursive = TRUE)
         cf.occcheck.l<-list(CheckedOcc = cf.occcheck , CheckedSpatialPoints = sp.occcheck)
         return(cf.occcheck.l)
       }
