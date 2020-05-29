@@ -28,7 +28,7 @@
 #' features from 'SpatialPoints' class corresponding only to the occurrences of
 #' species filtered based on the poly area. Default if \code{FALSE}.
 #' @return \code{checkOcc} returns the species occurring inside of the polygon
-#' provided with the respective total of ocurrences falling in this polygon.
+#' provided and their respective total of ocurrences falling in this polygon.
 #' If SpOcc is \code{TRUE}, \code{checkdOcc} also returns the 'SpatialPoints'
 #' of species filtered based on the poly area.
 #' @encoding UTF-8
@@ -101,7 +101,7 @@ checkOcc<-function(occ, poly, distOcc = NULL, SpOcc=FALSE){
       }
 
       if(SpOcc == TRUE){
-        sp.occcheck<-occ[match(names(occ), names(cf.occcheck))]
+        sp.occcheck<-occ[match(names(cf.occcheck), names(occ))]
         sp.occcheck<-list.clean(sp.occcheck, fun = is.null, recursive = TRUE)
         cf.occcheck.l<-list(CheckedOcc = cf.occcheck , CheckedSpatialPoints = sp.occcheck)
         return(cf.occcheck.l)
