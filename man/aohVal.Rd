@@ -9,16 +9,16 @@
 'RasterStack', a 'list' of 'RasterLayer' or 'aoh' object (see
  \code{\link[aoh]{aoh}} to generate the latter object)
 
-aohVal(eoo.sp, aoh.sp, plot=TRUE, progress=FALSE)
+aohVal(eooSp, aohSp, plot=TRUE, progress=FALSE)
 }
 \arguments{
-\item{eoo.sp}{Spatial distribution data of the species representing the
+\item{eooSp}{Spatial distribution data of the species representing the
 original (i.e. not refined) extent of occurrence (EOO). It might correspond to
 'SpatialPolygonsDataFrame' (see \code{\link[aoh]{readShp}} to obtain such
 class of object), a 'RasterLayer', a 'RasterStack', or a 'list' with 'RasterLayer'
 class of features (see \code{\link[aoh]{readRas}} to obtain such object).}
 
-\item{aoh.sp}{Spatial distribution data of the species representing the area
+\item{aohSp}{Spatial distribution data of the species representing the area
 of habitat (AOH). It might correspond to 'SpatialPolygonsDataFrame'
 (see \code{\link[aoh]{readShp}} to obtain such class of object), a
 'RasterLayer', a 'RasterStack', a 'list' with 'RasterLayer' class of features
