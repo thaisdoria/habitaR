@@ -5,27 +5,32 @@
 \alias{aHull}
 \title{aHull: generate alpha hull polygons for multiple-species}
 \usage{
-aHull (occ, crs, distOcc = 0.25, poly = NULL, fraction = 1.0, partCount = 2,
-buff = 1000, alphaIncrement = 0.01, cropToPoly = FALSE)
+aHull (occ, crs, fraction = NULL, partCount = NULL, alphaIncrement = NULL,
+buff = 0.0, distOcc = NULL, poly = NULL, cropToPoly = FALSE, occSum = TRUE)
 }
 \arguments{
-\item{occ}{Occurrences records of the species. It might be a 'sp.occ'
-object corresponding to a list of 'SpatialPoints' for multiple species
-(see \code{\link[aoh]{readOcc}} to obtain such class of object), a 'list' of
-'data.frames' with the occurrences from multiple species, or a path for a folder
-with the species occurrences files (.csv format). Each file, corresponding to
-only one species and named with the corresponding species names, must have be 3 columns
-identified as "species" (species names or other identification of taxa), "long"
-(longitude), "lat" (latitude).}
+\item{occ}{Occurrences records of the species (coordinates in decimal degrees).
+It might be a path for a folder with the species occurrences files (.csv format),
+a 'list' of 'data.frames' with the occurrences from multiple species (see data
+examples), or a 'spOcc' object corresponding to a list of 'SpatialPoints' from
+multiple species (see \code{\link[aoh]{readOcc}} to obtain such object).
+NOTE: If path is provided, each .csv file should correspond to only one species
+and the file must be named with the corresponding species names. The files must
+have 3 columns identified as "species" (species names or other identification of taxa),
+"long" (longitude), "lat" (latitude). Longitude must be in a column before the
+latitude column.}
 
 \item{crs}{The Coordinate Reference System (CRS) specifing the projection and
 datum of dataset. Could be a CRS object or a character string.}
 
-\item{alphaIncrement}{The amount to increase alpha with each iteration.}
-
 \item{fraction}{The minimum fraction of occurrences that must be included in polygon.}
 
 \item{partCount}{The maximum number of disjunct polygons that are allowed.}
+
+\item{alphaIncrement}{The amount to increase alpha with each iteration.}
+
+\item{buff}{A buffer distance in meters to increase boundaries of alpha hull.
+Default is zero (0).}
 
 \item{distOcc}{A value corresponding to the minimum distance assigned to consider
 two coordinates as not duplicate. Values up to this distance will be consider
@@ -34,8 +39,6 @@ coordinates will be removed). Units of this value must be the same as those of
 the coordinates for projected data or in km if coordinates are defined to be
 longitude/latitude. For more details, see \code{\link[sp:remove.duplicates]
 {remove.duplicates}}.}
-
-\item{buff}{A buffer distance in meters to increase boundaries of alpha hull.}
 
 \item{poly}{Optional. A polygon (ESRI shapefile as 'SpatialPolygonsDataFrame'
 class) of the specific area to be checked for occurrences of species and to
@@ -51,12 +54,31 @@ hull cropped by the provided poly. Only used if poly provided.}
 species and the respective alpha value assigned to build the alpha hull.
 If a \emph{poly} is provided and \emph{cropToPoly} is \code{TRUE}, \code{aHull}
 also returns the cropped alpha hull.
+
+\code{aHull} returns a 'aHull' object corresponding to a list with
+two elements. The first element is a data.frame
+
+If the conditions cannot be satisfied, then a minimum convex hull is returned
+.
+It gives the number of records matching with the EOO ("MATCH.EOO) and with the
+AOH ("MATCH.AOH) and the values of prevalence of points ("PP", Rondinini et al.
+2011) through the proportion of occurrences spatially congruent with suitable
+cells, and of model prevalence ("MP", Rondinini et al. 2011), which represents
+EOOs proportion assigned as suitable). AOH predict species occurrences
+correctly when all available records match with its suitable cells (PP = 1).
+The evaluation of AOHs performance is based on difference between PP and MP.
+If PP > MP, AOH performs better than EOO in predict presences (Ficetola et al.
+2015).
+
+If plot is \code{TRUE}, the function return also a plot with a graphical representation
+of validation results (see Rondinini et al. 2011). If plot \code{FALSE}, the function
+return a data.frame
 }
 \description{
-From the raw occurrences records of multiple species, provides the alpha hull
+From the occurrences records of multiple species, provides the alpha hull
 polygon representing the extent of occurrence (EOO) of each species which have
 a minimun of 3 not duplicate records. It is build based on the original function
-\code{\link[rangeBuilder]{getDynamicAlphaHull}} (rangeBuilder package), that
+\code{\link[rangeBuilder]{getDynamicAlphaHull}} \pkg{rangeBuilder}, that
 determines the α parameter by the spatial distribution of the coordinates.
 }
 \details{
@@ -70,6 +92,29 @@ alpha hull construction is restrict to the filtered species, but the extension o
 these polygons can extrapolate the area of polygon if there are occurrences beyond
 the boundaries of 'poly' object. If the user want also have the alpha hull cropped
 by the area of \emph{poly}, assign \code{TRUE} to 'cropToPoly'.
+
+The function gives the summary of validation steps followed to evaluate
+the quality of models as described and performed by Rondidini et al. (2011) and
+Ficetola et al. (2015).
+}
+\examples{
+
+### Fictitious plants data
+
+# Example for signature 'DataFrame' (occ).
+
+ahull_plants<-aHull(eoo = eoo_birdShp, aoh = aoh_birdRas, plot = TRUE, progress = TRUE)
+
+}
+\references{
+1. Capinha Brooks, T. M, Fonseca, S.L. Pimm, Akçakaya, H.R., Buchanan, G.M., …,
+Rondinini C. (2019). Measuring Terrestrial Area of Habitat (AOH) and Its
+Utility for the IUCN Red List. Trends in Ecology &amp; Evolution, 34(11),
+977–986.
+
+2. CRIADOR DO RANGE BUILDER.
+
+3. Meyer et al. (2018)
 }
 \seealso{
 Dynamic alpha hulls from increasing alpha values are created with
