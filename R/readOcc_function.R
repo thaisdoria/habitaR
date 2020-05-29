@@ -21,7 +21,8 @@
 #' @param OccSum (logical) Whether the output should include also a data.frame
 #' with the number of occurrences records after the removal of duplicate coordinates.
 #' Default if \code{FALSE}.
-#' @return \code{readOcc} returns, by default, a 'spOcc' object corresponding to a
+#' @seealso \code{\link[sp:remove.duplicates]{remove.duplicates}}
+#' @return By default, \code{readOcc} returns a 'spOcc' object corresponding to a
 #' species list with features from a class of 'SpatialPoints'.
 #' If occSum is \code{TRUE}, \code{readOcc} also returns a data.frame with the number
 #' of occurrences records after the cleaning step to remove duplicate coordinates.
