@@ -6,12 +6,12 @@
 \title{readOcc: read species occurrences}
 \usage{
 readOcc (occ, crs = "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0",
-distOcc = 0.25)
+distOcc = 0.25, occSum = FALSE)
 }
 \arguments{
 \item{occ}{Path for a folder with the species occurrences records files
-(.csv format). Coordinates should be in decimal degrees. The files names should
-correspond to the species names and must have be 3 columns identified as
+(.csv format). Coordinates should be in decimal degrees. The names of files
+should correspond to the species names and must have be 3 columns identified as
 "species" (species names or other identification of taxa), "long" (longitude),
 "lat" (latitude). NOTE: Longitude must be at a column before the latitude column.}
 
@@ -23,10 +23,16 @@ two coordinates as not duplicate. Values up to this distance will be consider
 as duplicates and removed. Units of this value must be in km. Optional.
 Default is zero (i.e. only exactly coincindent coordinates will be removed).
 For more details, see \code{\link[sp:remove.duplicates]{remove.duplicates}}.}
+
+\item{OccSum}{(logical) Whether the output should include also a data.frame
+with the number of occurrences records after the removal of duplicate coordinates.
+Default if \code{FALSE}.}
 }
 \value{
-\code{readOcc} returns a 'sp.occ' object corresponding to a list of species
-with features from a class of 'SpatialPoints'.
+\code{readOcc} returns, by default, a 'spOcc' object corresponding to a
+species list with features from a class of 'SpatialPoints'.
+If occSum is \code{TRUE}, \code{readOcc} also returns a data.frame with the number
+of occurrences records after the cleaning step to remove duplicate coordinates.
 }
 \description{
 Read and clean the occurrences records files (.csv format) of multiples species
