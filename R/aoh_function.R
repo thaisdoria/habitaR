@@ -103,9 +103,9 @@ aoh <- function(eooSp = NULL, lc = NULL, alt = NULL, altPref = NULL,
     if (is.null(altPref) & !is.null(alt))
       stop('altPref is missing')
     if (!is.null(extentOut) & shpOut == TRUE)
-      stop('extentOut can be only used when shpOut = FALSE')
+      stop('extentOut can only be used when shpOut = FALSE')
     if (continuous == TRUE & shpOut == TRUE)
-      stop('shpOut can be only be true when continuous = FALSE')
+      stop('shpOut can only be true when continuous = FALSE')
   }
 
   # Read shapes in directory
