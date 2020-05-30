@@ -34,22 +34,28 @@ If 'occ' correspond to 'SpatialPoints', this argument ('distOcc') should be igno
 of species filtered based on the poly boundaries. Default is \code{FALSE}.}
 }
 \value{
-\code{checkOcc} returns a data.frame of species and the respectives
+\code{checkOcc} returns a data.frame of species and the respective
 occurrences matching with the provided polygon. If SpOcc is \code{TRUE},
 \code{checkdOcc} returns a list with two elements. The first element is the
 data.frame with the species and occurrences filtered by the polygon. The second
-is the 'SpatialPoints' of each species that match with polygon. In this case,
-the 'poly' is used only to reduce the species from initial dataset, but not
-to restrict the 'SpatialPoints' to occurrences inside of polygon. 'SpatialPoints'
-returned, thus, correspond to all set of occurrences and not to a subset that matched
-with the provided polygon (i.e. it is not cleaned to remove the records
-falling outside the polygon checked).
+is the 'SpatialPoints' of each species that match with polygon, but without clean
+the records to remove those falling outside the polygon checked. See details.
 }
 \description{
-From a list of 'SpatialPoints' for multiple species, gives the species and its
+From 'SpatialPoints' of multiple species, gives the species and its
 occurrences that are inside of a polygon (ESRI shapefile format) representing
 a region of interest (e.g. study area, continent, country or other regions with
 specific boundaries).
+}
+\details{
+The function filter the initial dataset of species (\emph{occ})
+based on a given region (\emph{poly}). NOTE: if \emph{SpOcc} is \code{TRUE}, the
+'SpatialPoints' returned encompass all set of occurrences and not a subset
+that match with the specified region (\emph{poly}). Therefore, the 'SpatialPoints'
+are not cleaned to remove the records falling outside the polygon checked and to
+restrict the 'SpatialPoints' only to occurrences recorded inside of polygon,
+but just filtered to reduce the species from initial dataset based in the area
+of \emph{poly}.
 }
 \author{
 Thaís Dória & Daniel Gonçalves-Souza
