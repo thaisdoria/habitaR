@@ -114,9 +114,10 @@ aHullcro <- function(occ, crs = NULL, fraction = NULL, partCount = NULL, alphaIn
   {
   if (missing(occ))
     stop("occ is missing")
-  if (is.null(crs) & (class(occ) != "spOcc" | class(occ) !="SpatialPoints" |
-                      (class(occ) == "list" & class(occ[[1]]) != "spOcc") |
-                      (class(occ) == "list" & class(occ[[1]]) != "SpatialPoints")))
+  if ((is.null(crs) & class(occ) != "spOcc") | (is.null(crs) & class(occ) !="SpatialPoints") |
+      (is.null(crs) & (class(occ) == "list" & class(occ[[1]]) != "spOcc")) |
+      (is.null(crs) & (class(occ) == "list" & class(occ[[1]]) != "SpatialPoints")))
+
       stop('a crs must be informed')
   if (is.null(poly) & (cropToPoly == TRUE))
     stop('cropToPoly can only be true when poly is provided')
@@ -151,7 +152,7 @@ aHullcro <- function(occ, crs = NULL, fraction = NULL, partCount = NULL, alphaIn
      class(occ) <- "spOcc"
   }
 
- # Input data as 'SpatialPoints' will be converted into a 'spOcc' object
+  # Input data as 'SpatialPoints' will be converted into a 'spOcc' object
     if(class(occ) == "list" & class(occ[[1]]) =="SpatialPoints"){
       class(occ) <- "spOcc"
     }
