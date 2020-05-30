@@ -7,8 +7,8 @@ resolucao <- function(x, y, type = 0, lbl = 'blank'){
       if(lbl %in% 'adq' | type == 1){
         new.x[[i]] <- resample(new.x[[i]], y)
       }
-      if(lbl %in% c('lc', 'alt'| type == 2)){
-        factor <- trunc(xres(y) / xres(new.x))
+      if(lbl %in% c('lc', 'alt')| type == 2){
+        factor <- trunc(xres(y) / xres(new.x[[i]]))
         if(factor > 1){
           new.x[[i]] <- aggregate(new.x[[i]], fact = factor, fun = sum)
           new.x[[i]] <- new.x[[i]] / (factor^2)
