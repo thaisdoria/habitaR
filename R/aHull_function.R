@@ -1,10 +1,11 @@
 #' aHull: generate alpha hull polygons for multiple-species
 #'
-#' From the occurrences records of multiple species, provides the alpha hull
-#' polygon representing the extent of occurrence (EOO) of each species which have
-#' a minimun of 3 not duplicate records. It is build based on the original function
-#' \code{\link[rangeBuilder]{getDynamicAlphaHull}} \pkg{rangeBuilder}, that
-#' determines the α parameter by the spatial distribution of the coordinates.
+#' From a set of occurrences records, provides the alpha hull representing the
+#' extent of occurrence (EOO) of multiple species which have a minimun of 3 not
+#' duplicate records.
+#' It is build based on the original function \code{\link[rangeBuilder]{getDynamicAlphaHull}}
+#' from the \pkg{rangeBuilder} package, that determines the α parameter by the spatial distribution of the
+#' coordinates.
 #'
 #' @usage aHull (occ, crs, fraction = NULL, partCount = NULL, alphaIncrement = NULL,
 #' buff = 0.0, distOcc = NULL, poly = NULL, cropToPoly = FALSE, occSum = TRUE)
@@ -21,64 +22,60 @@
 #' latitude column.
 #' @param crs The Coordinate Reference System (CRS) specifing the projection and
 #' datum of dataset. Could be a CRS object or a character string.
-#' @param distOcc A value corresponding to the minimum distance assigned to consider
-#' two coordinates as not duplicate. Values up to this distance will be consider
-#' as duplicates and removed. Default is zero (i.e. only exactly coincindent
-#' coordinates will be removed). Units of this value must be the same as those of
-#' the coordinates for projected data or in km if coordinates are defined to be
-#' longitude/latitude. For more details, see \code{\link[sp:remove.duplicates]
-#' {remove.duplicates}}.
-#' @param poly Optional. A polygon (ESRI shapefile as 'SpatialPolygonsDataFrame'
-#' class) of the specific area to be checked for occurrences of species and to
-#' restrict alpha hull development only to the species occurring inside of the polygon.
-#' See details.
 #' @param fraction The minimum fraction of occurrences that must be included in polygon.
 #' @param partCount The maximum number of disjunct polygons that are allowed.
+#' @param alphaIncrement The amount to increase alpha with each iteration.
 #' @param buff A buffer distance in meters to increase boundaries of alpha hull.
 #' Default is zero (0).
-#' @param alphaIncrement The amount to increase alpha with each iteration.
+#' @param distOcc A value corresponding to the minimum distance assigned to
+#' consider two coordinates as not duplicate. Values up to this distance will
+#' correspond to duplicates and removed. Units of this value must be in km.
+#' Default is zero (i.e. only exactly coincindent coordinates will be removed).
+#' Optional and only used if 'occ' is a path for .csv files or a list of data.frames.
+#' If 'occ' correspond to 'SpatialPoints', this argument should be ignored
+#' (i.e., distOcc = NULL). For more details, see \code{\link[sp:remove.duplicates]{remove.duplicates}}
+#' in the \pkg{sp} package.
+#' @param poly Optional. A polygon (ESRI shapefile in a 'SpatialPolygonsDataFrame'
+#' class) of a given area to be checked for occurrences of species and to restrict
+#' the building of alpha hull only to the species occurring inside of the provided
+#' polygon. See details.
 #' @param cropToPoly (logical) Whether the output should also include the alpha
-#' hull cropped by the provided poly. Only used if poly provided.
-#' @import rangeBuilder
-#' @return \code{aHull} returns the alpha hull polygon (ESRI shapefile as
-#' 'SpatialPolygonsDataFrame') representing the extent of occurrence (EOO) of
-#' species and the respective alpha value assigned to build the alpha hull.
-#' If a \emph{poly} is provided and \emph{cropToPoly} is \code{TRUE}, \code{aHull}
-#' also returns the cropped alpha hull.
-#' @details The function generate an alpha hull polygon from the occurrences
-#' records of multiple species by sequentially increasing α parameter (starting from 0
-#' in steps of defined \emph{alphaIncrease} until find the smallest value that return the
-#' \emph{partCount} polygon encompassing the \emph{fraction} of occurrences provided.
-#' If \emph{poly} is provided, the function filter the original species dataset by
-#' keeping only those species occurring inside of the specified polygon. In this case, the
-#' alpha hull construction is restrict to the filtered species, but the extension of
-#' these polygons can extrapolate the area of polygon if there are occurrences beyond
-#' the boundaries of 'poly' object. If the user want also have the alpha hull cropped
-#' by the area of \emph{poly}, assign \code{TRUE} to 'cropToPoly'.
-#' @seealso Dynamic alpha hulls from increasing alpha values are created with
-#' \code{\link[rangeBuilder:getDynamicAlphaHull]{getDynamicAlphaHull}}
-#' @return \code{aHull} returns a 'aHull' object corresponding to a list with
-#' two elements. The first element is a data.frame
+#' hull cropped by the provided poly. Only used if 'poly' is provided.
+#' @param occSum (logical) Whether the output should include also a data.frame
+#' with the number of occurrences records after the removal of duplicate coordinates.
+#' Default is \code{TRUE}.
+#'#'
+#' @return \code{aHull} returns a list with two elements. The first is a data.frame
+#' of species and the respective alpha values and occurrences used to construct
+#' the alpha hull. The second element is a 'aHull' object corresponding to a list
+#' of alpha hulls of each species ('SpatialPolygons class). If the conditions
+#' assigned by the user to build the alpha hulls cannot be satisfied, is returned
+#' the minimum convex (MCH). If a \emph{poly} is provided and \emph{cropToPoly}
+#' is \code{TRUE}, \code{aHull} also returns the cropped alpha hulls as a third
+#' element from the resulting list.
 #'
-#' If the conditions cannot be satisfied, then a minimum convex hull is returned
-#' .
-#' It gives the number of records matching with the EOO ("MATCH.EOO) and with the
-#' AOH ("MATCH.AOH) and the values of prevalence of points ("PP", Rondinini et al.
-#' 2011) through the proportion of occurrences spatially congruent with suitable
-#' cells, and of model prevalence ("MP", Rondinini et al. 2011), which represents
-#' EOOs proportion assigned as suitable). AOH predict species occurrences
-#' correctly when all available records match with its suitable cells (PP = 1).
-#' The evaluation of AOHs performance is based on difference between PP and MP.
-#' If PP > MP, AOH performs better than EOO in predict presences (Ficetola et al.
-#' 2015).
 #'
-#' If plot is \code{TRUE}, the function return also a plot with a graphical representation
-#' of validation results (see Rondinini et al. 2011). If plot \code{FALSE}, the function
-#' return a data.frame
+#' @details Based on a set of occurrences records of multiple-species, the
+#' function generate alpha hull polygons ('SpatialPolygons' class) by sequentially
+#' increasing the value of α parameter (starting from 0 in steps of defined
+#' \emph{alphaIncrement}) until find the smallest value that met the \emph{partCount} condition and
+#' encompass the \emph{fraction} of occurrences assigned by the user.
+#' If \emph{poly} is provided, the function filter the original species dataset
+#' by keeping only those species occurring inside of the specified region.
+#' In this case, the construction of alpha hulls will be restricted only to the
+#' filtered species, but the extension of these resulting maps can extrapolate
+#' the area of 'poly' if the occurrences extend far away beyond the boundaries
+#' of 'poly' object. NOTE: if the user want have the alpha hull cropped by the
+#' area of \emph{poly}, 'cropToPoly' should be assign as \code{TRUE}, but even in
+#' this case, the alpha hull is firstly constructed based on all dataset of
+#' occurrences and then cropped by some desired region in a second step. Thus,
+#' cropped alpha hulls correspond to the original alpha hull clipped/trinned by
+#' some region and not drawn based in a restrict set of occurrences recorded inside
+#' of some specific region.
 #'
-#' @details The function gives the summary of validation steps followed to evaluate
-#' the quality of models as described and performed by Rondidini et al. (2011) and
-#' Ficetola et al. (2015).
+#' @seealso The dynamic alpha hulls drawn from the sequentially increase of alpha
+#' values are created with \code{\link[rangeBuilder:getDynamicAlphaHull]{getDynamicAlphaHull}}
+#' from \pkg{rangeBuilder} package.
 #'
 #' @examples
 #'
@@ -86,7 +83,7 @@
 #'
 #' # Example for signature 'DataFrame' (occ).
 #'
-#' ahull_plants<-aHull(eoo = eoo_birdShp, aoh = aoh_birdRas, plot = TRUE, progress = TRUE)
+#' ahull_plants<-aHull(occ = occ_plants, crs=, plot = TRUE, progress = TRUE)
 #'
 #' @references
 #' 1. Capinha Brooks, T. M, Fonseca, S.L. Pimm, Akçakaya, H.R., Buchanan, G.M., …,
@@ -96,11 +93,13 @@
 #'
 #' 2. CRIADOR DO RANGE BUILDER.
 #'
-#' 3. Meyer et al. (2018)
+#' 3. Meyer et al. (2018).
 #'
 #' @encoding UTF-8
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export aHull
+#' @import rangeBuilder
+#' @import sp
 
 aHull <- function(occ, crs, fraction = NULL, partCount = NULL, alphaIncrement = NULL,
                    buff = 0, distOcc = NULL, poly = NULL, cropToPoly = FALSE,
