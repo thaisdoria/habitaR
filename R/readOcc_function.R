@@ -17,7 +17,7 @@
 #' @param distOcc A value corresponding to the minimum distance assigned to consider
 #' two coordinates as not duplicate. Values up to this distance will be consider
 #' as duplicates and removed. Units of this value must be in km. Optional.
-#' Default is zero (i.e. only exactly coincindent coordinates will be removed).
+#' Default is zero (i.e. only exactly coincident coordinates will be removed).
 #' For more details, see \code{\link[sp:remove.duplicates]{remove.duplicates}}.
 #' @param occSum (logical) Whether the output should include also a data.frame
 #' with the number of occurrences records after the removal of duplicate coordinates.
