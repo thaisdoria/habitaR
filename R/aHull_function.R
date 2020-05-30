@@ -8,7 +8,7 @@
 #' coordinates.
 #'
 #' @usage aHull (occ, crs, fraction = NULL, partCount = NULL, alphaIncrement = NULL,
-#' buff = 0.0, distOcc = NULL, poly = NULL, cropToPoly = FALSE, occSum = TRUE)
+#' buff = 0.0, distOcc = NULL, poly = NULL, cropToPoly = FALSE)
 #'
 #' @param occ Occurrences records of the species (coordinates in decimal degrees).
 #' It might be a path for a folder with the species occurrences files (.csv format),
@@ -21,7 +21,7 @@
 #' "long" (longitude), "lat" (latitude). Longitude must be in a column before the
 #' latitude column.
 #' @param crs The Coordinate Reference System (CRS) specifing the projection and
-#' datum of dataset. Could be a CRS object or a character string.
+#' datum of dataset. Could be a CRS object or a character string. Only used
 #' @param fraction The minimum fraction of occurrences that must be included in polygon.
 #' @param partCount The maximum number of disjunct polygons that are allowed.
 #' @param alphaIncrement The amount to increase alpha with each iteration.
@@ -47,20 +47,20 @@
 #' Default is \code{TRUE}.
 #'#'
 #' @return \code{aHull} returns a list with two elements. The first is a data.frame
-#' of species and the respective alpha values and occurrences used to construct
-#' the alpha hull. The second element is a 'aHull' object corresponding to a list
-#' of alpha hulls of each species ('SpatialPolygons class). If the conditions
-#' assigned by the user to build the alpha hulls cannot be satisfied, is returned
-#' the minimum convex (MCH). If a \emph{poly} is provided and \emph{cropToPoly}
-#' is \code{TRUE}, \code{aHull} also returns the cropped alpha hulls as a third
-#' element from the resulting list.
-#'
+#' of species and the respective alpha values and number of occurrences used to construct
+#' the alpha hull after the removal of duplicate coordinates.
+#' The second element is a 'aHull' object corresponding to a list of species-specific
+#' alpha hulls ('SpatialPolygons class). If the conditions assigned by the user to
+#' build the alpha hulls cannot be satisfied, is returned the minimum convex hull (MCH)
+#' and the alpha value is identified as 'MCH'.
+#' If a \emph{poly} is provided and \emph{cropToPoly} is \code{TRUE}, \code{aHull}
+#' also returns the cropped alpha hulls as a third element from the resulting list.
 #'
 #' @details Based on a set of occurrences records of multiple-species, the
 #' function generate alpha hull polygons ('SpatialPolygons' class) by sequentially
 #' increasing the value of α parameter (starting from 0 in steps of defined
-#' \emph{alphaIncrement}) until find the smallest value that met the \emph{partCount} condition and
-#' encompass the \emph{fraction} of occurrences assigned by the user.
+#' \emph{alphaIncrement}) until find the smallest value that met the \emph{partCount}
+#' condition and encompass the \emph{fraction} of occurrences assigned by the user.
 #' If \emph{poly} is provided, the function filter the original species dataset
 #' by keeping only those species occurring inside of the specified region.
 #' In this case, the construction of alpha hulls will be restricted only to the
@@ -84,39 +84,43 @@
 #'
 #' # Example for signature 'DataFrame' (occ).
 #'
-#' ahull_plants<-aHull(occ = occ_plants, crs=, plot = TRUE, progress = TRUE)
-#'
-#' @references
-#' 1. Capinha Brooks, T. M, Fonseca, S.L. Pimm, Akçakaya, H.R., Buchanan, G.M., …,
-#' Rondinini C. (2019). Measuring Terrestrial Area of Habitat (AOH) and Its
-#' Utility for the IUCN Red List. Trends in Ecology &amp; Evolution, 34(11),
-#' 977–986.
-#'
-#' 2. CRIADOR DO RANGE BUILDER.
-#'
-#' 3. Meyer et al. (2018).
+#' ahull_plants<-aHull(occ = occ_plants, crs= "+proj=longlat +datum=WGS84 +ellps=WGS84
+#'  +towgs84=0,0,0", fraction = 1, partCount = 1, alphaIncrement = 1, buff = 0,
+#'  distOcc = 0.25, poly = poly, cropToPoly = TRUE)
 #'
 #' @encoding UTF-8
+#'
+#' @references
+#' 1. Rabosky A.R.D., Cox C.L., Rabosky D.L., Title P.O., Holmes I.A., Feldman A.,
+#' and McGuire J.A. (2016). Coral snakes predict the evolution of mimicry across
+#' New World snakes. Nature Communications 7:11484.
+#'
+#' 2. Meyer, L., Diniz-Filho, J.A.F., and Lohmann, L.G. (2018). A comparison of
+#' hull methods for estimating species ranges and richness maps. Plant Ecology &
+#' Diversity, 10(5-6):389-401.
+#'
+#' 2. Capinha C., Pateiro-López B. (2014). Predicting species distributions in
+#' new areas or time periods with alpha-shapes. Ecological Informatics, 24:231–237.
+#'
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export aHull
 #' @import rangeBuilder
 #' @import sp
 
-aHullcro <- function(occ, crs, fraction = NULL, partCount = NULL, alphaIncrement = NULL,
-                   buff = 0, distOcc = NULL, poly = NULL, cropToPoly = FALSE,
-                   occSum= TRUE){
+aHullcro <- function(occ, crs = NULL, fraction = NULL, partCount = NULL, alphaIncrement = NULL,
+                   buff = 0, distOcc = NULL, poly = NULL, cropToPoly = FALSE){
 
   # Checking list and warning messages
   {
   if (missing(occ))
     stop("occ is missing")
-  if (missing(crs))
-    stop("crs is missing")
-
-  if (is.null(poly) & cropToPoly == TRUE){
-    stop('cropToPoly can be only be true when poly is provided')
-    }
-  }
+  if (is.null(crs) & (class(occ) != "spOcc" | class(occ) !="SpatialPoints" |
+                      (class(occ) == "list" & class(occ[[1]]) != "spOcc") |
+                      (class(occ) == "list" & class(occ[[1]]) != "SpatialPoints")))
+      stop('a crs must be informed')
+  if (is.null(poly) & (cropToPoly == TRUE))
+    stop('cropToPoly can only be true when poly is provided')
+      }
 
   # Converting input data into a 'spOcc' object
   if (class(occ) != "spOcc"){
@@ -166,44 +170,42 @@ aHullcro <- function(occ, crs, fraction = NULL, partCount = NULL, alphaIncrement
     spp.names <- names(occ.ahul)
 
     # Data frame of results
-    df <- data.frame (matrix(ncol = 2, nrow = length(occ.ahul)))
-    names(df) <- c('Species', 'Alpha')
+    df <- data.frame (matrix(ncol = 3, nrow = length(occ.ahul)))
+    names(df) <- c('Species', 'Ocurrences', 'Alpha')
     df[, 1] <- spp.names
+
+    for (i in 1:length(occ.ahul)){
+    df[i,2] <- length(occ.ahul[[i]]@coords[,1])}
 
     # Building the alpha hull for each species
     sp.ahull <- mapply(f.ahull, occ.ahul, MoreArgs = list(fraction, partCount, buff, alphaIncrement))
     ahulls <- sp.ahull[1,] # a 'SpatialPolygonsDataFrame' object
+    class(ahulls) <- "aHull"
     alphas <- matrix(unlist(sp.ahull[2,]))
     alphas <-gsub("alpha", "", alphas[,1])
-    df[,2]<- alphas
+    df[,3]<- alphas
 
-    # CROP TO POLY
-    if(cropToPoly == TRUE){
-      l <- list()
-      for (i in 1:length(ahulls)){
-        crop.ahull <- crop(ahulls[[i]], poly)
-        l[[i]] <- crop.ahull
-      }
-      class(crop.ahull) <- "aHull"
-                }
-
-     if(occSum == FALSE){
-    ahull.result <- list(AlphaValues = df, AhullShps = ahulls)
-    class(ahull.result) <- "aHull"
+    # SUMMARIZING RESULTS
+    if(cropToPoly == FALSE){ # default
+    ahull.result <- list(AlphaValues_OccRecords = df, AhullShps = ahulls)
     return(ahull.result)
     }
 
-    if(occSum == TRUE){
-      df2 <- data.frame (matrix(ncol = 1, nrow = length(occ.ahul)))
-      names(df2) <- 'Occurrences'
-      for (i in 1:length(occ.ahul)){
-        df2[i,1] <- length(occ.ahul[[i]]@coords[,1])}
-      df<-cbind(df, df2)
-      ahull.result <- list(AlphaValues = df, AhullShps = ahulls)
-      class(ahull.result) <- "aHull"
+    # CROP TO POLY
+    if(cropToPoly == TRUE){
+      crop.ahulls <- list()
+      for (i in 1:length(ahulls)){
+        crop.ahul <- crop(ahulls[[i]], poly, filename=spp.names[i])
+        crop.ahulls[[i]] <- crop.ahul
+      }
+      names(crop.ahulls)<-spp.names
+      class(crop.ahulls) <- "aHull"
+      ahull.result <- list(AlphaValues_OccRecords = df, AhullShps = ahulls, CroppedAhullShps=crop.ahulls)
       return(ahull.result)
-          }
-  }
+      }
+    }
+
+
 
 
 
