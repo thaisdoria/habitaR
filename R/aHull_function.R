@@ -40,7 +40,8 @@
 #' the building of alpha hull only to the species occurring inside of the provided
 #' polygon. See details.
 #' @param cropToPoly (logical) Whether the output should also include the alpha
-#' hull cropped by the provided poly. Only used if 'poly' is provided.
+#' hull cropped by the provided poly. Only used if 'poly' is provided. Default is
+#' \code{FALSE}.
 #' @param occSum (logical) Whether the output should include also a data.frame
 #' with the number of occurrences records after the removal of duplicate coordinates.
 #' Default is \code{TRUE}.
@@ -101,16 +102,20 @@
 #' @import rangeBuilder
 #' @import sp
 
-aHull <- function(occ, crs, fraction = NULL, partCount = NULL, alphaIncrement = NULL,
+aHullcro <- function(occ, crs, fraction = NULL, partCount = NULL, alphaIncrement = NULL,
                    buff = 0, distOcc = NULL, poly = NULL, cropToPoly = FALSE,
-                   occSum= FALSE){
+                   occSum= TRUE){
 
   # Checking list and warning messages
   {
-   if (missing(occ))
+  if (missing(occ))
     stop("occ is missing")
   if (missing(crs))
     stop("crs is missing")
+
+  if (is.null(poly) & cropToPoly == TRUE){
+    stop('cropToPoly can be only be true when poly is provided')
+    }
   }
 
   # Converting input data into a 'spOcc' object
@@ -172,8 +177,17 @@ aHull <- function(occ, crs, fraction = NULL, partCount = NULL, alphaIncrement = 
     alphas <-gsub("alpha", "", alphas[,1])
     df[,2]<- alphas
 
-    # Results
-    if(occSum == FALSE){
+    # CROP TO POLY
+    if(cropToPoly == TRUE){
+      l <- list()
+      for (i in 1:length(ahulls)){
+        crop.ahull <- crop(ahulls[[i]], poly)
+        l[[i]] <- crop.ahull
+      }
+      class(crop.ahull) <- "aHull"
+                }
+
+     if(occSum == FALSE){
     ahull.result <- list(AlphaValues = df, AhullShps = ahulls)
     class(ahull.result) <- "aHull"
     return(ahull.result)
