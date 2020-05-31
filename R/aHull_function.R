@@ -8,7 +8,8 @@
 #' coordinates.
 #'
 #' @usage aHull (occ, crs, fraction = NULL, partCount = NULL, alphaIncrement = NULL,
-#' buff = 0.0, distOcc = NULL, poly = NULL, cropToPoly = FALSE)
+#' buff = 0.0, distOcc = NULL, poly = NULL, cropToPoly = FALSE, rasOut = FALSE,
+#' ras = NULL)
 #'
 #' @param occ Occurrences records of the species (coordinates in decimal degrees).
 #' It might be a path for a folder with the species occurrences files (.csv format),
@@ -38,14 +39,17 @@
 #' @param poly Optional. A polygon (ESRI shapefile in a 'SpatialPolygonsDataFrame'
 #' class) of a given area to be checked for occurrences of species and to restrict
 #' the building of alpha hull only to the species occurring inside of the provided
-#' polygon. See details.
+#' polygon. NOTE: this argument does not reduce the set of occurrences based on
+#' the poly, but only reduce the species dataset based on its presence inside of poly.
+#' See details.
 #' @param cropToPoly (logical) Whether the output should also include the alpha
 #' hull cropped by the provided poly. Only used if 'poly' is provided. Default is
 #' \code{FALSE}.
-#' @param occSum (logical) Whether the output should include also a data.frame
-#' with the number of occurrences records after the removal of duplicate coordinates.
-#' Default is \code{TRUE}.
-#'#'
+#' @param rasOut (logical) Whether the output should be also include a raster objects.
+#' Default is \code{FALSE}.
+#' @param ras A raster object (file in .asc or .tif format) to be used as baseline
+#' to rasterize the ahull polygons. Only used if rasOut' is \code{TRUE}.
+#'
 #' @return \code{aHull} returns a list with two elements. The first is a data.frame
 #' of species and the respective alpha values and number of occurrences used to construct
 #' the alpha hull after the removal of duplicate coordinates.
@@ -86,7 +90,7 @@
 #'
 #' ahull_plants<-aHull(occ = occ_plants, crs= "+proj=longlat +datum=WGS84 +ellps=WGS84
 #'  +towgs84=0,0,0", fraction = 1, partCount = 1, alphaIncrement = 1, buff = 0,
-#'  distOcc = 0.25, poly = poly, cropToPoly = TRUE)
+#'  distOcc = 0.25, poly = poly, cropToPoly = TRUE, rasOut = TRUE, ras = ras)
 #'
 #' @encoding UTF-8
 #'
@@ -105,27 +109,33 @@
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export aHull
 #' @import rangeBuilder
+#' @import raster
 #' @import sp
 
-aHullcro <- function(occ, crs = NULL, fraction = NULL, partCount = NULL, alphaIncrement = NULL,
-                   buff = 0, distOcc = NULL, poly = NULL, cropToPoly = FALSE){
+aHull <- function(occ, crs = NULL, fraction = NULL, partCount = NULL, alphaIncrement = NULL,
+                   buff = 0, distOcc = NULL, poly = NULL, cropToPoly = FALSE,
+                  rasOut = FALSE, ras = NULL){
 
-  # Checking list and warning messages
+  # Checking list / data conversion / warning messages
   {
   if (missing(occ))
-    stop("occ is missing")
-  if ((is.null(crs) & class(occ) != "spOcc") | (is.null(crs) & class(occ) !="SpatialPoints") |
-      (is.null(crs) & (class(occ) == "list" & class(occ[[1]]) != "spOcc")) |
-      (is.null(crs) & (class(occ) == "list" & class(occ[[1]]) != "SpatialPoints")))
-
+    stop('occ is missing')
+    # Occ as 'SpatialPoints' will be converted into a 'spOcc' object
+    if(class(occ) == "list" & class(occ[[1]]) =="SpatialPoints"){
+      class(occ) <- "spOcc"
+    }
+  if (is.null(crs) & (class(occ) != "spOcc"))
       stop('a crs must be informed')
   if (is.null(poly) & (cropToPoly == TRUE))
     stop('cropToPoly can only be true when poly is provided')
-      }
+  if ((rasOut == TRUE) & is.null(ras))
+      stop('rasOut can only be true when ras is provided')
+    }
 
+  # Pre-processing of data
   # Converting input data into a 'spOcc' object
   if (class(occ) != "spOcc"){
-  # Input data as 'data.frame' will be converted into a 'spOcc' object
+
        # 1. ocurrences records as .csv files of multiple species:
        # To read the files and create a list of data.frames
        if (is.character(occ)){
@@ -137,74 +147,130 @@ aHullcro <- function(occ, crs = NULL, fraction = NULL, partCount = NULL, alphaIn
       names(occ) <- gsub(".csv", " ", files.sp)
     }
 
-       # 2. Ocurrences records of multiple species as a list of 'data.frames
+       # 2. Ocurrences records of multiple species as a list of 'data.frames'
+       # To convert data.frame occurrences into 'SpatialPoints'
        if (class(occ) == "list" & class(occ[[1]]) =="data.frame"){
-        # Converting data.frame occurrences into 'SpatialPoints'
-        # Warning messages
-     {
-  if (is.null(distOcc))
-    warning("distOcc is not provided, so default (zero) is used")
+            # Warning message
+            if (is.null(distOcc))
+            warning('distOcc is not provided, so default (zero) is used')
+          occ <- lapply(occ, f.clean1) # a 'spOcc' object
+          for (i in 1:length(occ)){
+             colnames(occ[[i]]@coords) <- c("long", "lat")
+             }
+          class(occ) <- "spOcc"
   }
-     occ <- lapply(occ, f.clean1) # a 'spOcc' object
-       for (i in 1:length(occ)){
-       colnames(occ[[i]]@coords) <- c("long", "lat")
-       }
-     class(occ) <- "spOcc"
-  }
-
-  # Input data as 'SpatialPoints' will be converted into a 'spOcc' object
-    if(class(occ) == "list" & class(occ[[1]]) =="SpatialPoints"){
-      class(occ) <- "spOcc"
-    }
-
 }
 
-  # Checking and filtering the species occurrences based on a specified area (if 'poly' is provided)
-  if (class(occ) == "spOcc" & !is.null(poly)){
-  spcheck<-checkOcc(occ, poly, SpOcc=TRUE)
-  occ<-spcheck[[2]]
-  }
+  # ANALYSIS BASED ON 'spOcc' OBJECT
+  # GENERATING THE ALPHA HULL
 
-    # GENERATING THE ALPHA HULL
-    # Removing from dataset those species with less than 3 records
-    occ.ahul <- list.clean(occ, fun = f.clean2, recursive = TRUE) # List with SpatialPoints of species with, at least, 3 occurrences records not duplicated
-    spp.names <- names(occ.ahul)
+      # If 'poly' is provided
+      # Filtering the species occurrences based on a specified area
+      if (class(occ) == "spOcc" & !is.null(poly)){
+      spcheck<-checkOcc(occ, poly, SpOcc=TRUE)
+      occ<-spcheck[[2]]
+       }
 
-    # Data frame of results
-    df <- data.frame (matrix(ncol = 3, nrow = length(occ.ahul)))
-    names(df) <- c('Species', 'Ocurrences', 'Alpha')
-    df[, 1] <- spp.names
+      # Removing from dataset those species with less than 3 records
+      occ.ahul <- list.clean(occ, fun = f.clean2, recursive = TRUE) # List with SpatialPoints of species with, at least, 3 occurrences records not duplicated
+      spp.names <- names(occ.ahul)
 
-    for (i in 1:length(occ.ahul)){
-    df[i,2] <- length(occ.ahul[[i]]@coords[,1])}
+      # Data frame of results
+      df <- data.frame (matrix(ncol = 3, nrow = length(occ.ahul)))
+      names(df) <- c('Species', 'Ocurrences', 'Alpha')
+      df[, 1] <- spp.names
 
-    # Building the alpha hull for each species
-    sp.ahull <- mapply(f.ahull, occ.ahul, MoreArgs = list(fraction, partCount, buff, alphaIncrement))
-    ahulls <- sp.ahull[1,] # a 'SpatialPolygonsDataFrame' object
-    class(ahulls) <- "aHull"
-    alphas <- matrix(unlist(sp.ahull[2,]))
-    alphas <-gsub("alpha", "", alphas[,1])
-    df[,3]<- alphas
+      # Counting and summarazing the occurrences the will be used to build alpha hulls
+      for (i in 1:length(occ.ahul)){
+      df[i,2] <- length(occ.ahul[[i]]@coords[,1])}
 
-    # SUMMARIZING RESULTS
-    if(cropToPoly == FALSE){ # default
-    ahull.result <- list(AlphaValues_OccRecords = df, AhullShps = ahulls)
-    return(ahull.result)
-    }
+      # Building the alpha hull for each species
+      sp.ahull <- mapply(f.ahull, occ.ahul, MoreArgs = list(fraction, partCount,
+                                                            buff, alphaIncrement))
+      ahulls <- sp.ahull[1,] # a 'SpatialPolygonsDataFrame' object
+      class(ahulls) <- "aHull"
+      alphas <- matrix(unlist(sp.ahull[2,]))
+      alphas <-gsub("alpha", "", alphas[,1])
+      df[,3]<- alphas
 
-    # CROP TO POLY
-    if(cropToPoly == TRUE){
-      crop.ahulls <- list()
-      for (i in 1:length(ahulls)){
-        crop.ahul <- crop(ahulls[[i]], poly, filename=spp.names[i])
-        crop.ahulls[[i]] <- crop.ahul
-      }
-      names(crop.ahulls)<-spp.names
-      class(crop.ahulls) <- "aHull"
-      ahull.result <- list(AlphaValues_OccRecords = df, AhullShps = ahulls, CroppedAhullShps=crop.ahulls)
+      # OUTPUTS
+
+          # Shapefile output
+            if (rasOut == FALSE){
+
+               # Without crop to poly
+               if(cropToPoly == FALSE){ # default
+         # Output
+         ahull.result <- list(AlphaValues_OccRecords = df, AhullShps = ahulls)
+         return(ahull.result)
+         }
+               # Cropping to poly
+               if(cropToPoly == TRUE){
+               crop.ahulls <- list()
+                 for (i in 1:length(ahulls)){
+                 crop.ahul <- crop(ahulls[[i]], poly, filename=spp.names[i])
+                 crop.ahulls[[i]] <- crop.ahul
+                   }
+              names(crop.ahulls)<-spp.names
+              class(crop.ahulls) <- "aHull"
+
+      # OUTPUT
+      ahull.result <- list(AlphaValues_OccRecords = df, AhullShps = ahulls,
+                           CroppedAhullShps=crop.ahulls)
       return(ahull.result)
+         }
+
+        }
+
+          # Raster output
+            if(rasOut == TRUE){
+
+               # Without crop to poly
+               if(cropToPoly == FALSE){ # default
+               # Rasterizing the ahulls
+               ahulls.r <- mapply(rasterize, ahulls, MoreArgs =
+                                    list(ras, background = 0, mask=FALSE))
+               for (i in 1:length(ahulls.r)){
+               ahulls.r[[i]][ahulls.r[[i]] > 1] <- 1
+                }
+
+      # OUTPUT
+      ahull.result <- list(AlphaValues_OccRecords = df, AhullShps = ahulls,
+                             AhullRas = ahulls.r)
+        return(ahull.result)
+      }
+               # Cropping to poly
+               if(cropToPoly == TRUE){
+               crop.ahulls <- list()
+               for (i in 1:length(ahulls)){
+               crop.ahul <- crop(ahulls[[i]], poly, filename=spp.names[i])
+               crop.ahulls[[i]] <- crop.ahul
+                }
+               names(crop.ahulls)<-spp.names
+               class(crop.ahulls) <- "aHull"
+               # Rasterizing the results
+                   # Original ahulls
+                   ahulls.r <- mapply(rasterize, ahulls, MoreArgs = list(ras,
+                                                  background = 0, mask=FALSE))
+                  for (i in 1:length(ahulls.r)){
+                  ahulls.r[[i]][ahulls.r[[i]] > 1] <- 1
+                  }
+                   # Cropped ahulls
+                   crop.ahulls.r <- mapply(rasterize, crop.ahulls, MoreArgs =
+                                             list(ras,background = 0, mask=FALSE))
+                   for (i in 1:length(crop.ahulls.r)){
+                   crop.ahulls.r[[i]][crop.ahulls.r[[i]] > 1] <- 1
+            }
+
+       # OUTPUT
+       ahull.result <- list(AlphaValues_OccRecords = df, AhullShps = ahulls,
+                             CroppedAhullShps = crop.ahulls, AhullRas = ahulls.r,
+                             CroppedAhullRas = crop.ahulls.r)
+       return(ahull.result)
       }
     }
+       }
+
 
 
 
