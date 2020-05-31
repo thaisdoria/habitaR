@@ -45,6 +45,12 @@
 #' is the 'SpatialPoints' of each species that match with polygon, but without clean
 #' the records to remove those falling outside the polygon checked. See details.
 #'
+#' @examples
+#'
+#' # Example for signature 'list' of 'data.frames'
+#'
+#' check <- checkOcc(occ_plants, poly, distOcc = NULL, SpOcc = TRUE)
+#'
 #' @encoding UTF-8
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export checkOcc
