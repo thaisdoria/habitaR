@@ -10,7 +10,7 @@
 #' It might be a path for a folder with the species occurrences files (.csv format),
 #' a 'list' of 'data.frames' with the occurrences from multiple species (see data
 #' examples), or a 'spOcc' object corresponding to a list of 'SpatialPoints' from
-#' multiple species (see \code{\link[aoh]{readOcc}} to obtain such object).
+#' multiple species (see \code{\link[habitaR]{readOcc}} to obtain such object).
 #' NOTE: If path is provided, each .csv file should correspond to only one species
 #' and the file must be named with the corresponding species names. The files must
 #' have 3 columns identified as "species" (species names or other identification of taxa),
@@ -58,7 +58,6 @@ checkOcc<-function(occ, poly, distOcc = NULL, SpOcc = FALSE){
     stop("occ is missing")
   if (missing(poly))
     stop("poly is missing")
-
 
   # Possibilities of input data
   # 1. Occurrences as .csv files or list of data.frame
