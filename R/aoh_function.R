@@ -87,7 +87,7 @@ aoh <- function(eooSp = NULL, lc = NULL, alt = NULL, altPref = NULL,
     # Checklist
   {
     if (missing(eooSp))
-      stop("eooSp is missing")
+      stop('eooSp is missing')
     if (is.null(lc) & is.null(alt))
       stop('You have to provide at least lc or alt')
     if (is.null(lc))
