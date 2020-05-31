@@ -1,9 +1,9 @@
-### rasAhull: rasterize the aHull polygons
+#' rasAhull: rasterize the aHull polygons
 #'
 #' Rasterize the aHull distribution maps (or other objects from a 'SpatialPolygons'
 #' or 'SpatialDataFrame' classes) based on a 'raster' object.
 #'
-#' @usage rasAhull (aHull, ras, mask = FALSE)
+#' @usage rasAhull (aHull, ras)
 #' @param aHull Alpha hull polygons or other types of distribution data
 #' representing the species extent of occurrence (EOO). It might be a 'aHull' object
 #' (see \code{\link[habitaR]{aHull}} to obtain such class of object) or a list of
