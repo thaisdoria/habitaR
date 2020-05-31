@@ -57,6 +57,13 @@ restrict the 'SpatialPoints' only to occurrences recorded inside of polygon,
 but just filtered to reduce the species from initial dataset based in the area
 of \emph{poly}.
 }
+\examples{
+
+# Example for signature 'list' of 'data.frames'
+
+check <- checkOcc(occ_plants, poly, distOcc = NULL, SpOcc = TRUE)
+
+}
 \author{
 Thaís Dória & Daniel Gonçalves-Souza
 }
