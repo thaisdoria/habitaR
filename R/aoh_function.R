@@ -52,7 +52,7 @@
 #' of a given species.
 #' @examples
 #'
-#' ### Raster Output
+#' ### Raster Output ###
 #'
 #' aoh_ras <- aoh(eooSp = eoo_birdShp, lc = lc_map, alt = alt_map,
 #' altPref = alpref_bird, habPref = habpref_bird, climSuit = climSuit_bird,
