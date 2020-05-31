@@ -3,10 +3,9 @@
 \encoding{UTF-8}
 \name{rasAhull}
 \alias{rasAhull}
-\title{Rasterize the aHull distribution maps (or other objects from a 'SpatialPolygons'
-or 'SpatialDataFrame' classes) based on a 'raster' object.}
+\title{rasAhull: rasterize the aHull polygons}
 \usage{
-rasAhull (aHull, ras, mask = FALSE)
+rasAhull (aHull, ras)
 }
 \arguments{
 \item{aHull}{Alpha hull polygons or other types of distribution data
