@@ -21,18 +21,19 @@ resolucao <- function(x, y, type = 0, lbl = 'blank'){
     }
     new.x <- stack(new.x)
     return(new.x)
-  }
-  #RasterLayer
-  if(lbl %in% 'climSuit'| type == 1){
-    x <- resample(x, y)
-  }
-  if(lbl %in% c('lc', 'alt')| type == 2){
-    factor <- trunc(xres(y) / xres(x))
-    if(factor > 1){
-      x <- aggregate(x, fact = factor, fun = sum)
-      x <- x / (factor^2)
+  } else {
+    #RasterLayer
+    if(lbl %in% 'climSuit'| type == 1){
+      x <- resample(x, y)
     }
-    x <- resample(x, y, method = 'ngb')
+    if(lbl %in% c('lc', 'alt')| type == 2){
+      factor <- trunc(xres(y) / xres(x))
+      if(factor > 1){
+        x <- aggregate(x, fact = factor, fun = sum)
+        x <- x / (factor^2)
+      }
+      x <- resample(x, y, method = 'ngb')
+    }
+    return(x)
   }
-  return(x)
 }
