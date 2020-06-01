@@ -7,7 +7,7 @@ resolucao <- function(x, y, type = 0, lbl = 'blank'){
     new.x <- list()
     for (i in 1:nlayers(x)) {
       new.x[[i]] <- x[[i]]
-      if(lbl %in% 'adq' | type == 1){
+      if(lbl %in% 'climSuit' | type == 1){
         new.x[[i]] <- resample(new.x[[i]], y)
       }
       if(lbl %in% c('lc', 'alt')| type == 2){
