@@ -50,15 +50,20 @@
 #' @param ras A raster object (file in .asc or .tif format) to be used as baseline
 #' to rasterize the ahull polygons. Only used if rasOut' is \code{TRUE}.
 #'
-#' @return \code{aHull} returns a list with two elements. The first is a data.frame
-#' of species and the respective alpha values and number of occurrences used to construct
-#' the alpha hull after the removal of duplicate coordinates.
-#' The second element is a 'aHull' object corresponding to a list of species-specific
+#' @return By default, \code{aHull} returns a list with two elements:
+#'  \itemize{
+#'   \item A data.frame of species and the respective alpha values and number of occurrences
+#'   used to construct the alpha hull (i.e. after the removal of duplicate coordinates).
+#'    \item A 'aHull' object corresponding to a list of species-specific
 #' alpha hulls ('SpatialPolygons class). If the conditions assigned by the user to
 #' build the alpha hulls cannot be satisfied, is returned the minimum convex hull (MCH)
 #' and the alpha value is identified as 'MCH'.
-#' If a \emph{poly} is provided and \emph{cropToPoly} is \code{TRUE}, \code{aHull}
-#' also returns the cropped alpha hulls as a third element from the resulting list.
+#' }
+#' NOTE: if a \emph{poly} is provided and \emph{cropToPoly} is \code{TRUE}, \code{aHull}
+#' also returns a third element from the resulting list:
+#' \itemize{
+#' \item A 'aHull' object corresponding to a list of species-specific cropped alpha hulls.
+#' }
 #'
 #' @details Based on a set of occurrences records of multiple-species, the
 #' function generate alpha hull polygons ('SpatialPolygons' class) by sequentially
