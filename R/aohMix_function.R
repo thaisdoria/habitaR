@@ -1,10 +1,14 @@
-#' aohMix: mapping the specie's Area of Habitat (AOH) by thresholding species
-#' distribution model (SDM) based on the 'Extent of Occurrence' (EOO) geometry.
+#' aohMix: mapping the AOH of species by mixing data from SDM and EOO.
 #'
-#' Based on a unifying approch to combine species distribution maps derived from
-#' spatil and modelling techniques, mapping the area of habitat.
+#' Based on a mixing approach to combine the geographical species distribution
+#' derived from spatial-informed methods and also modelling techniques, mapping the specie's
+#' area of habitat (AOH) from a mixing approach
 #'
-#'@usage aohMix (eooSp, modSp, thresInitial = NULL, thresIncrement = NULL, )
+#' mapping the AOH by thresholding distribution models (SDM) based on the EOO geometry.
+#'
+#'@usage aohMix (eooSp, modSp, thresInitial = NULL , thresIncrement = NULL,
+#'continuous = TRUE, poly = NULL, cropToPoly = FALSE, progress = TRUE,
+#'removeTempFile = TRUE, stack = TRUE )
 #'
 #'@param eooSp Spatial distribution data of the species representing the
 #' original (i.e. not refined) extent of occurrence (EOO). It might correspond to
@@ -27,19 +31,44 @@
 #'
 #'@examples
 #'
-#' ### Fictitious plants data
+#' ### Shapefile as Input ('aHull' class) ###
 #'
-#' # Example for signature 'aHull'
+#' # Binary Output
 #'
-#' aoh_Mix<-aohMix (eooSp = aHull_plantShp, modSp = sdm_plantRas, SEGUIR)
+#' aohmixS_bin <- aohMix (eooSp = aHull_plantShp, modSp = sdm_plantRas,
+#' thresInitial = 0.05, thresIncrement = 0.25, continuous = FALSE, cropToPoly = TRUE,
+#' poly = poly, progress = TRUE, stack = TRUE)
+#'
+#' # Continuous Output #
+#'
+#' aohmixS_con <- aohMix (eooSp = aHull_plantShp, modSp = sdm_plantRas,
+#' thresInitial = 0.05, thresIncrement = 0.25, continuous = TRUE, cropToPoly = TRUE,
+#' poly = poly, progress = TRUE, stack = TRUE)
+#' }
+#'
+#' ### Raster as Input ###
+#'
+#' # Binary Output #
+#'
+#' aohmixR_bin <- aohMix (eooSp = aHull_plantRas, modSp = sdm_plantRas,
+#' thresInitial = 0.05, thresIncrement = 0.25, continuous = FALSE, cropToPoly = TRUE,
+#' poly = poly, progress = TRUE, stack = TRUE)
+#'
+#' # Continuous Output #
+#'
+#' aohmixR_con <- aohMix (eooSp = aHull_plantRas, modSp = sdm_plantRas,
+#' thresInitial = 0.05, thresIncrement = 0.25, continuous = TRUE, cropToPoly = TRUE,
+#' poly = poly, progress = TRUE, stack = TRUE)
 #'
 #'@encoding UTF-8
 #'
 #'@references
-#' 1. Syfert . (2014). Global habitat suitability models of terrestrial mammals.
-#' Philosophical Transactions of the Royal Society B, 366, 2633–2641.
+#' 1. Syfert M.M., Joppa L.N., Smith M.J, Coomes D., Bachman S.P. & Brummitt N.A. (2014).
+#' Using species distribution models to inform IUCN Red List assessments. Biological
+#' Conservation. 177.
 #'
-#' 2. Sangermano.
+#' 2. Sangermano F., Eastman J.R. (2012). A GIS framework for the refinement of species
+#' geographic ranges. International Journal of Geographical Information Science 26, 39-55.
 #'
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export aohMix
@@ -47,9 +76,9 @@
 #' @import sp
 
 
-aohMix <- function(eooSp, modSp, thresInitial = 0.05 , thresIncrement = NULL,
-                   removeTempFile = TRUE, continuous = TRUE, poly = NULL,
-                   cropToPoly = FALSE, progress = TRUE, stack = TRUE){
+aohMix <- function(eooSp, modSp, thresInitial = NULL , thresIncrement = NULL,
+                   continuous = TRUE, poly = NULL, cropToPoly = FALSE,
+                   progress = TRUE, removeTempFile = TRUE, stack = TRUE){
 
   # Checking list and warning messages
   {
@@ -68,7 +97,7 @@ aohMix <- function(eooSp, modSp, thresInitial = 0.05 , thresIncrement = NULL,
   dfres[,1] <- spp.nm
 
   # Creating the threshold (spectrum of values)
-  threshold <- seq(0.1,1,0.1)
+  threshold <- seq(thresInitial,1,thresIncrement)
 
   # Pre-processing of data: converting 'eooSp' input data into a 'Raster'
   {
