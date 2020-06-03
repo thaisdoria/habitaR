@@ -48,7 +48,8 @@
 
 
 aohMix <- function(eooSp, modSp, thresInitial = 0.05 , thresIncrement = NULL,
-                   removeTempFile = TRUE, continuous = TRUE, maskToPoly = FALSE){
+                   removeTempFile = TRUE, continuous = TRUE, poly = NULL,
+                   maskToPoly = FALSE, progress = TRUE, stack = TRUE){
 
   # Checking list and warning messages
   {
@@ -56,6 +57,8 @@ aohMix <- function(eooSp, modSp, thresInitial = 0.05 , thresIncrement = NULL,
       stop("eooSp is missing")
     if (missing(modSp))
       stop("modSp is missing")
+    if (is.null(poly) & (maskToPoly == TRUE))
+      stop('maskToPoly can only be true when poly is provided')
     }
 
   # Data.frame of results
@@ -90,7 +93,12 @@ aohMix <- function(eooSp, modSp, thresInitial = 0.05 , thresIncrement = NULL,
        | class(eooSp) == "RasterLayer" | class(eooSp) == "RasterStack"){
 
   # Looping analysis to each feature from a list of rasters, a 'RasterStack', or a 'RasterBrick':
-   list.r <- list()
+    # Enabling the progress bar
+    if(progress == TRUE){
+    pb <- txtProgressBar(min = 0, max = length(sp.names), style = 3)
+      }
+
+    list.r <- list()
     for (j in 1:length(eooSp)){
     rasEoo<-eooSp[[j]] #eoos (e.g. alpha hull)
     rasMod<-modSp[[j]] #models (e.g. sdms)
@@ -152,39 +160,50 @@ aohMix <- function(eooSp, modSp, thresInitial = 0.05 , thresIncrement = NULL,
     # SUMMARIZING THE RESULTS OF MODEL JACCARD
     dfres[j,2] <- dfjacord[length(threshold),1] # thresholdMAX
     dfres[j,3] <- dfjacord[length(threshold),2] # maxJSI
-    dfres[j,4]<- difSize
-    dfres[j,5]<- prop
+    dfres[j,4] <- difSize
+    dfres[j,5] <- prop
 
-    # Removing temp files
-    if (removeTempFile == TRUE) # default
-      {
+    # Removing temp files and displaying progress bar
+    if (removeTempFile == TRUE) {
       removeTmpFiles(h=0.0)
-    }
+    } # default
 
-    # OUTPUT MAPPING FORMAT
+    # OUTPUT FORMAT OF MAPS
 
     # Raster Continuos
     if (continuous){
       aohMix<-mask(rasMod, aohMax.bin) # crop the continuous model based on geometry from aohMax.bin
       aohMix[is.na(aohMix[])]<- 0
-    }
+          }
     else{
       aohMix<-aohMax.bin
       aohMix[is.na(aohMix[])]<- 0
-        }
+              }
 
-    if (maskToPoly){
+    if (maskToPoly == TRUE){
         aohMix<-mask(aohMix, poly) # incluir argumento 'maskToPoly' para usar um masktopoly
+                 }
+    if(progress == TRUE){
+      setTxtProgressBar(pb, i)
+
+    list.r[[j]]<-aohMix
+    }
     }
 
-    list.r[[j]]<-raster::stack(aohMix)
-    names(list.r)<-spp.nm
     }
-}
+
+   names(list.r)<-spp.nm
 
    # FINAL OUTPUT
-   aohMix.Res <- list(Measures = dfres, aohMix = list.r)
-   return(aohMix.Res)
-}
+   if(stack){
+     list.r <- raster::stack(list.r)
+     aohMix.Res <- list(SpecificMeasures = dfres, aohMix = list.r)
+     return(aohMix.Res)
+   }
+   else{
+     aohMix.Res <- list(SpecificMeasures = dfres, aohMix = list.r)
+     return(aohMix.Res)
+   }
+   }
 }
 
