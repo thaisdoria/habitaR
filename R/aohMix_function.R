@@ -49,7 +49,7 @@
 
 aohMix <- function(eooSp, modSp, thresInitial = 0.05 , thresIncrement = NULL,
                    removeTempFile = TRUE, continuous = TRUE, poly = NULL,
-                   maskToPoly = FALSE, progress = TRUE, stack = TRUE){
+                   cropToPoly = FALSE, progress = TRUE, stack = TRUE){
 
   # Checking list and warning messages
   {
@@ -57,8 +57,8 @@ aohMix <- function(eooSp, modSp, thresInitial = 0.05 , thresIncrement = NULL,
       stop("eooSp is missing")
     if (missing(modSp))
       stop("modSp is missing")
-    if (is.null(poly) & (maskToPoly == TRUE))
-      stop('maskToPoly can only be true when poly is provided')
+    if (is.null(poly) & (cropToPoly == TRUE))
+      stop('cropToPoly can only be true when poly is provided')
     }
 
   # Data.frame of results
@@ -180,8 +180,9 @@ aohMix <- function(eooSp, modSp, thresInitial = 0.05 , thresIncrement = NULL,
       aohMix[is.na(aohMix[])]<- 0
               }
 
-    if (maskToPoly == TRUE){
-        aohMix<-mask(aohMix, poly) # incluir argumento 'maskToPoly' para usar um masktopoly
+    if (cropToPoly == TRUE){
+        aohMix<-crop(mask(aohMix, poly),poly) # incluir argumento 'maskToPoly' para usar um masktopoly
+        aohMix<-extend(aohMix, c(10,10))
                  }
     if(progress == TRUE){
       setTxtProgressBar(pb, i)
