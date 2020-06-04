@@ -5,7 +5,7 @@
 \alias{aohMix}
 \title{aohMix: mapping the AOH of species by mixing data from SDM and EOO.}
 \usage{
-aohMix (eooSp, modSp, thresInitial = 0.05 , thresIncrement = NULL,
+aohMix (eooSp, modSp, thresInitial = NULL , thresIncrement = NULL,
 continuous = TRUE, poly = NULL, cropToPoly = FALSE, progress = TRUE,
 removeTempFile = TRUE, stack = TRUE )
 }
@@ -36,38 +36,6 @@ area of habitat (AOH) from a mixing approach
 }
 \details{
 mapping the AOH by thresholding distribution models (SDM) based on the EOO geometry.
-}
-\examples{
-
-### Shapefile as Input ('aHull' class) ###
-\\itemize{
-\\item Binary Output
-aohmixS_bin <- aohMix (eooSp = aHull_plantShp, modSp = sdm_plantRas,
-thresInitial = 0.05, thresIncrement = 0.25, continuous = FALSE, cropToPoly = TRUE,
-poly = poly, progress = TRUE, stack = TRUE)
-
-\\item Continuous Output
-aohmixS_con <- aohMix (eooSp = aHull_plantShp, modSp = sdm_plantRas,
-thresInitial = 0.05, thresIncrement = 0.25, continuous = TRUE, cropToPoly = TRUE,
-poly = poly, progress = TRUE, stack = TRUE)
-}
-
-### Raster as Input ###
-
-\\itemize{
-\\item ## Binary Output ##
-
-aohmixS_bin <- aohMix (eooSp = aHull_plantShp, modSp = sdm_plantRas,
-thresInitial = 0.05, thresIncrement = 0.25, continuous = FALSE, cropToPoly = TRUE,
-poly = poly, progress = TRUE, stack = TRUE)
-
-\\item ## Continuous Output ##
-
-aohmixS_con <- aohMix (eooSp = aHull_plantShp, modSp = sdm_plantRas,
-thresInitial = 0.05, thresIncrement = 0.25, continuous = TRUE, cropToPoly = TRUE,
-poly = poly, progress = TRUE, stack = TRUE)
-}
-
 }
 \references{
 1. Syfert M.M., Joppa L.N., Smith M.J, Coomes D., Bachman S.P. & Brummitt N.A. (2014).
