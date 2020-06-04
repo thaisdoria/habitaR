@@ -114,16 +114,20 @@ ahull_plants<-aHull(occ = occ_plants, crs= "+proj=longlat +datum=WGS84 +ellps=WG
 
 }
 \references{
-1. Rabosky A.R.D., Cox C.L., Rabosky D.L., Title P.O., Holmes I.A., Feldman A.,
+1. Brugman M.A., and Fox J.C. (2003). Bias in species range estimates from minimum
+convex polygons: implications for conservation and options for improved planning.
+Animal Conservation 6:19-28.
+
+2. Capinha C., and Pateiro-López B. (2014). Predicting species distributions in
+new areas or time periods with alpha-shapes. Ecological Informatics, 24:231–237.
+
+3. Rabosky A.R.D., Cox C.L., Rabosky D.L., Title P.O., Holmes I.A., Feldman A.,
 and McGuire J.A. (2016). Coral snakes predict the evolution of mimicry across
 New World snakes. Nature Communications 7:11484.
 
-2. Meyer, L., Diniz-Filho, J.A.F., and Lohmann, L.G. (2018). A comparison of
+4. Meyer L., Diniz-Filho J.A.F., and Lohmann L.G. (2018). A comparison of
 hull methods for estimating species ranges and richness maps. Plant Ecology &
 Diversity, 10(5-6):389-401.
-
-2. Capinha C., Pateiro-López B. (2014). Predicting species distributions in
-new areas or time periods with alpha-shapes. Ecological Informatics, 24:231–237.
 }
 \seealso{
 The dynamic alpha hulls drawn from the sequentially increase of alpha
