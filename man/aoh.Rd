@@ -90,6 +90,21 @@ altPref = alpref_bird,habPref = habpref_bird, climSuit = climSuit_bird,
 resolution = 0.05, shpOut = TRUE, progress = FALSE)
 
 }
+\references{
+1. Rondinini C., Di Marco M., Chiozza F., Santulli G., Baisero D., Visconti P.,
+and Boitani L. (2011). Global habitat suitability models of terrestrial mammals.
+Philosophical Transactions of the Royal Society B, 366:2633–2641.
+
+2. Ficetola G.F., Rondinini C., Bonardi A., Baisero D., and Padoa-Schippa E.
+(2015).Habitat availability for amphibians and extinction threat: a global
+analysis. Diversity and Distributions, 21(3):302–311.
+
+3. Brooks T.M., Pimm S.L., Akçakaya H.R., Buchanan G.M., Butchart S.H.M, Foden W.,
+Hilton-Taylor C., Hoffmann M., Jenkins C.N., Joppa L., Li B.V., Menon V.,
+Ocampo-Peñuela N., and Rondinini C. (2019). Measuring Terrestrial Area of Habitat
+(AOH) and Its Utility for the IUCN Red List. Trends in Ecology & Evolution,
+34(11):977–986.
+}
 \author{
 Daniel Gonçalves-Souza & Thaís Dória
 }
