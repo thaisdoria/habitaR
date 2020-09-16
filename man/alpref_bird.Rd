@@ -4,7 +4,9 @@
 \name{alpref_bird}
 \alias{alpref_bird}
 \title{Altitude preference for Birds}
-\format{A data frame with 4 rows and 4 variables}
+\format{
+A data frame with 4 rows and 4 variables
+}
 \usage{
 data(alpref_bird)
 }
