@@ -18,22 +18,22 @@
 #'   \item aHull
 #'   \item 'aHull'Raster
 #'  }
-#' PATH / , 'SpatialPolygonsDataFrame' (see \code{\link[aoh]{readShp}} to obtain such
+#' PATH / 'SpatialPolygonsDataFrame' (see \code{\link[aoh]{readShp}} to obtain such
 #' class of object), 'AHUL object created from occurrences records
 #' (see \code{\link[aoh]{aHull}} to obtain such class of object), a 'RasterLayer', a 'RasterStack', a 'RasterBrick,
 #' or a 'list' with 'RasterLayer' class of features (see \code{\link[aoh]{readRas}} to obtain such object).
 #'@param modSp Species distribution derived from modelling techniques (eg. SDMs).
 #'It might correspond to a
 #'in a 'RasterFile' format or a stack of rasters.
-#'@param thresInitial
-#'@param thresIncrement
+#'@param thresInitial teste
+#'@param thresIncrement teste
 #'
 #'
 #'@examples
 #'
 #' ### Shapefile as Input ('aHull' class) ###
 #'
-#' # Binary Output
+#' # Binary Output #
 #'
 #' aohmixS_bin <- aohMix (eooSp = aHull_plantShp, modSp = sdm_plantRas,
 #' thresInitial = 0.05, thresIncrement = 0.25, continuous = FALSE, cropToPoly = TRUE,
@@ -44,7 +44,7 @@
 #' aohmixS_con <- aohMix (eooSp = aHull_plantShp, modSp = sdm_plantRas,
 #' thresInitial = 0.05, thresIncrement = 0.25, continuous = TRUE, cropToPoly = TRUE,
 #' poly = poly, progress = TRUE, stack = TRUE)
-#' }
+#'
 #'
 #' ### Raster as Input ###
 #'

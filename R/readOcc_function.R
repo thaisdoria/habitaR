@@ -5,7 +5,7 @@
 #' the removal of duplicates coordinates.
 #'
 #' @usage readOcc (occ, crs = "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0",
-#' distOcc = NULL, occSum = TRUE)
+#' distOcc = NULL, occSum = FALSE)
 #'
 #' @param occ Path for a folder with the species occurrences records files
 #' (.csv format). Coordinates should be in decimal degrees. The names of .csv files
@@ -21,7 +21,7 @@
 #' For more details, see \code{\link[sp:remove.duplicates]{remove.duplicates}}.
 #' @param occSum (logical) Whether the output should include also a data.frame
 #' with the number of occurrences records after the removal of duplicate coordinates.
-#' Default is \code{TRUE}.
+#' Default is \code{FALSE}.
 #'
 #' @seealso \code{\link[sp:remove.duplicates]{remove.duplicates}}
 #'
@@ -35,7 +35,7 @@
 #' @export readOcc
 #' @import sp
 
-readOcc <- function(occ, crs, distOcc = NULL, occSum = TRUE){
+readOcc <- function(occ, crs, distOcc = NULL, occSum = FALSE){
 
     if(substr(occ, nchar(occ), nchar(occ)) == '/'){
     path <- substr(occ, 1, nchar(occ) - 1)
@@ -50,6 +50,10 @@ readOcc <- function(occ, crs, distOcc = NULL, occSum = TRUE){
   }
   class(sp.pointsclean) <- "spOcc"
 
+  if(occSum == FALSE){
+    return(sp.pointsclean)
+  }
+
   if(occSum == TRUE){
   df <- data.frame (matrix(ncol = 2, nrow = length(sp.pointsclean)))
   names(df) <- c('Species', 'Cleaned Occurrences')
@@ -58,10 +62,6 @@ readOcc <- function(occ, crs, distOcc = NULL, occSum = TRUE){
   df[i,2] <- length(sp.pointsclean[[i]]@coords[,1])}
   sp.pointsclean.l<-list(sp.pointsclean, df)
   return(sp.pointsclean.l)
-  }
-
-  if(occSum == FALSE){
-    return(sp.pointsclean)
   }
 }
 
