@@ -151,3 +151,16 @@ NULL
 #' @usage data(climSuit_bird)
 #' @format A list with 3 Rasterlayers.
 NULL
+
+
+#### sdm_plantRas ####
+#'  Lorem ipsum
+#'
+#' Lorem ipsum Lorem ipsum Lorem ipsum
+
+#' @docType data
+#' @keywords datasets
+#' @name sdm_plantRas
+#' @usage data(sdm_plantRas)
+#' @format A list with 6 Rasterlayers.
+NULL
