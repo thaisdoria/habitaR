@@ -96,7 +96,7 @@ and Boitani L. (2011). Global habitat suitability models of terrestrial mammals.
 Philosophical Transactions of the Royal Society B, 366:2633–2641.
 
 2. Ficetola G.F., Rondinini C., Bonardi A., Baisero D., and Padoa-Schippa E.
-(2015).Habitat availability for amphibians and extinction threat: a global
+(2015). Habitat availability for amphibians and extinction threat: a global
 analysis. Diversity and Distributions, 21(3):302–311.
 
 3. Brooks T.M., Pimm S.L., Akçakaya H.R., Buchanan G.M., Butchart S.H.M, Foden W.,
