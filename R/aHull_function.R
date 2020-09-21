@@ -148,12 +148,7 @@ aHull <- function(occ, crs = NULL, fraction = NULL, partCount = NULL, alphaIncre
        # 1. ocurrences records as .csv files of multiple species:
        # To read the files and create a list of data.frames
        if (is.character(occ)){
-          if(substr(occ, nchar(occ), nchar(occ)) == '/'){
-        occ <- substr(occ, 1, nchar(occ) - 1)
-        }
-      files.sp <- list.files(occ, pattern = ".csv$")
-      occ <- do.call("list", lapply (files.sp, read.csv, sep=";", header = TRUE))
-      names(occ) <- gsub(".csv", " ", files.sp)
+          occ<-readOcc(occ, crs)
     }
 
        # 2. Ocurrences records of multiple species as a list of 'data.frames'
@@ -199,7 +194,7 @@ aHull <- function(occ, crs = NULL, fraction = NULL, partCount = NULL, alphaIncre
       ahulls <- sp.ahull[1,] # a 'SpatialPolygonsDataFrame' object
       class(ahulls) <- "aHull"
       alphas <- matrix(unlist(sp.ahull[2,]))
-      alphas <-gsub("alpha", "", alphas[,1])
+      alphas <- gsub("alpha", "", alphas[,1])
       df[,3]<- alphas
 
       # OUTPUTS
