@@ -12,26 +12,18 @@
 #' @export readRas
 
 readRas <- function(path){
+
   if(substr(path, nchar(path), nchar(path)) == '/'){
     path <- substr(path, 1, nchar(path) - 1)
   }
 
-   files.sp <- list.files(path, pattern = ".tif$|.asc$",
-                          full.names = T)
+  files.sp <- list.files(path, pattern = ".tif$|.asc$",
+                         full.names = T)
 
-   if(length(files.sp) > 1){
-  sps <- list()
-  for (i in 1:length(files.sp)){
-    sps[[i]] <- raster(files.sp[i])
-  }
-  names(sps)<-sub("(\\w+\\s+\\w+).*", "\\1", files.sp)
+  sps <- lapply(files.sp, raster)
+  names.sp <- list.files(path, pattern = ".tif$|.asc$")
+  names(sps) <- gsub("*\\.asc|*\\.tif", '', names.sp)
+
   return(sps)
-  }
-
-  if(length(files.sp) == 1){
-    sps <- raster(files.sp[1])
-    names(sps)<-sub("(\\w+\\s+\\w+).*", "\\1", files.sp)
-    return(sps)
-  }
 }
 
