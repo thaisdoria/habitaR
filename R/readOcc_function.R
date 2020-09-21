@@ -38,13 +38,14 @@
 readOcc <- function(occ, crs, distOcc = NULL, occSum = FALSE){
 
     if(substr(occ, nchar(occ), nchar(occ)) == '/'){
-    path <- substr(occ, 1, nchar(occ) - 1)
+    occ <- substr(occ, 1, nchar(occ) - 1)
   }
 
-  files.sp <- list.files(occ, pattern = ".csv$")
+  files.sp <- list.files(occ, pattern = ".csv$", full.names = T)
+  names <- list.files(occ, pattern = ".csv$", full.names = F)
   occ <- do.call("list", lapply (files.sp, read.csv, header = TRUE, sep=";"))
-  names(occ) <- gsub(".csv", " ", files.sp)
-  sp.pointsclean <- lapply(occ, f.clean1)
+  names(occ) <- gsub("*\\.csv", '', names)
+  sp.pointsclean <- mapply(f.clean1, occ, crs)
   for (i in 1:length(sp.pointsclean)){
   colnames(sp.pointsclean[[i]]@coords) <- c("long", "lat")
   }
