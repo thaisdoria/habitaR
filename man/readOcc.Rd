@@ -5,8 +5,8 @@
 \alias{readOcc}
 \title{readOcc: read species occurrences}
 \usage{
-readOcc (occ, crs = "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0",
-distOcc = NULL, occSum = TRUE)
+readOcc (occ = occ, crs = "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0",
+distOcc = NULL, occSum = FALSE)
 }
 \arguments{
 \item{occ}{Path for a folder with the species occurrences records files
@@ -26,7 +26,7 @@ For more details, see \code{\link[sp:remove.duplicates]{remove.duplicates}}.}
 
 \item{occSum}{(logical) Whether the output should include also a data.frame
 with the number of occurrences records after the removal of duplicate coordinates.
-Default is \code{TRUE}.}
+Default is \code{FALSE}.}
 }
 \value{
 By default, \code{readOcc} returns a list with two elements. The first
