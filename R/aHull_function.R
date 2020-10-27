@@ -243,7 +243,7 @@ aHull <- function(occ = NULL, crs = NULL, distOcc = NULL, fraction = NULL,
   }
 
   # Removing from dataset those species with less than 3 records
-  occ.ahul <- list.clean(occ, fun = f.clean2, recursive = TRUE) # List with SpatialPoints of species with, at least, 3 occurrences records not duplicated
+  occ.ahul <- list.clean(occ, fun = f.clean, recursive = TRUE) # List with SpatialPoints of species with, at least, 3 occurrences records not duplicated
   spp.names <- names(occ.ahul)
 
   # Data frame of results
