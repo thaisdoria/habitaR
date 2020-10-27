@@ -1,4 +1,4 @@
-#' aohMix: mapping the AOH of species by mixing data from SDM and EOO.
+#' aohMix: mapping the AOH of species by mixing data from SDM and EOO following Syfert et al. (2014).
 #'
 #' Based on a mixing approach to combine the geographical species distribution
 #' derived from spatial-informed methods and also modelling techniques, mapping the specie's
@@ -6,25 +6,34 @@
 #'
 #' mapping the AOH by thresholding distribution models (SDM) based on the EOO geometry.
 #'
-#'@usage aohMix (eooSp, modSp, thresInitial = NULL , thresIncrement = NULL,
+#'@usage aohMix1 (eooSp, modSp, thresInitial = NULL , thresIncrement = NULL,
 #'continuous = TRUE, poly = NULL, cropToPoly = FALSE, progress = TRUE,
 #'removeTempFile = TRUE, stack = TRUE )
 #'
 #'@param eooSp Spatial distribution data of the species representing the
 #' original (i.e. not refined) extent of occurrence (EOO). It might correspond to
 #' \itemize{
-#'   \item path
-#'   \item SpatialPolygonDataFrame
-#'   \item aHull
-#'   \item 'aHull'Raster
+#'   \item path for a folder with spatial distribution files (.shp, .asc or .tif
+#'   format)
+#'   \item SpatialPolygonDataFrame (see \code{\link[aoh]{readShp}} to obtain such
+#' class of object)
+#'   \item aHull object created from occurrences records (see \code{\link[aoh]{aHull}}
+#'   to obtain such class of object)
+#'   \item 'aHull' Raster
+#'   \item 'RasterLayer' object
+#'   \item 'RasterStack' object
+#'   \item 'RasterBrick' object
 #'  }
-#' PATH / 'SpatialPolygonsDataFrame' (see \code{\link[aoh]{readShp}} to obtain such
-#' class of object), 'AHUL object created from occurrences records
-#' (see \code{\link[aoh]{aHull}} to obtain such class of object), a 'RasterLayer', a 'RasterStack', a 'RasterBrick,
-#' or a 'list' with 'RasterLayer' class of features (see \code{\link[aoh]{readRas}} to obtain such object).
 #'@param modSp Species distribution derived from modelling techniques (eg. SDMs).
-#'It might correspond to a
-#'in a 'RasterFile' format or a stack of rasters.
+#'It might correspond to
+#'#'\itemize{
+#'   \item path for a folder with species distribution models files (.asc or .tif
+#'   format)
+#'   \item 'RasterLayer' object
+#'   \item 'RasterStack' object
+#'   \item 'RasterBrick' object
+#'   \item 'list' with 'RasterLayer' class of features (see \code{\link[aoh]{readRas}}
+#'   to obtain such object).
 #'@param thresInitial teste
 #'@param thresIncrement teste
 #'
@@ -210,7 +219,7 @@ aohMix <- function(eooSp, modSp, thresInitial = NULL , thresIncrement = NULL,
               }
 
     if (cropToPoly == TRUE){
-        aohMix<-crop(mask(aohMix, poly),poly) # incluir argumento 'maskToPoly' para usar um masktopoly
+        aohMix<-crop(mask(aohMix, poly),poly)
         aohMix<-extend(aohMix, c(10,10))
                  }
     if(progress == TRUE){
