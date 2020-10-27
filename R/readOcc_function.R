@@ -4,7 +4,7 @@
 #' from a specified folder and provide a list of 'SpatialPoints' of species through
 #' the removal of duplicates coordinates.
 #'
-#' @usage readOcc (occ, crs = "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0",
+#' @usage readOcc (occ = occ, crs = "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0",
 #' distOcc = NULL, occSum = FALSE)
 #'
 #' @param occ Path for a folder with the species occurrences records files
@@ -35,9 +35,27 @@
 #' @export readOcc
 #' @import sp
 
-readOcc <- function(occ, crs, distOcc = NULL, occSum = FALSE){
+readOcc <- function(occ = NULL, crs = NULL, distOcc = NULL, occSum = FALSE) {
 
-    if(substr(occ, nchar(occ), nchar(occ)) == '/'){
+  # Checklist and warning messages
+  if (missing(occ))
+    stop("occ is missing")
+  if (class(occ)!= "character")
+    stop("occ must be a path for folder with the species occurrences records files")
+  if (is.null(crs))
+    stop("a crs must be informed")
+  if (class(crs)=='numeric')
+    stop("crs as 'numeric' is not valid for slot ‘proj4string’ in an object of class “Spatial”. See usage.")
+  if (is.null(distOcc))
+    warning("distOcc is not provided, so default (zero) is used")
+  if (!is.null(distOcc) & class(distOcc) != "numeric")
+    stop("distOcc must be provided as 'numeric' or NULL")
+
+
+  # 1. Input data
+  # Occurrences as .csv files
+  # Path for a folder
+  if(substr(occ, nchar(occ), nchar(occ)) == '/'){
     occ <- substr(occ, 1, nchar(occ) - 1)
   }
 
@@ -45,24 +63,65 @@ readOcc <- function(occ, crs, distOcc = NULL, occSum = FALSE){
   names <- list.files(occ, pattern = ".csv$", full.names = F)
   occ <- do.call("list", lapply (files.sp, read.csv, header = TRUE, sep=";"))
   names(occ) <- gsub("*\\.csv", '', names)
-  sp.pointsclean <- mapply(f.clean1, occ, crs)
-  for (i in 1:length(sp.pointsclean)){
-  colnames(sp.pointsclean[[i]]@coords) <- c("long", "lat")
-  }
-  class(sp.pointsclean) <- "spOcc"
 
+  # 2. To get coords from data.frame
+  l<-list()
+  for (i in 1:length(occ)){
+    long<-as.numeric(as.character(occ[[i]]$long))
+    lat<-as.numeric(as.character(occ[[i]]$lat))
+    l[[i]]<-as.matrix(cbind(long, lat))
+  }
+  names(l) <- names(occ) # list of coords
+
+  # 3. To convert occurrences into 'SpatialPoints'
+  # CRS is required
+  sp.clean<-list()
+  for (i in 1:length(l)){
+    if (is.character(crs)){
+      spcc<-SpatialPoints(l[[i]], proj4string = CRS(crs))
+    }
+    if (class(crs) == "CRS"){
+      spcc<-SpatialPoints(l[[i]], proj4string = crs)
+    }
+    sp.clean[[i]]<-spcc
+  }
+  names(sp.clean) <- names(l)
+
+  # Removing duplicates (distOcc)
+  sp.clean2<-list()
+  for (i in 1:length(sp.clean)){
+    if (!is.null(distOcc)){
+      sp<-remove.duplicates(sp.clean[[i]], zerodist(sp.clean[[i]], zero=as.numeric(distOcc)))
+    }
+    if (is.null(distOcc)){
+      sp<-remove.duplicates(sp.clean[[i]])
+    }
+    sp.clean2[[i]]<-sp
+  }
+  names(sp.clean2) <- names(sp.clean)
+
+  # 4. To convert object in a "spOcc" class
+  for (i in 1:length(sp.clean2)){
+    colnames(sp.clean2[[i]]@coords) <- c("long", "lat")
+  }
+  class(sp.clean2) <- "spOcc" # a 'spOcc' object
+
+
+  # 5. Output
+  # Without return a data.frame with total of spatial points after removing duplicates
   if(occSum == FALSE){
-    return(sp.pointsclean)
+    return(sp.clean2)
   }
-
+  # Returning a data.frame with total of spatial points after removing duplicates
   if(occSum == TRUE){
-  df <- data.frame (matrix(ncol = 2, nrow = length(sp.pointsclean)))
-  names(df) <- c('Species', 'Cleaned Occurrences')
-  df[,1] <- names(sp.pointsclean)
-  for (i in 1:length(sp.pointsclean)){
-  df[i,2] <- length(sp.pointsclean[[i]]@coords[,1])}
-  sp.pointsclean.l<-list(sp.pointsclean, df)
-  return(sp.pointsclean.l)
-  }
+    # Data frame of results
+    df <- data.frame (matrix(ncol = 2, nrow = length(sp.clean2)))
+    names(df) <- c('Species', 'Cleaned Occurrences')
+    df[,1] <- names(sp.clean2)
+    for (i in 1:length(sp.clean2)){
+      df[i,2] <- length(sp.clean2[[i]]@coords[,1])}
+    sp.clean.l<-list(sp.clean2, df)
+    return(sp.clean.l)}
 }
+
 
