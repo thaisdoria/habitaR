@@ -89,7 +89,6 @@ checkOcc<-function(occ = NULL, crs = NULL, distOcc = NULL, poly = NULL, SpOcc = 
    }
  }
 
-
   # Possibilities of input data
   # 1. Occurrences as .csv files or list of data.frame
   {
@@ -158,7 +157,7 @@ checkOcc<-function(occ = NULL, crs = NULL, distOcc = NULL, poly = NULL, SpOcc = 
 
   # 2. Ocurrences as 'SpatialPoints' or 'spOcc' (obtained with readOcc function)
   {
-    # List with occurrences data from a multiple species in a 'data.frame' class
+    # List with occurrences data from a multiple species in a 'SpatialPoints' class
     if (class(occ) == "list" & class(occ[[1]]) =="SpatialPoints"){
       for (i in 1:length(occ)){
         colnames(occ[[i]]@coords) <- c("long", "lat")
@@ -166,7 +165,7 @@ checkOcc<-function(occ = NULL, crs = NULL, distOcc = NULL, poly = NULL, SpOcc = 
       class(occ) <- "spOcc"
     }
 
-    # List with occurrences data from a multiple species in a 'SpatialPoints' class
+    # List with occurrences data from a multiple species in a 'SpOcc' class
     if (class(occ) == "spOcc"){
       # Identifying spatial limits of the extent of interest (research area)
       lin <- as(poly, "SpatialLinesDataFrame")
