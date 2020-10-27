@@ -4,7 +4,9 @@
 \name{eoo_birdRas}
 \alias{eoo_birdRas}
 \title{EOO Raster for Birds}
-\format{A RasterStack with 3 layers.}
+\format{
+A RasterStack with 3 layers.
+}
 \usage{
 data(eoo_birdRas)
 }
