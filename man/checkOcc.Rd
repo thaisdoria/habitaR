@@ -5,7 +5,7 @@
 \alias{checkOcc}
 \title{checkOcc: check if occurrences fall inside of an specific are}
 \usage{
-checkOcc (occ, poly, distOcc = NULL, SpOcc = FALSE)
+checkOcc (occ, crs, poly, distOcc = NULL, SpOcc = FALSE)
 }
 \arguments{
 \item{occ}{Occurrences records of the species (coordinates in decimal degrees).
@@ -19,9 +19,10 @@ have 3 columns identified as "species" (species names or other identification of
 "long" (longitude), "lat" (latitude). Longitude must be in a column before the
 latitude column.}
 
-\item{poly}{A polygon (ESRI shapefile from a 'SpatialPolygonsDataFrame' class)
-of the specific area to be checked.
-#' @param distOcc A value corresponding to the minimum distance assigned to
+\item{crs}{The Coordinate Reference System (CRS) specifing the projection and
+datum of dataset. Could be a CRS object or a character string.}
+
+\item{distOcc}{A value corresponding to the minimum distance assigned to
 consider two coordinates as not duplicate. Values up to this distance will
 correspond to duplicates and removed. Units of this value must be in km. Default
 is zero (i.e. only exactly coincindent coordinates will be removed).
@@ -29,6 +30,9 @@ For more details,see \code{\link[sp:remove.duplicates]{remove.duplicates}}.
 Optional and only used if 'occ' is a path for .csv files or a list of 'data.frame'.
 If 'occ' correspond to 'SpatialPoints', this argument ('distOcc') should be ignored
 (i.e. NULL).}
+
+\item{poly}{A polygon (ESRI shapefile from a 'SpatialPolygonsDataFrame' class)
+of the specific area to be checked.}
 
 \item{SpOcc}{(logical) Whether the output should also return the 'SpatialPoints'
 of species filtered based on the poly boundaries. Default is \code{FALSE}.}
@@ -52,7 +56,7 @@ The function filter the initial dataset of species (\emph{occ})
 based on a given region (\emph{poly}). NOTE: if \emph{SpOcc} is \code{TRUE}, the
 'SpatialPoints' returned encompass all set of occurrences and not a subset
 that match with the specified region (\emph{poly}). Therefore, the 'SpatialPoints'
-are not cleaned to remove the records falling outside the polygon checked and to
+are \emph{NOT} cleaned to remove the records falling outside the polygon checked and to
 restrict the 'SpatialPoints' only to occurrences recorded inside of polygon,
 but just filtered to reduce the species from initial dataset based in the area
 of \emph{poly}.
