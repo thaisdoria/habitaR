@@ -24,15 +24,6 @@ latitude column.}
 \item{crs}{The Coordinate Reference System (CRS) specifing the projection and
 datum of dataset. Could be a CRS object or a character string. Only used}
 
-\item{fraction}{The minimum fraction of occurrences that must be included in polygon.}
-
-\item{partCount}{The maximum number of disjunct polygons that are allowed.}
-
-\item{alphaIncrement}{The amount to increase alpha with each iteration.}
-
-\item{buff}{A buffer distance in meters to increase boundaries of alpha hull.
-Default is zero (0).}
-
 \item{distOcc}{A value corresponding to the minimum distance assigned to
 consider two coordinates as not duplicate. Values up to this distance will
 correspond to duplicates and removed. Units of this value must be in km.
@@ -41,6 +32,15 @@ Optional and only used if 'occ' is a path for .csv files or a list of data.frame
 If 'occ' correspond to 'SpatialPoints', this argument should be ignored
 (i.e., distOcc = NULL). For more details, see \code{\link[sp:remove.duplicates]{remove.duplicates}}
 in the \pkg{sp} package.}
+
+\item{fraction}{The minimum fraction of occurrences that must be included in polygon.}
+
+\item{partCount}{The maximum number of disjunct polygons that are allowed.}
+
+\item{alphaIncrement}{The amount to increase alpha with each iteration.}
+
+\item{buff}{A buffer distance in meters to increase boundaries of alpha hull.
+Default is zero (0).}
 
 \item{poly}{Optional. A polygon (ESRI shapefile in a 'SpatialPolygonsDataFrame'
 class) of a given area to be checked for occurrences of species and to restrict
