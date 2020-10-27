@@ -6,7 +6,7 @@
 #' (longitude and latitude).
 #' @noRd
 
-f.clean1 <- function(occ, distOcc = NULL){
+f.clean1 <- function(occ, crs, distOcc = NULL){
   long<-as.numeric(as.character(occ$long))
   lat<-as.numeric(as.character(occ$lat))
   c<-cbind(as.numeric(as.character(long)), as.numeric(as.character(lat)))
