@@ -3,9 +3,9 @@
 \encoding{UTF-8}
 \name{aohMix}
 \alias{aohMix}
-\title{aohMix: mapping the AOH of species by mixing data from SDM and EOO.}
+\title{aohMix: mapping the AOH of species by mixing data from SDM and EOO following Syfert et al. (2014).}
 \usage{
-aohMix (eooSp, modSp, thresInitial = NULL , thresIncrement = NULL,
+aohMix1 (eooSp, modSp, thresInitial = NULL , thresIncrement = NULL,
 continuous = TRUE, poly = NULL, cropToPoly = FALSE, progress = TRUE,
 removeTempFile = TRUE, stack = TRUE )
 }
@@ -13,21 +13,21 @@ removeTempFile = TRUE, stack = TRUE )
 \item{eooSp}{Spatial distribution data of the species representing the
 original (i.e. not refined) extent of occurrence (EOO). It might correspond to
 \itemize{
-  \item path
-  \item SpatialPolygonDataFrame
-  \item aHull
-  \item 'aHull'Raster
- }
-PATH / , 'SpatialPolygonsDataFrame' (see \code{\link[aoh]{readShp}} to obtain such
-class of object), 'AHUL object created from occurrences records
-(see \code{\link[aoh]{aHull}} to obtain such class of object), a 'RasterLayer', a 'RasterStack', a 'RasterBrick,
-or a 'list' with 'RasterLayer' class of features (see \code{\link[aoh]{readRas}} to obtain such object).}
+  \item path for a folder with spatial distribution files (.shp, .asc or .tif
+  format)
+  \item SpatialPolygonDataFrame (see \code{\link[aoh]{readShp}} to obtain such
+class of object)
+  \item aHull object created from occurrences records (see \code{\link[aoh]{aHull}}
+  to obtain such class of object)
+  \item 'aHull' Raster
+  \item 'RasterLayer' object
+  \item 'RasterStack' object
+  \item 'RasterBrick' object
+ }}
 
-\item{modSp}{Species distribution derived from modelling techniques (eg. SDMs).
-It might correspond to a
-in a 'RasterFile' format or a stack of rasters.}
+\item{thresInitial}{teste}
 
-\item{thresIncrement}{}
+\item{thresIncrement}{teste}
 }
 \description{
 Based on a mixing approach to combine the geographical species distribution
@@ -36,6 +36,38 @@ area of habitat (AOH) from a mixing approach
 }
 \details{
 mapping the AOH by thresholding distribution models (SDM) based on the EOO geometry.
+}
+\examples{
+
+### Shapefile as Input ('aHull' class) ###
+
+# Binary Output #
+
+aohmixS_bin <- aohMix (eooSp = aHull_plantShp, modSp = sdm_plantRas,
+thresInitial = 0.05, thresIncrement = 0.25, continuous = FALSE, cropToPoly = TRUE,
+poly = poly, progress = TRUE, stack = TRUE)
+
+# Continuous Output #
+
+aohmixS_con <- aohMix (eooSp = aHull_plantShp, modSp = sdm_plantRas,
+thresInitial = 0.05, thresIncrement = 0.25, continuous = TRUE, cropToPoly = TRUE,
+poly = poly, progress = TRUE, stack = TRUE)
+
+
+### Raster as Input ###
+
+# Binary Output #
+
+aohmixR_bin <- aohMix (eooSp = aHull_plantRas, modSp = sdm_plantRas,
+thresInitial = 0.05, thresIncrement = 0.25, continuous = FALSE, cropToPoly = TRUE,
+poly = poly, progress = TRUE, stack = TRUE)
+
+# Continuous Output #
+
+aohmixR_con <- aohMix (eooSp = aHull_plantRas, modSp = sdm_plantRas,
+thresInitial = 0.05, thresIncrement = 0.25, continuous = TRUE, cropToPoly = TRUE,
+poly = poly, progress = TRUE, stack = TRUE)
+
 }
 \references{
 1. Syfert M.M., Joppa L.N., Smith M.J, Coomes D., Bachman S.P. & Brummitt N.A. (2014).
