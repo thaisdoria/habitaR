@@ -4,8 +4,10 @@
 \name{alt_map}
 \alias{alt_map}
 \title{Altitude Map}
-\format{A RasterLayer with 266 rows, 187 columns and resolution of
-0.05 x 0.05 degrees}
+\format{
+A RasterLayer with 266 rows, 187 columns and resolution of
+0.05 x 0.05 degrees
+}
 \usage{
 data(alt_map)
 }
