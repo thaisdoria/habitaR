@@ -3,6 +3,7 @@
 export(aHull)
 export(aoh)
 export(aohMix)
+export(aohMixS)
 export(aohVal)
 export(checkOcc)
 export(plot.aohVal)
