@@ -12,10 +12,14 @@
 #' ras = NULL)
 #'
 #' @param occ Occurrences records of the species (coordinates in decimal degrees).
-#' It might be a path for a folder with the species occurrences files (.csv format),
-#' a 'list' of 'data.frames' with the occurrences from multiple species (see data
-#' examples), or a 'spOcc' object corresponding to a list of 'SpatialPoints' from
+#' 'It might correspond to
+#'\itemize{
+#'   \item path for a folder with the species occurrences files (.csv format)
+#'   \item a 'list' of 'data.frames' with the occurrences from multiple species (see data
+#' examples)
+#'   \item 'spOcc' object corresponding to a list of 'SpatialPoints' from
 #' multiple species (see \code{\link[aoh]{readOcc}} to obtain such object).
+#' }
 #' NOTE: If path is provided, each .csv file should correspond to only one species
 #' and the file must be named with the corresponding species names. The files must
 #' have 3 columns identified as "species" (species names or other identification of taxa),
