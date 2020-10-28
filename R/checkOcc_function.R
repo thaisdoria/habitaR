@@ -7,10 +7,14 @@
 #'
 #' @usage checkOcc (occ, crs, poly, distOcc = NULL, SpOcc = FALSE)
 #' @param occ Occurrences records of the species (coordinates in decimal degrees).
-#' It might be a path for a folder with the species occurrences files (.csv format),
-#' a 'list' of 'data.frames' with the occurrences from multiple species (see data
-#' examples), or a 'spOcc' object corresponding to a list of 'SpatialPoints' from
-#' multiple species (see \code{\link[habitaR]{readOcc}} to obtain such object).
+#' 'It might correspond to
+#'\itemize{
+#'   \item path for a folder with the species occurrences files (.csv format)
+#'   \item a 'list' of 'data.frames' with the occurrences from multiple species (see data
+#' examples)
+#'   \item 'spOcc' object corresponding to a list of 'SpatialPoints' from
+#' multiple species (see \code{\link[aoh]{readOcc}} to obtain such object).
+#' }
 #' NOTE: If path is provided, each .csv file should correspond to only one species
 #' and the file must be named with the corresponding species names. The files must
 #' have 3 columns identified as "species" (species names or other identification of taxa),
@@ -40,22 +44,26 @@
 #' but just filtered to reduce the species from initial dataset based in the area
 #' of \emph{poly}.
 #'
-#' @return \code{checkOcc} returns a data.frame of species and the respective
-#' occurrences matching with the provided polygon. If SpOcc is \code{TRUE},
-#' \code{checkdOcc} returns a list with two elements. The first element is the
-#' data.frame with the species and occurrences filtered by the polygon. The second
-#' is the 'SpatialPoints' of each species that match with polygon, but without clean
-#' the records to remove those falling outside the polygon checked. See details.
-#'
+#' @return By default, \code{checkOcc} returns a data.frame of species and its
+#' respective occurrences matching with the provided polygon. If SpOcc is \code{TRUE},
+#' \code{checkdOcc} returns a list with two elements:
+#' \itemize{
+#'   \item A data.frame with the species and total occurrences filtered by the polygon.
+#'   \item A list of 'SpatialPoints' from each species that match with polygon, but
+#'   without clean the records to remove those falling outside the polygon checked.
+#'   See details.
+#'}
 #' @examples
 #'
-#' ### List of 'data.frame' input ###
+#' ### List of 'data.frame' as Input ###
 #'
-#' check1 <- checkOcc(occ_plants, crs = cr, poly=poly, distOcc = NULL, SpOcc = TRUE)
+#' check1 <- checkOcc(occ_plants, crs = "+proj=longlat +datum=WGS84 +ellps=WGS84
+#'  +towgs84=0,0,0", poly=poly, distOcc = NULL, SpOcc = TRUE)
 #'
-#' ### spOcc or list of 'SpatialPoints' input ###
+#' ### spOcc or list of 'SpatialPoints' as Input ###
 #'
-#' check2 <- checkOcc(spOcc_plants, crs = crs, poly=poly, distOcc = 0.1, SpOcc = TRUE)
+#' check2 <- checkOcc(spOcc_plants, crs = "+proj=longlat +datum=WGS84 +ellps=WGS84
+#'  +towgs84=0,0,0", poly=poly, distOcc = 0.1, SpOcc = TRUE)
 #'
 #' @encoding UTF-8
 #' @author Thaís Dória & Daniel Gonçalves-Souza
