@@ -63,9 +63,13 @@ of \emph{poly}.
 }
 \examples{
 
-# Example for signature 'list' of 'data.frames'
+### List of 'data.frame' input ###
 
-check <- checkOcc(occ_plants, poly, distOcc = NULL, SpOcc = TRUE)
+check1 <- checkOcc(occ_plants, crs = cr, poly=poly, distOcc = NULL, SpOcc = TRUE)
+
+### spOcc or list of 'SpatialPoints' input ###
+
+check2 <- checkOcc(spOcc_plants, crs = crs, poly=poly, distOcc = 0.1, SpOcc = TRUE)
 
 }
 \author{
