@@ -13,7 +13,7 @@ readShp (path)
 column of the attribute table of the shapefile.}
 }
 \value{
-A object from a class of 'SpatialPolygonsDataFrame'
+\code{readShp} returns a object from a class of 'SpatialPolygonsDataFrame'.
 }
 \description{
 Read the spatial distribution shapefiles (ESRI shapefile format) of species
