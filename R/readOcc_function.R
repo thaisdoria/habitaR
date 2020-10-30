@@ -25,10 +25,13 @@
 #'
 #' @seealso \code{\link[sp:remove.duplicates]{remove.duplicates}}
 #'
-#' @return By default, \code{readOcc} returns a list with two elements. The first
-#' element is a 'spOcc' object corresponding to a species list with features of
-#' 'SpatialPoints' class. The second element is a data.frame with the number of
-#' occurrences records after the cleaning step to remove duplicate coordinates.
+#' @return By default, \code{readOcc} returns a list with two elements:
+#' \itemize{
+#'   \item A 'spOcc' object corresponding to a species list with features of
+#' 'SpatialPoints' class.
+#'   \item A data.frame with the number of occurrences records after the cleaning
+#' step to remove duplicate coordinates.
+#' }
 #' If occSum is \code{FALSE}, \code{readOcc} returns only the 'spOcc' object.
 #' @encoding UTF-8
 #' @author Thaís Dória & Daniel Gonçalves-Souza
