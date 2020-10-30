@@ -29,10 +29,13 @@ with the number of occurrences records after the removal of duplicate coordinate
 Default is \code{FALSE}.}
 }
 \value{
-By default, \code{readOcc} returns a list with two elements. The first
-element is a 'spOcc' object corresponding to a species list with features of
-'SpatialPoints' class. The second element is a data.frame with the number of
-occurrences records after the cleaning step to remove duplicate coordinates.
+By default, \code{readOcc} returns a list with two elements:
+\itemize{
+  \item A 'spOcc' object corresponding to a species list with features of
+'SpatialPoints' class.
+  \item A data.frame with the number of occurrences records after the cleaning
+step to remove duplicate coordinates.
+}
 If occSum is \code{FALSE}, \code{readOcc} returns only the 'spOcc' object.
 }
 \description{
