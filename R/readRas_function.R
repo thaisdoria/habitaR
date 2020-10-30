@@ -6,7 +6,7 @@
 #' @usage readRas (path)
 #' @param path Path for a folder with spatial distribution raster files
 #' (.asc or .tif format).
-#' @return A list of raster files or a raster file
+#' @return \code{readRas} retrurns a list of raster files or a raster file.
 #' @encoding UTF-8
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export readRas
