@@ -38,14 +38,17 @@
 #' @param extentOut Extent object or a vector of four numbers indicating the
 #' preferred output for the rasters. Optional.
 #' @param progress (logical) A bar showing the progress of the function.
-#' @return \code{aoh} returns 'aoh' object corresponding to a list with two
-#' elements. The first element is a data.frame detailing if the function was
-#' able (1) or not (0) to refinate the species distribution. The second element
-#' is a list of 'RasterLayer' or 'SpatialPolygons' object representing the refined
+#' @return By default, \code{aoh} returns 'aoh' object corresponding to a list with two
+#' elements:
+#' \itemize{
+#'   \item A data.frame detailing if the function was able (1) or not (0) to refinate
+#'   the species distribution.
+#'   \item A list of 'RasterLayer' or 'SpatialPolygons' object representing the refined
 #' distribution of the species. For the 'RasterLayer' the value of 0 indicates the
 #' cells where the species were considered as present before the refinement.
 #' Values higher than 0 indicates the coverage of cell by the spatial distribution
 #' after the species habitat's mapping.
+#' }
 #' @details The function map the 'area of habitat' (AOH) within the polygon of
 #' geographical distribution (SpatialPolygon) representing the 'extent of occurrence'
 #' (EOO). This mapping is made considering the specific preference for habitats

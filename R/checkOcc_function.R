@@ -13,7 +13,7 @@
 #'   \item a 'list' of 'data.frames' with the occurrences from multiple species (see data
 #' examples)
 #'   \item 'spOcc' object corresponding to a list of 'SpatialPoints' from
-#' multiple species (see \code{\link[aoh]{readOcc}} to obtain such object).
+#' multiple species (see \code{\link[habitaR]{readOcc}} to obtain such object).
 #' }
 #' NOTE: If path is provided, each .csv file should correspond to only one species
 #' and the file must be named with the corresponding species names. The files must
