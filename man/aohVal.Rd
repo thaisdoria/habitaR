@@ -33,7 +33,7 @@ Default is \code{TRUE}.}
 Default is \code{FALSE}.}
 }
 \value{
-\code{aohVal} returns a data.frame with a summary of results for each species which aoh was evaluated.
+By default, \code{aohVal} returns a data.frame with a summary of results for each species which aoh was evaluated.
 It gives the number of records matching with the EOO ("MATCH.EOO) and with the
 AOH ("MATCH.AOH) and the values of prevalence of points ("PP", Rondinini et al.
 2011) through the proportion of occurrences spatially congruent with suitable
