@@ -7,22 +7,22 @@
 #' @usage
 #' # method for signature 'SpatialPolygonsDataFrame', 'RasterLayer',
 #' 'RasterStack', a 'list' of 'RasterLayer' or 'aoh' object (see
-#'  \code{\link[aoh]{aoh}} to generate the latter object)
+#'  \code{\link[habitaR]{aoh}} to generate the latter object)
 #'
 #' aohVal(eooSp, aohSp, plot=TRUE, progress=FALSE)
 #'
 #' @param eooSp Spatial distribution data of the species representing the
 #' original (i.e. not refined) extent of occurrence (EOO). It might correspond to
-#' 'SpatialPolygonsDataFrame' (see \code{\link[aoh]{readShp}} to obtain such
+#' 'SpatialPolygonsDataFrame' (see \code{\link[habitaR]{readShp}} to obtain such
 #' class of object), a 'RasterLayer', a 'RasterStack', or a 'list' with 'RasterLayer'
-#' class of features (see \code{\link[aoh]{readRas}} to obtain such object).
+#' class of features (see \code{\link[habitaR]{readRas}} to obtain such object).
 #'
 #' @param aohSp Spatial distribution data of the species representing the area
 #' of habitat (AOH). It might correspond to 'SpatialPolygonsDataFrame'
-#' (see \code{\link[aoh]{readShp}} to obtain such class of object), a
+#' (see \code{\link[habitaR]{readShp}} to obtain such class of object), a
 #' 'RasterLayer', a 'RasterStack', a 'list' with 'RasterLayer' class of features
-#' (see \code{\link[aoh]{readRas}} to obtain such object), or a 'aoh'
-#' (see \code{\link[aoh]{aoh}} to obtain such class of object).
+#' (see \code{\link[habitaR]{readRas}} to obtain such object), or a 'aoh'
+#' (see \code{\link[habitaR]{aoh}} to obtain such class of object).
 #'
 #' @param plot (logical) Whether the output should also return a plot
 #' representing the graphical result of validation (see Rondinini et al. 2011).
