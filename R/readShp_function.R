@@ -7,7 +7,7 @@
 #' @param path Path for a folder with spatial distribution shapefiles
 #' (ESRI shapefile format). The name of the species must be on the second
 #' column of the attribute table of the shapefile.
-#' @return A object from a class of 'SpatialPolygonsDataFrame'
+#' @return \code{readShp} returns a object from a class of 'SpatialPolygonsDataFrame'.
 #' @encoding UTF-8
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export readShp
