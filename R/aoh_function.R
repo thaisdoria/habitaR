@@ -7,7 +7,7 @@
 #' continuous = FALSE, shpOut = FALSE, extentOut = NULL,
 #' progress = FALSE)
 #' @param eooSp SpatialPolygons of the spatial distribution of the species or path
-#'  for a folder with spatial distribution shapefiles (ESRI shapefile format) .
+#'  for a folder with spatial distribution shapefiles (ESRI shapefile format).
 #'  The name of the species must be on the second column of the attribute table
 #'  of the shapefile.
 #' @param lc RasterLayer, RasterBrick or RasterStack object of the land use map

@@ -1,63 +1,80 @@
-#' aohMixS: mapping the species' AOH oby mixing data from SDM and EOO following
+#' aohMixS: mapping the species' AOH by mixing data from SDM and EOO following
 #' Syfert et al. (2014).
 #'
 #' Through a mix approach that combines the species' spatial-informed distribution
 #' with modelling techniques, thresholds the distribution models (SDM) based on EOO's
 #' geometry to generate models-derived EOOs. It is develop by adapting the approach
 #' described in Syfert et al. (2014), so that the species' area of habitat (AOH) can
-#' be interpreted as the SDMs-derived Alpha Hull (see Syfert et al. 2014).
-#'
+#' be interpreted as the SDMs-derived Alpha Hulls (see Syfert et al. 2014).
 #'
 #'@usage aohMixS (eooSp = eooSp, modSp = modSp, thresInitial = NULL , thresIncrement = NULL,
 #'continuous = TRUE, poly = NULL, cropToPoly = FALSE, progress = TRUE,
 #'removeTempFile = TRUE, stack = TRUE )
 #'
 #'@param eooSp Spatial distribution data of the species representing the
-#' original (i.e. not refined) extent of occurrence (EOO). It might correspond to
+#' original (i.e. not refined) extent of occurrence (EOO). It might correspond to:
 #' \itemize{
-#'   \item path for a folder with spatial distribution files (.shp, .asc or .tif
-#'   format)
-#'   \item SpatialPolygonDataFrame (see \code{\link[aoh]{readShp}} to obtain such
-#' class of object)
-#'   \item aHull object created from occurrences records (see \code{\link[aoh]{aHull}}
-#'   to obtain such class of object)
-#'   \item 'aHull' Raster
-#'   \item 'RasterLayer' object
-#'   \item 'RasterStack' object
-#'   \item 'RasterBrick' object
+#'   \item path for a folder with spatial distribution files (ESRI shapefile format).
+#'   \item SpatialPolygonsDataFrame (see \code{\link[habitaR]{readShp}} to obtain such
+#' class of object).
+#'   \item aHull object with elements of 'SpatialPolygons' class created from occurrences records (see \code{\link[habitaR]{aHull}}
+#'   to obtain such class of object).
+#'   \item a list of 'RasterLayer' objects created from occurrences records (see \code{\link[habitaR]{aHull}}
+#'   to obtain such class of object).
+#'   \item 'RasterLayer', 'RasterStack' or 'RasterBrick' objects.
 #'  }
+#'
 #'@param modSp Species distribution derived from modelling techniques (eg. SDMs).
-#'It might correspond to
-#'#'\itemize{
+#'It might correspond to:
+#' \itemize{
 #'   \item path for a folder with species distribution models files (.asc or .tif
 #'   format)
-#'   \item 'RasterLayer' object
-#'   \item 'RasterStack' object
-#'   \item 'RasterBrick' object
-#'   \item 'list' with 'RasterLayer' class of features (see \code{\link[habitaR]{readRas}}
-#'   to obtain such object).
+#'    \item a list of 'RasterLayer' objects created from occurrences records (see \code{\link[habitaR]{aHull}}
+#'   to obtain such class of object)
+#'   \item 'RasterLayer', 'RasterStack' or 'RasterBrick' objects
+#'   }
+#'
 #'@param thresInitial The minimum value of threshold to indicate the presence of the
-#'species in the cell. NOTE: From this initial value, a range of all spectrum of
-#'threshold will be considered, based on the increment value defined by \code{\link[habitaR]{readRas}{threIncrement}
-#'argument, up to maximum value of 1.0.
+#'species in the cell. NOTE: From this initial value, NOTE: From this initial value,
+#'based on the increment value defined by \code{\link[habitaR]{threIncrement}}
+#'all threshold spectrum will be considered up to maximum value of 1.0.
 #'@param thresIncrement The amount to increase threshold with each iteration.
 #'@param continuous (logical) Whether the output should be binary or continuous
 #' for the rasters.
 #'@param poly Optional. A polygon (ESRI shapefile in a 'SpatialPolygonsDataFrame'
 #' class) of a given area to be used as a mask to crop and restrict the models-derived
-#' EOOs to the area corresponding to provided polygon. NOTE: this argument does not
-#' reduce the set of occurrences based on the poly, but only reduce the species dataset based on its presence inside of poly.
+#' EOOs to the area corresponding to provided polygon.
+#'@param cropToPoly (logical) Whether the output should be cropped by the provided poly.
+#'Only used if 'poly' is provided. Default is \code{FALSE}.NOTE: If \code{TRUE}, the resulting
+#'maps will be restricted to the area of the poly.
 #' See details.
-#'@param cropToPoly (logical) Whether the output should also include the alpha
-#' hull cropped by the provided poly. Only used if 'poly' is provided. Default is
-#' \code{FALSE}.
-#'@param progress
+#'@param progress (logical) A bar showing the progress of the function.
+#' Default is \code{TRUE}.
+#'@param removeTempFile (logical) Whether the temporary files generated in each iteration
+#'should be deleted. It is recommended if the user wants to analyse a high volume of data at
+#'the same time. Default is \code{TRUE}.
 #'@param stack (logical) Whether the output should be returned as a stack of 'RasterLayer'
 #'files. Default is \code{TRUE}.
 #'
 #'@examples
 #'
-#' ### Shapefile as Input ('aHull' class) ###
+#' ### Path for folder as Input ###
+#'
+#' \dontrun{
+#'
+#' # Binary Output #
+#' aohmixR_bin <- aohMixS (eooSp = path_eoo, modSp = path_mod,
+#' thresInitial = 0.05, thresIncrement = 0.25, continuous = FALSE, cropToPoly = TRUE,
+#' poly = poly, progress = TRUE, stack = TRUE)
+#'
+#' # Continuous Output #
+#' aohmixR_con <- aohMixS (eooSp = path_eoo, modSp = path_mod,
+#' thresInitial = 0.05, thresIncrement = 0.25, continuous = TRUE, cropToPoly = TRUE,
+#' poly = poly, progress = TRUE, stack = TRUE)
+#' }
+#'
+#'
+#' ### Shapefile as Input ('aHull' or 'SpatialPolygonsDataFrame' class) ###
 #'
 #' # Binary Output #
 #'
@@ -116,32 +133,63 @@ aohMixS <- function(eooSp = NULL, modSp = NULL, thresInitial = NULL , thresIncre
       stop('cropToPoly can only be true when poly is provided')
     }
 
+  # Creating the threshold (spectrum of values)
+  threshold <- seq(thresInitial,1,thresIncrement)
+
+  # Pre-processing of data:
+  # Converting 'modSp' input data into a 'Raster'
+  if (is.character(modSp)) {
+    modSp <- readRas(modSp)
+  }
+
+  # Converting 'eooSp' input data into a 'Raster'
+    # 1. Input as a path for folders
+    if (is.character(eooSp)) {
+       if(substr(eooSp, nchar(eooSp), nchar(eooSp)) == '/'){
+           eooSp <- substr(eooSp, 1, nchar(eooSp) - 1)
+         }
+       files.sp <- list.files(eooSp, pattern = ".shp$")
+       files.sp <- gsub(".shp","", files.sp)
+       names <- list.files(eooSp, pattern = ".shp$", full.names = F)
+       sps <- list()
+       for (i in 1:length(files.sp)){
+         sps[[i]] <- readOGR(dsn = eooSp,
+                             layer = files.sp[i])
+       }
+       names(sps)<- files.sp
+       eooSp <- sps
+                    }
+
+   # 2. Input as 'SpatialPolygons' or 'SpatialPolygonsDataFrame' family of class
+    # Rasterize them
+    if((class(eooSp) == "list" & class(eooSp[[1]]) == "SpatialPolygonsDataFrame") |
+    class(eooSp) == "aHull"){
+    eooSp <- mapply(rasterize, eooSp, MoreArgs =
+                      list(modSp[[1]], background = 0, mask=FALSE))
+    for (i in 1:length(eooSp)){
+      eooSp[[i]][eooSp[[i]] > 1] <- 1
+    }
+    }
+
+    if(class(eooSp) == "SpatialPolygonsDataFrame" | class(eooSp) == "SpatialPolygons"){
+      lsp<-list()
+      for (i in 1:length(eooSp)){
+        lsp[[i]]<-eooSp[i,1]
+      }
+      names(lsp)<-names(modSp)
+      eooSp<-lsp
+      eooSp <- mapply(rasterize, eooSp, MoreArgs =
+                        list(modSp[[1]], background = 0, mask=FALSE))
+      for (i in 1:length(eooSp)){
+        eooSp[[i]][eooSp[[i]] > 1] <- 1
+      }
+
+    }
+
   # Data.frame of results
   dfres <- data.frame(matrix(ncol = 5, nrow = length(eooSp)))
   names(dfres) <- c('Species', 'Threshold', 'MaxJsi', 'DifSizes', 'Prop')
   spp.nm<-gsub("[.]", " ", names(eooSp))
-  dfres[,1] <- spp.nm
-
-  # Creating the threshold (spectrum of values)
-  threshold <- seq(thresInitial,1,thresIncrement)
-
-  # Pre-processing of data: converting 'eooSp' input data into a 'Raster'
-  {
-  # 1. Input as a path for folders
-    if (is.character(eooSp)) {
-    eooSp <- readShp(eooSp)
-  }
-  # 2. Input as 'SpatialPolygons' or 'SpatialPolygonsDataFrame' family of class
-    # Rasterize them
-    if(class(eooSp) == "aHull" | class(eooSp) == "SpatialPolygonsDataFrame"
-       | class(eooSp) == "SpatialPolygons"){
-    eooSp <- mapply(rasterize, aHull_plantShp, MoreArgs =
-                      list(sdm_plantRas[[1]], background = 0, mask=FALSE))
-    for (i in 1:length(eooSp)){
-      eooSp[[i]][eooSp[[i]] > 1] <- 1
-    }
-  }
-  }
 
   # 3. Input data as 'Raster' family of classes
     if((class(eooSp) == "list" & class(eooSp[[1]]) == "RasterLayer")
@@ -149,16 +197,16 @@ aohMixS <- function(eooSp = NULL, modSp = NULL, thresInitial = NULL , thresIncre
 
   # Looping analysis to each feature from a list of rasters, a 'RasterStack', or a 'RasterBrick':
     # Enabling the progress bar
-    if(progress == TRUE){
-    pb <- txtProgressBar(min = 0, max = length(sp.names), style = 3)
+    list.r <- list()
+    if(progress){
+    pb <- txtProgressBar(min = 0, max = length(eooSp), style = 3)
       }
 
-    list.r <- list()
     for (j in 1:length(eooSp)){
     rasEoo<-eooSp[[j]] #eoos (e.g. alpha hull)
     rasMod<-modSp[[j]] #models (e.g. sdms)
-    # Align the extent to compare both set of distribution maps
 
+     # Align the extent to compare both set of distribution maps
     if((extent(rasMod[[1]]) == extent(rasEoo[[1]])) == FALSE){
         rasMod<-setExtent(rasMod, extent(rasEoo), keepres=FALSE, snap=FALSE)}
 
@@ -184,6 +232,7 @@ aohMixS <- function(eooSp = NULL, modSp = NULL, thresInitial = NULL , thresIncre
       jsi<-cellStats(both, sum)/cellStats(all,sum)
       jsi[is.nan(jsi)] <- 0
 
+
       # Summary of Results (jsi for all threshold spectrum)
       dfjac <- data.frame(matrix(ncol = 2, nrow = nt))
       names(dfjac) <- c('Threshold', 'Jsi')
@@ -199,7 +248,6 @@ aohMixS <- function(eooSp = NULL, modSp = NULL, thresInitial = NULL , thresIncre
       aohMax.bin<-subset(rasMod.bin,layermax) # extracting only the layer corresponding to the max threshold
       aohMax.bin[aohMax.bin == 0]<-NA
 
-
       ### Measures of performance/evaluation
       # DIF SIZES (difference, in area - number of cells - between the modeljaccard and eoo)
        difSize<-cellStats(aohMax.bin, sum)/cellStats(rasEoo,sum)
@@ -212,11 +260,13 @@ aohMixS <- function(eooSp = NULL, modSp = NULL, thresInitial = NULL , thresIncre
        # PROP (proportion of EOO that was maintained in the resulting modeljaccard)
        prop <- cellStats(both.eval, sum) / cellStats(rasEoo, sum)
 
-    # SUMMARIZING THE RESULTS OF MODEL JACCARD
-    dfres[j,2] <- dfjacord[length(threshold),1] # thresholdMAX
-    dfres[j,3] <- dfjacord[length(threshold),2] # maxJSI
-    dfres[j,4] <- difSize
-    dfres[j,5] <- prop
+       # SUMMARIZING THE RESULTS OF MODEL JACCARD
+       dfres[,1] <- spp.nm
+       dfres[j,2] <- dfjacord[length(threshold),1] # thresholdMAX
+       dfres[j,3] <- dfjacord[length(threshold),2] # maxJSI
+       dfres[j,4] <- difSize
+       dfres[j,5] <- prop
+
 
     # Removing temp files and displaying progress bar
     if (removeTempFile == TRUE) {
@@ -239,24 +289,24 @@ aohMixS <- function(eooSp = NULL, modSp = NULL, thresInitial = NULL , thresIncre
         aohMix<-crop(mask(aohMix, poly),poly)
         aohMix<-extend(aohMix, c(10,10))
                  }
+
     if(progress == TRUE){
-      setTxtProgressBar(pb, i)
+      setTxtProgressBar(pb, j)
+    }
 
     list.r[[j]]<-aohMix
     }
     }
 
-    }
-
-   names(list.r)<-spp.nm
-
-   # FINAL OUTPUT
+  # FINAL OUTPUT
    if(stack){
      list.r <- raster::stack(list.r)
+     names(list.r)<-spp.nm
      aohMix.Res <- list(aohMix = list.r, SpecificMeasures = dfres)
      return(aohMix.Res)
    }
    else{
+     names(list.r)<-spp.nm
      aohMix.Res <- list(aohMix = list.r, SpecificMeasures = dfres)
      return(aohMix.Res)
    }
