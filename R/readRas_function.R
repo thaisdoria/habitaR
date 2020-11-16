@@ -19,9 +19,8 @@ readRas <- function(path){
 
   files.sp <- list.files(path, pattern = ".tif$|.asc$",
                          full.names = T)
-
+  names.sp <- list.files(path, pattern = ".tif$|.asc$", full.names=F)
   sps <- lapply(files.sp, raster)
-  names.sp <- list.files(path, pattern = ".tif$|.asc$")
   names(sps) <- gsub("*\\.asc|*\\.tif", '', names.sp)
 
   return(sps)

@@ -12,7 +12,7 @@ progress = FALSE)
 }
 \arguments{
 \item{eooSp}{SpatialPolygons of the spatial distribution of the species or path
-for a folder with spatial distribution shapefiles (ESRI shapefile format) .
+for a folder with spatial distribution shapefiles (ESRI shapefile format).
 The name of the species must be on the second column of the attribute table
 of the shapefile.}
 
