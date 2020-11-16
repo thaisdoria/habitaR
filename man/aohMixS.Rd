@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{aohMixS}
 \alias{aohMixS}
-\title{aohMixS: mapping the species' AOH oby mixing data from SDM and EOO following
+\title{aohMixS: mapping the species' AOH by mixing data from SDM and EOO following
 Syfert et al. (2014).}
 \usage{
 aohMixS (eooSp = eooSp, modSp = modSp, thresInitial = NULL , thresIncrement = NULL,
@@ -12,19 +12,32 @@ removeTempFile = TRUE, stack = TRUE )
 }
 \arguments{
 \item{eooSp}{Spatial distribution data of the species representing the
-original (i.e. not refined) extent of occurrence (EOO). It might correspond to
+original (i.e. not refined) extent of occurrence (EOO). It might correspond to:
 \itemize{
-  \item path for a folder with spatial distribution files (.shp, .asc or .tif
-  format)
-  \item SpatialPolygonDataFrame (see \code{\link[aoh]{readShp}} to obtain such
-class of object)
-  \item aHull object created from occurrences records (see \code{\link[aoh]{aHull}}
-  to obtain such class of object)
-  \item 'aHull' Raster
-  \item 'RasterLayer' object
-  \item 'RasterStack' object
-  \item 'RasterBrick' object
+  \item path for a folder with spatial distribution files (ESRI shapefile format).
+  \item SpatialPolygonsDataFrame (see \code{\link[habitaR]{readShp}} to obtain such
+class of object).
+  \item aHull object with elements of 'SpatialPolygons' class created from occurrences records (see \code{\link[habitaR]{aHull}}
+  to obtain such class of object).
+  \item a list of 'RasterLayer' objects created from occurrences records (see \code{\link[habitaR]{aHull}}
+  to obtain such class of object).
+  \item 'RasterLayer', 'RasterStack' or 'RasterBrick' objects.
  }}
+
+\item{modSp}{Species distribution derived from modelling techniques (eg. SDMs).
+It might correspond to:
+\itemize{
+  \item path for a folder with species distribution models files (.asc or .tif
+  format)
+   \item a list of 'RasterLayer' objects created from occurrences records (see \code{\link[habitaR]{aHull}}
+  to obtain such class of object)
+  \item 'RasterLayer', 'RasterStack' or 'RasterBrick' objects
+  }}
+
+\item{thresInitial}{The minimum value of threshold to indicate the presence of the
+species in the cell. NOTE: From this initial value, NOTE: From this initial value,
+based on the increment value defined by \code{\link[habitaR]{threIncrement}}
+all threshold spectrum will be considered up to maximum value of 1.0.}
 
 \item{thresIncrement}{The amount to increase threshold with each iteration.}
 
@@ -33,13 +46,19 @@ for the rasters.}
 
 \item{poly}{Optional. A polygon (ESRI shapefile in a 'SpatialPolygonsDataFrame'
 class) of a given area to be used as a mask to crop and restrict the models-derived
-EOOs to the area corresponding to provided polygon. NOTE: this argument does not
-reduce the set of occurrences based on the poly, but only reduce the species dataset based on its presence inside of poly.
+EOOs to the area corresponding to provided polygon.}
+
+\item{cropToPoly}{(logical) Whether the output should be cropped by the provided poly.
+Only used if 'poly' is provided. Default is \code{FALSE}.NOTE: If \code{TRUE}, the resulting
+maps will be restricted to the area of the poly.
 See details.}
 
-\item{cropToPoly}{(logical) Whether the output should also include the alpha
-hull cropped by the provided poly. Only used if 'poly' is provided. Default is
-\code{FALSE}.}
+\item{progress}{(logical) A bar showing the progress of the function.
+Default is \code{TRUE}.}
+
+\item{removeTempFile}{(logical) Whether the temporary files generated in each iteration
+should be deleted. It is recommended if the user wants to analyse a high volume of data at
+the same time. Default is \code{TRUE}.}
 
 \item{stack}{(logical) Whether the output should be returned as a stack of 'RasterLayer'
 files. Default is \code{TRUE}.}
@@ -49,11 +68,27 @@ Through a mix approach that combines the species' spatial-informed distribution
 with modelling techniques, thresholds the distribution models (SDM) based on EOO's
 geometry to generate models-derived EOOs. It is develop by adapting the approach
 described in Syfert et al. (2014), so that the species' area of habitat (AOH) can
-be interpreted as the SDMs-derived Alpha Hull (see Syfert et al. 2014).
+be interpreted as the SDMs-derived Alpha Hulls (see Syfert et al. 2014).
 }
 \examples{
 
-### Shapefile as Input ('aHull' class) ###
+### Path for folder as Input ###
+
+\dontrun{
+
+# Binary Output #
+aohmixR_bin <- aohMixS (eooSp = path_eoo, modSp = path_mod,
+thresInitial = 0.05, thresIncrement = 0.25, continuous = FALSE, cropToPoly = TRUE,
+poly = poly, progress = TRUE, stack = TRUE)
+
+# Continuous Output #
+aohmixR_con <- aohMixS (eooSp = path_eoo, modSp = path_mod,
+thresInitial = 0.05, thresIncrement = 0.25, continuous = TRUE, cropToPoly = TRUE,
+poly = poly, progress = TRUE, stack = TRUE)
+}
+
+
+### Shapefile as Input ('aHull' or 'SpatialPolygonsDataFrame' class) ###
 
 # Binary Output #
 
