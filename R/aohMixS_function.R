@@ -1,11 +1,13 @@
 #' aohMixS: mapping the species' AOH by mixing data from SDM and EOO following
 #' Syfert et al. (2014).
 #'
-#' Through a mix approach that combines the species' spatial-informed distribution
-#' with modelling techniques, thresholds the distribution models (SDM) based on EOO's
-#' geometry to generate models-derived EOOs. It is develop by adapting the approach
-#' described in Syfert et al. (2014), so that the species' area of habitat (AOH) can
-#' be interpreted as the SDMs-derived Alpha Hulls (see Syfert et al. 2014).
+#' Through a mix approach combining the species' spatial-informed distribution with
+#' modelling techniques, thresholds the distribution models (e.g. SDMs) based on EOO's
+#' geometry to generate models-derived EOOs. Here, EOOs might correspond to the Alpha
+#' Hulls or Minimum Polygon Convex (MCP) and a geographical similarity approach is used
+#' to estimate the shape of the species' distribution based on models. It is develop by
+#' adapting the approach described in Syfert et al. (2014), so that the species' area
+#' of habitat (AOH) can be interpreted as the SDMs-derived EOOs.
 #'
 #'@usage aohMixS (eooSp = eooSp, modSp = modSp, thresInitial = NULL , thresIncrement = NULL,
 #'continuous = TRUE, poly = NULL, cropToPoly = FALSE, progress = TRUE,
@@ -17,9 +19,11 @@
 #'   \item path for a folder with spatial distribution files (ESRI shapefile format).
 #'   \item SpatialPolygonsDataFrame (see \code{\link[habitaR]{readShp}} to obtain such
 #' class of object).
-#'   \item aHull object with elements of 'SpatialPolygons' class created from occurrences records (see \code{\link[habitaR]{aHull}}
-#'   to obtain such class of object).
-#'   \item a list of 'RasterLayer' objects created from occurrences records (see \code{\link[habitaR]{aHull}}
+#'   \item aHull object with elements of 'SpatialPolygons' class created from
+#'   occurrences records (see \code{\link[habitaR]{aHull}} to obtain such class
+#'   of object).
+#'   \item a list of 'RasterLayer' objects created from occurrences records
+#'   (see \code{\link[habitaR]{aHull}}
 #'   to obtain such class of object).
 #'   \item 'RasterLayer', 'RasterStack' or 'RasterBrick' objects.
 #'  }
@@ -35,19 +39,18 @@
 #'   }
 #'
 #'@param thresInitial The minimum value of threshold to indicate the presence of the
-#'species in the cell. NOTE: From this initial value, NOTE: From this initial value,
-#'based on the increment value defined by \code{\link[habitaR]{threIncrement}}
-#'all threshold spectrum will be considered up to maximum value of 1.0.
-#'@param thresIncrement The amount to increase threshold with each iteration.
-#'@param continuous (logical) Whether the output should be binary or continuous
-#' for the rasters.
+#'species in the cell. NOTE: From this initial value, based on the increment value defined
+#'by \code{\link[habitaR]{threIncrement}}, all threshold spectrum will be considered up to
+#'maximum value of 1.0.
+#'@param thresIncrement The amount to sequentially increase the initial threshold with each
+#'iteration until find the value that maximizes the geographical overlap (maxJSI) between
+#'EOO and distribution models. See details.
 #'@param poly Optional. A polygon (ESRI shapefile in a 'SpatialPolygonsDataFrame'
 #' class) of a given area to be used as a mask to crop and restrict the models-derived
 #' EOOs to the area corresponding to provided polygon.
 #'@param cropToPoly (logical) Whether the output should be cropped by the provided poly.
-#'Only used if 'poly' is provided. Default is \code{FALSE}.NOTE: If \code{TRUE}, the resulting
-#'maps will be restricted to the area of the poly.
-#' See details.
+#'Only used if 'poly' is provided. If \code{TRUE}, the resulting maps will be restricted
+#'to the area of the poly. Default is \code{FALSE}.
 #'@param progress (logical) A bar showing the progress of the function.
 #' Default is \code{TRUE}.
 #'@param removeTempFile (logical) Whether the temporary files generated in each iteration
@@ -55,6 +58,47 @@
 #'the same time. Default is \code{TRUE}.
 #'@param stack (logical) Whether the output should be returned as a stack of 'RasterLayer'
 #'files. Default is \code{TRUE}.
+#'
+#'@return By default, \code{aohMix} returns a list with two elements:
+#'  \itemize{
+#'   \item A 'RasterStack' (if \code{stack = TRUE}) or list of 'RasterLayer'
+#'   objects (if \code{stack = FALSE}) of maps representing SDMs-derived EOOs.
+#'    \item A data.frame of species and data/measures relative to construction of
+#'    SDM-derived EOOs and the evaluation of this procedure, as follow:
+#'      \itemize{
+#'         \item Threshold - Threshold value maximizing the geographical similarity
+#'         between distribution from EOO and from model.
+#'         \item MaxJSI - Value of Jaccard Similarity Index (JSI) measured from
+#'         comparison between the EOO and the model returning the maximum geographical
+#'         similarity.
+#'         \item DifSizes - Difference (in number of cells) between the EOO and
+#'         the SDMs-derived EOOs. It is a measure to evaluate the performance
+#'         of this analysis (see Syfert et al. 2014 for more details).
+#'         \item Prop - Proportion of the EOO that was maintained in the resulting
+#'         SDMs-derived EOOs. It is also a measure to evaluate the performance
+#'         of this analysis (see Syfert et al. 2014 for more details).
+#'         }
+#'      }
+#'
+#'@details
+#' Models-derived EOOs are generated through an adapted approach presented by Syfert
+#' et al. (2014) to  setting thresholds by maximizing (across all spectrum of
+#' probabilities) the geographical similarity between the EOO (i.e. a polygon drawn
+#' based on the presence records, such as alpha hull or minimum polygon convex) and
+#' the polygon derived from models (e.g. SDMs predicted presences). In each iteration,
+#' based on the increment value defined by \code{\link[habitaR]{threIncrement}}, is
+#' searched the threshold value that return the most similar distribution between
+#' the provided model and the EOO (SDM-derived models) through the Jaccard
+#' Similarity Index (JSI), calculated as:
+#' \itemize{
+#'         \item JSI = C / (A + B) - C
+#'         }
+#'
+#'A: area of alpha hull / B: area of SDM / C: overlapped area between A and B.
+#'
+#'NOTE: Input data for EOOs might correspond to Alpha Hull (see \code{\link[habitaR]{aHull}} to obtain such maps) or to Minimum Polygon Convex (MCP), which can be
+#' generated, for example, with the \code{\link[dismo]{convaHull}}
+#' or \code{\link[adehabitatHR]{mcp}}.
 #'
 #'@examples
 #'
@@ -71,6 +115,7 @@
 #' aohmixR_con <- aohMixS (eooSp = path_eoo, modSp = path_mod,
 #' thresInitial = 0.05, thresIncrement = 0.25, continuous = TRUE, cropToPoly = TRUE,
 #' poly = poly, progress = TRUE, stack = TRUE)
+#'
 #' }
 #'
 #'
@@ -82,9 +127,17 @@
 #' thresInitial = 0.05, thresIncrement = 0.25, continuous = FALSE, cropToPoly = TRUE,
 #' poly = poly, progress = TRUE, stack = TRUE)
 #'
+#' aohmixS_bin <- aohMixS (eooSp = spdf_plantShp, modSp = sdm_plantRas,
+#' thresInitial = 0.05, thresIncrement = 0.25, continuous = FALSE, cropToPoly = TRUE,
+#' poly = poly, progress = TRUE, stack = TRUE)
+#'
 #' # Continuous Output #
 #'
 #' aohmixS_con <- aohMixS (eooSp = aHull_plantShp, modSp = sdm_plantRas,
+#' thresInitial = 0.05, thresIncrement = 0.25, continuous = TRUE, cropToPoly = TRUE,
+#' poly = poly, progress = TRUE, stack = TRUE)
+#'
+#' aohmixS_con <- aohMixS (eooSp = spdf_plantShp, modSp = sdm_plantRas,
 #' thresInitial = 0.05, thresIncrement = 0.25, continuous = TRUE, cropToPoly = TRUE,
 #' poly = poly, progress = TRUE, stack = TRUE)
 #'
