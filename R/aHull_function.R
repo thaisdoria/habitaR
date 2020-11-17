@@ -122,6 +122,8 @@
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export aHull
 #' @import rangeBuilder
+#' @import rlist
+#' @import rgdal
 #' @import raster
 #' @import sp
 
