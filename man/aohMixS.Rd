@@ -3,8 +3,8 @@
 \encoding{UTF-8}
 \name{aohMixS}
 \alias{aohMixS}
-\title{aohMixS: mapping the species' AOH by mixing data from SDM and EOO following
-Syfert et al. (2014).}
+\title{aohMixS: mapping the species' AOH by mixing data from EOO and species'
+distribution models following Syfert's method.}
 \usage{
 aohMixS (eooSp = eooSp, modSp = modSp, thresInitial = NULL , thresIncrement = NULL,
 continuous = TRUE, poly = NULL, cropToPoly = FALSE, progress = TRUE,
@@ -16,30 +16,32 @@ original (i.e. not refined) extent of occurrence (EOO). It might correspond to:
 \itemize{
   \item path for a folder with spatial distribution files (ESRI shapefile format).
   \item SpatialPolygonsDataFrame (see \code{\link[habitaR]{readShp}} to obtain such
-class of object).
+  class of object).
   \item aHull object with elements of 'SpatialPolygons' class created from
   occurrences records (see \code{\link[habitaR]{aHull}} to obtain such class
   of object).
   \item a list of 'RasterLayer' objects created from occurrences records
-  (see \code{\link[habitaR]{aHull}}
-  to obtain such class of object).
+  (see \code{\link[habitaR]{aHull}} to obtain such class of object).
   \item 'RasterLayer', 'RasterStack' or 'RasterBrick' objects.
- }}
+ }
+NOTE: Input data for EOOs might correspond to Alpha Hull or to Minimum Polygon
+Convex (MCP), which can be generated, for example, with the \code{\link[dismo]{convaHull}}
+or \code{\link[adehabitatHR]{mcp}} functions.}
 
 \item{modSp}{Species distribution derived from modelling techniques (eg. SDMs).
 It might correspond to:
 \itemize{
   \item path for a folder with species distribution models files (.asc or .tif
-  format)
+  format).
    \item a list of 'RasterLayer' objects created from occurrences records (see \code{\link[habitaR]{aHull}}
-  to obtain such class of object)
-  \item 'RasterLayer', 'RasterStack' or 'RasterBrick' objects
+  to obtain such class of object).
+  \item 'RasterLayer', 'RasterStack' or 'RasterBrick' objects.
   }}
 
 \item{thresInitial}{The minimum value of threshold to indicate the presence of the
-species in the cell. NOTE: From this initial value, based on the increment value defined
-by \code{\link[habitaR]{threIncrement}}, all threshold spectrum will be considered up to
-maximum value of 1.0.}
+species in the cell. NOTE: From this initial value all threshold spectrum will be
+considered up to maximum value of 1.0 based on the increment value defined
+by \code{\link[habitaR]{threIncrement}}.}
 
 \item{thresIncrement}{The amount to sequentially increase the initial threshold with each
 iteration until find the value that maximizes the geographical overlap (maxJSI) between
@@ -68,8 +70,8 @@ By default, \code{aohMix} returns a list with two elements:
  \itemize{
   \item A 'RasterStack' (if \code{stack = TRUE}) or list of 'RasterLayer'
   objects (if \code{stack = FALSE}) of maps representing SDMs-derived EOOs.
-   \item A data.frame of species and data/measures relative to construction of
-   SDM-derived EOOs and the evaluation of this procedure, as follow:
+   \item A data.frame of species and measures relative to SDM-derived EOO's
+   construction and evaluation, as follow:
      \itemize{
         \item Threshold - Threshold value maximizing the geographical similarity
         between distribution from EOO and from model.
@@ -77,42 +79,38 @@ By default, \code{aohMix} returns a list with two elements:
         comparison between the EOO and the model returning the maximum geographical
         similarity.
         \item DifSizes - Difference (in number of cells) between the EOO and
-        the SDMs-derived EOOs. It is a measure to evaluate the performance
+        the SDMs-derived EOOs. This measure can be used to evaluate the performance
         of this analysis (see Syfert et al. 2014 for more details).
-        \item Prop - Proportion of the EOO that was maintained in the resulting
-        SDMs-derived EOOs. It is also a measure to evaluate the performance
-        of this analysis (see Syfert et al. 2014 for more details).
+        \item Prop - Proportion of the EOO maintained in the resulting SDMs-derived EOOs.
+        This measure can be used to evaluate the performance of this analysis
+        (see Syfert et al. 2014 for more details).
         }
      }
 }
 \description{
 Through a mix approach combining the species' spatial-informed distribution with
 modelling techniques, thresholds the distribution models (e.g. SDMs) based on EOO's
-geometry to generate models-derived EOOs. Here, EOOs might correspond to the Alpha
-Hulls or Minimum Polygon Convex (MCP) and a geographical similarity approach is used
-to estimate the shape of the species' distribution based on models. It is develop by
-adapting the approach described in Syfert et al. (2014), so that the species' area
-of habitat (AOH) can be interpreted as the SDMs-derived EOOs.
+geometry to generate models-derived EOOs. Here, EOOs might correspond to the alpha
+hulls (ahull) or Minimum Polygon Convex (MCP) and a geographical similarity approach
+is used to estimate the shape of the species' distribution based on models. It is
+develop by adapting the approach described in Syfert et al. (2014), so that the
+species' area of habitat (AOH) can be interpreted as the SDMs-derived EOOs.
 }
 \details{
 Models-derived EOOs are generated through an adapted approach presented by Syfert
-et al. (2014) to  setting thresholds by maximizing (across all spectrum of
+et al. (2014) to setting thresholds by maximizing (across all spectrum of
 probabilities) the geographical similarity between the EOO (i.e. a polygon drawn
 based on the presence records, such as alpha hull or minimum polygon convex) and
 the polygon derived from models (e.g. SDMs predicted presences). In each iteration,
 based on the increment value defined by \code{\link[habitaR]{threIncrement}}, is
-searched the threshold value that return the most similar distribution between
-the provided model and the EOO (SDM-derived models) through the Jaccard
-Similarity Index (JSI), calculated as:
+searched the threshold that return the most similar distribution between
+the provided model and the EOO through the Jaccard Similarity Index (JSI),
+calculated as:
 \itemize{
         \item JSI = C / (A + B) - C
         }
 
 A: area of alpha hull / B: area of SDM / C: overlapped area between A and B.
-
-NOTE: Input data for EOOs might correspond to Alpha Hull (see \code{\link[habitaR]{aHull}} to obtain such maps) or to Minimum Polygon Convex (MCP), which can be
-generated, for example, with the \code{\link[dismo]{convaHull}}
-or \code{\link[adehabitatHR]{mcp}}.
 }
 \examples{
 
