@@ -5,6 +5,6 @@ An R package to create and validate the species' Area of Habitat (AOH) as descri
 # Installation
 You can install the development version from GitHub with:
 
-  # install.packages("devtools")
+  install.packages("devtools")
   devtools::install_github("thaisdoria/habitaR")
 
