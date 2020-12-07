@@ -14,7 +14,7 @@
 #' "lat" (latitude). NOTE: Longitude must be in a column before the latitude column.
 #' @param crs The Coordinate Reference System (CRS) specifing the projection and
 #' datum of dataset. Could be a CRS object or a character string.
-#' @param distOcc A value corresponding to the minimum distance assigned to consider
+#' @param distOcc A value corresponding to the minimum distance to consider
 #' two coordinates as not duplicate. Values up to this distance will be consider
 #' as duplicates and removed. Units of this value must be in km. Optional.
 #' Default is zero (i.e. only exactly coincident coordinates will be removed).
