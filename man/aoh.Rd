@@ -16,16 +16,16 @@ for a folder with spatial distribution shapefiles (ESRI shapefile format).
 The name of the species must be on the second column of the attribute table
 of the shapefile.}
 
-\item{lc}{RasterLayer, RasterBrick or RasterStack object of the land use map
-reclassified for the categories of habitat.}
+\item{lc}{'RasterLayer', 'RasterBrick' or 'RasterStack' object of the
+land use map reclassified for the categories of habitat.}
 
-\item{alt}{RasterLayer object of the elevation map. Optional.}
+\item{alt}{'RasterLayer' object of the elevation map. Optional.}
 
-\item{altPref}{Data frame with altitudinal range of species. First
+\item{altPref}{Data.frame with altitudinal range of species. First
 column must be the species name, second column the minimum value of altitude
 and the third column the maximum value of altitude}
 
-\item{habPref}{Data frame 0/1 of habitat preference of the species.
+\item{habPref}{Data.frame 0/1 of habitat preference of the species.
 First column must be the species name. The posterior columns must be named
 after the categories of habitat as following the lc classification.
 \code{\link[habitaR]{prefHab}} can help obtain this data.}
@@ -43,7 +43,7 @@ the resolution of lc and alt are different or shpOut is
 \item{resolution}{Numeric value indicating the preferred resolution for the
 rasters. Resolution must coarser than the resolution of lc and alt.}
 
-\item{continuous}{(logical) Whether the output should be binary or continuous
+\item{continuous}{(logical) Whether the output should be continuous instead binary
 for the rasters. Only used if resolution provided or when the resolution of
 lc and alt are different.}
 

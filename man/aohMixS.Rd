@@ -33,7 +33,7 @@ It might correspond to:
 \itemize{
   \item path for a folder with species distribution models files (.asc or .tif
   format).
-   \item a list of 'RasterLayer' objects created from occurrences records (see \code{\link[habitaR]{aHull}}
+   \item a list of 'RasterLayer' objects (see \code{\link[habitaR]{readRas}}
   to obtain such class of object).
   \item 'RasterLayer', 'RasterStack' or 'RasterBrick' objects.
   }}
@@ -62,11 +62,11 @@ Default is \code{TRUE}.}
 should be deleted. It is recommended if the user wants to analyse a high volume of data at
 the same time. Default is \code{TRUE}.}
 
-\item{stack}{(logical) Whether the output should be returned as a stack of 'RasterLayer'
+\item{stack}{(logical) Whether the output maps should be returned as a stack of 'RasterLayer'
 files. Default is \code{TRUE}.}
 }
 \value{
-By default, \code{aohMix} returns a list with two elements:
+By default, \code{aohMixS} returns a list with two elements:
  \itemize{
   \item A 'RasterStack' (if \code{stack = TRUE}) or list of 'RasterLayer'
   objects (if \code{stack = FALSE}) of maps representing SDMs-derived EOOs.
@@ -119,12 +119,12 @@ A: area of alpha hull / B: area of SDM / C: overlapped area between A and B.
 \dontrun{
 
 # Binary Output #
-aohmixR_bin <- aohMixS (eooSp = path_eoo, modSp = path_mod,
+aohmix_bin <- aohMixS (eooSp = path_eoo, modSp = path_mod,
 thresInitial = 0.05, thresIncrement = 0.25, continuous = FALSE, cropToPoly = TRUE,
 poly = poly, progress = TRUE, stack = TRUE)
 
 # Continuous Output #
-aohmixR_con <- aohMixS (eooSp = path_eoo, modSp = path_mod,
+aohmix_con <- aohMixS (eooSp = path_eoo, modSp = path_mod,
 thresInitial = 0.05, thresIncrement = 0.25, continuous = TRUE, cropToPoly = TRUE,
 poly = poly, progress = TRUE, stack = TRUE)
 
