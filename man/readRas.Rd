@@ -12,7 +12,8 @@ readRas (path)
 (.asc or .tif format).}
 }
 \value{
-\code{readRas} retrurns a list of raster files or a raster file.
+\code{readRas} retrurns a list of 'RasterLayer' files or
+a 'RasterLayer' file.
 }
 \description{
 Read the spatial distribution raster files (.tif or .asc format) of species
