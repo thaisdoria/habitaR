@@ -91,7 +91,7 @@
 #' some region and not drawn based in a restrict set of occurrences recorded inside
 #' of some specific region.
 #'
-#' @seealso The dynamic alpha hulls drawn from the sequentially increase of alpha
+#' @seealso The dynamic alpha hulls drawn from the sequentially increasing of alpha
 #' values are created with \code{\link[rangeBuilder:getDynamicAlphaHull]{getDynamicAlphaHull}}
 #' from \pkg{rangeBuilder} package.
 #'
