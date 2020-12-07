@@ -7,8 +7,8 @@
 #' from the \pkg{rangeBuilder} package, that determines the α parameter by the spatial distribution of the
 #' coordinates.
 #'
-#' @usage aHull (occ, crs, fraction = NULL, partCount = NULL, alphaIncrement = NULL,
-#' buff = 0.0, distOcc = NULL, poly = NULL, cropToPoly = FALSE, rasOut = FALSE,
+#' @usage aHull (occ, crs, distOcc = NULL, fraction = NULL, partCount = NULL,
+#' alphaIncrement = NULL, buff = 0.0, poly = NULL, cropToPoly = FALSE, rasOut = FALSE,
 #' ras = NULL)
 #'
 #' @param occ Occurrences records of the species (coordinates in decimal degrees).
@@ -16,6 +16,8 @@
 #'\itemize{
 #'   \item path for a folder with the species occurrences files (.csv format)
 #'   \item a 'list' of 'data.frames' with the occurrences from multiple species (see data
+#' examples)
+#'   \item a 'list' of of 'SpatialPoints' from multiple species (see data
 #' examples)
 #'   \item 'spOcc' object corresponding to a list of 'SpatialPoints' from
 #' multiple species (see \code{\link[habitaR]{readOcc}} to obtain such object).
@@ -26,13 +28,9 @@
 #' "long" (longitude), "lat" (latitude). Longitude must be in a column before the
 #' latitude column.
 #' @param crs The Coordinate Reference System (CRS) specifing the projection and
-#' datum of dataset. Could be a CRS object or a character string. Only used
-#' @param fraction The minimum fraction of occurrences that must be included in polygon.
-#' @param partCount The maximum number of disjunct polygons that are allowed.
-#' @param alphaIncrement The amount to increase alpha with each iteration.
-#' @param buff A buffer distance in meters to increase boundaries of alpha hull.
-#' Default is zero (0).
-#' @param distOcc A value corresponding to the minimum distance assigned to
+#' datum of dataset. Could be a CRS object or a character string. Only used if 'occ'
+#' not correspond to a object from 'SpatialPoints' class.
+#' @param distOcc A value corresponding to the minimum distance to
 #' consider two coordinates as not duplicate. Values up to this distance will
 #' correspond to duplicates and removed. Units of this value must be in km.
 #' Default is zero (i.e. only exactly coincindent coordinates will be removed).
@@ -40,6 +38,11 @@
 #' If 'occ' correspond to 'SpatialPoints', this argument should be ignored
 #' (i.e., distOcc = NULL). For more details, see \code{\link[sp:remove.duplicates]{remove.duplicates}}
 #' in the \pkg{sp} package.
+#' @param fraction The minimum fraction of occurrences that must be included in polygon.
+#' @param partCount The maximum number of disjunct polygons that are allowed.
+#' @param alphaIncrement The amount to increase alpha with each iteration.
+#' @param buff A buffer distance in meters to increase boundaries of alpha hull.
+#' Default is zero (0).
 #' @param poly Optional. A polygon (ESRI shapefile in a 'SpatialPolygonsDataFrame'
 #' class) of a given area to be checked for occurrences of species and to restrict
 #' the building of alpha hull only to the species occurring inside of the provided
@@ -56,12 +59,13 @@
 #'
 #' @return By default, \code{aHull} returns a list with two elements:
 #'  \itemize{
-#'   \item A data.frame of species and the respective alpha values and number of occurrences
-#'   used to construct the alpha hull (i.e. after the removal of duplicate coordinates).
+#'   \item A data.frame of species and the respective alpha values and number of
+#'   occurrences (after the removal of duplicate coordinates) used to construct
+#'   the alpha hull. If the conditions assigned by the user to build the alpha hulls
+#'   cannot be satisfied, is returned the minimum convex hull (MCH) and the
+#'   alpha value is identified as 'MCH'.
 #'    \item A 'aHull' object corresponding to a list of species-specific
-#' alpha hulls ('SpatialPolygons class). If the conditions assigned by the user to
-#' build the alpha hulls cannot be satisfied, is returned the minimum convex hull (MCH)
-#' and the alpha value is identified as 'MCH'.
+#' alpha hulls ('SpatialPolygons class).
 #' }
 #' NOTE: if a \emph{poly} is provided and \emph{cropToPoly} is \code{TRUE}, \code{aHull}
 #' also returns a third element from the resulting list:
@@ -98,8 +102,8 @@
 #' # Example for signature 'DataFrame' (occ).
 #'
 #' ahull_plants<-aHull(occ = occ_plants, crs= "+proj=longlat +datum=WGS84 +ellps=WGS84
-#'  +towgs84=0,0,0", fraction = 1, partCount = 1, alphaIncrement = 1, buff = 0,
-#'  distOcc = 0.25, poly = poly, cropToPoly = TRUE, rasOut = TRUE, ras = ras)
+#'  +towgs84=0,0,0", distOcc = 0.25, fraction = 1, partCount = 1, alphaIncrement = 1,
+#'  buff = 0, poly = poly, cropToPoly = TRUE, rasOut = TRUE, ras = ras)
 #'
 #' @encoding UTF-8
 #'
@@ -157,7 +161,7 @@ aHull <- function(occ = NULL, crs = NULL, distOcc = NULL, fraction = NULL,
 
     # 2. Occ is NOT a 'spOcc' object or a list of 'SpatialPoints'
     if (class(occ) != "spOcc" | class(occ) == "list" & class(occ[[1]]) != "SpatialPoints"){
-      # I. ocurrences as .csv files of multiple species:
+      # I. ocurrences as path for folder with .csv files of multiple species:
       if (is.character(occ)){
         if(substr(occ, nchar(occ), nchar(occ)) == '/'){
           occ <- substr(occ, 1, nchar(occ) - 1)
