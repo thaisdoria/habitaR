@@ -460,7 +460,7 @@ aohMixK <- function(modSp = modSp, occ = NULL, crs = NULL, distOcc = NULL, thres
    if (validation == TRUE){ # default
      # Data frame of evaluation results
   val <- data.frame (matrix(ncol = 6, nrow = length(occ)))
-  colnames(val) <- c("Species", "CellsEOO", "CellsMOD", "MOD-EOO", "DifSizes", "Prop")
+  colnames(val) <- c("Species", "CellsEOO", "CellsMOD", "(MOD-EOO)", "DifSizes", "Prop")
   val[, 1] <- names(occ)
 
   # To build alpha hull based on original spatial points (all points) without the filtering (extracting) step
