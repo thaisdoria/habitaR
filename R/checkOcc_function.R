@@ -10,7 +10,7 @@
 #' 'It might correspond to
 #'\itemize{
 #'   \item path for a folder with the species occurrences files (.csv format)
-#'   \item a 'list' of 'data.frames' with the occurrences from multiple species (see data
+#'   \item a list of 'data.frames' with the occurrences from multiple species (see data
 #' examples)
 #'   \item 'spOcc' object corresponding to a list of 'SpatialPoints' from
 #' multiple species (see \code{\link[habitaR]{readOcc}} to obtain such object).
@@ -24,7 +24,7 @@
 #' datum of dataset. Could be a CRS object or a character string.
 #' @param poly A polygon (ESRI shapefile from a 'SpatialPolygonsDataFrame' class)
 #' of the specific area to be checked.
-#' @param distOcc A value corresponding to the minimum distance assigned to
+#' @param distOcc A value corresponding to the minimum distance to
 #' consider two coordinates as not duplicate. Values up to this distance will
 #' correspond to duplicates and removed. Units of this value must be in km. Default
 #' is zero (i.e. only exactly coincindent coordinates will be removed).
