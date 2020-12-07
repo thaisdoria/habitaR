@@ -5,8 +5,8 @@
 \alias{aHull}
 \title{aHull: generate alpha hull polygons for multiple-species}
 \usage{
-aHull (occ, crs, fraction = NULL, partCount = NULL, alphaIncrement = NULL,
-buff = 0.0, distOcc = NULL, poly = NULL, cropToPoly = FALSE, rasOut = FALSE,
+aHull (occ, crs, distOcc = NULL, fraction = NULL, partCount = NULL,
+alphaIncrement = NULL, buff = 0.0, poly = NULL, cropToPoly = FALSE, rasOut = FALSE,
 ras = NULL)
 }
 \arguments{
@@ -15,6 +15,8 @@ ras = NULL)
 \itemize{
   \item path for a folder with the species occurrences files (.csv format)
   \item a 'list' of 'data.frames' with the occurrences from multiple species (see data
+examples)
+  \item a 'list' of of 'SpatialPoints' from multiple species (see data
 examples)
   \item 'spOcc' object corresponding to a list of 'SpatialPoints' from
 multiple species (see \code{\link[habitaR]{readOcc}} to obtain such object).
@@ -26,9 +28,10 @@ have 3 columns identified as "species" (species names or other identification of
 latitude column.}
 
 \item{crs}{The Coordinate Reference System (CRS) specifing the projection and
-datum of dataset. Could be a CRS object or a character string. Only used}
+datum of dataset. Could be a CRS object or a character string. Only used if 'occ'
+not correspond to a object from 'SpatialPoints' class.}
 
-\item{distOcc}{A value corresponding to the minimum distance assigned to
+\item{distOcc}{A value corresponding to the minimum distance to
 consider two coordinates as not duplicate. Values up to this distance will
 correspond to duplicates and removed. Units of this value must be in km.
 Default is zero (i.e. only exactly coincindent coordinates will be removed).
@@ -66,12 +69,13 @@ to rasterize the ahull polygons. Only used if rasOut' is \code{TRUE}.}
 \value{
 By default, \code{aHull} returns a list with two elements:
  \itemize{
-  \item A data.frame of species and the respective alpha values and number of occurrences
-  used to construct the alpha hull (i.e. after the removal of duplicate coordinates).
+  \item A data.frame of species and the respective alpha values and number of
+  occurrences (after the removal of duplicate coordinates) used to construct
+  the alpha hull. If the conditions assigned by the user to build the alpha hulls
+  cannot be satisfied, is returned the minimum convex hull (MCH) and the
+  alpha value is identified as 'MCH'.
    \item A 'aHull' object corresponding to a list of species-specific
-alpha hulls ('SpatialPolygons class). If the conditions assigned by the user to
-build the alpha hulls cannot be satisfied, is returned the minimum convex hull (MCH)
-and the alpha value is identified as 'MCH'.
+alpha hulls ('SpatialPolygons class).
 }
 NOTE: if a \emph{poly} is provided and \emph{cropToPoly} is \code{TRUE}, \code{aHull}
 also returns a third element from the resulting list:
@@ -113,8 +117,8 @@ of some specific region.
 # Example for signature 'DataFrame' (occ).
 
 ahull_plants<-aHull(occ = occ_plants, crs= "+proj=longlat +datum=WGS84 +ellps=WGS84
- +towgs84=0,0,0", fraction = 1, partCount = 1, alphaIncrement = 1, buff = 0,
- distOcc = 0.25, poly = poly, cropToPoly = TRUE, rasOut = TRUE, ras = ras)
+ +towgs84=0,0,0", distOcc = 0.25, fraction = 1, partCount = 1, alphaIncrement = 1,
+ buff = 0, poly = poly, cropToPoly = TRUE, rasOut = TRUE, ras = ras)
 
 }
 \references{
