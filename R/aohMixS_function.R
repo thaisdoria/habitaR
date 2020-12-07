@@ -57,10 +57,10 @@
 #'@param removeTempFile (logical) Whether the temporary files generated in each iteration
 #'should be deleted. It is recommended if the user wants to analyse a high volume of data at
 #'the same time. Default is \code{TRUE}.
-#'@param stack (logical) Whether the output should be returned as a stack of 'RasterLayer'
+#'@param stack (logical) Whether the output maps should be returned as a stack of 'RasterLayer'
 #'files. Default is \code{TRUE}.
 #'
-#'@return By default, \code{aohMix} returns a list with two elements:
+#'@return By default, \code{aohMixS} returns a list with two elements:
 #'  \itemize{
 #'   \item A 'RasterStack' (if \code{stack = TRUE}) or list of 'RasterLayer'
 #'   objects (if \code{stack = FALSE}) of maps representing SDMs-derived EOOs.
@@ -104,12 +104,12 @@
 #' \dontrun{
 #'
 #' # Binary Output #
-#' aohmixR_bin <- aohMixS (eooSp = path_eoo, modSp = path_mod,
+#' aohmix_bin <- aohMixS (eooSp = path_eoo, modSp = path_mod,
 #' thresInitial = 0.05, thresIncrement = 0.25, continuous = FALSE, cropToPoly = TRUE,
 #' poly = poly, progress = TRUE, stack = TRUE)
 #'
 #' # Continuous Output #
-#' aohmixR_con <- aohMixS (eooSp = path_eoo, modSp = path_mod,
+#' aohmix_con <- aohMixS (eooSp = path_eoo, modSp = path_mod,
 #' thresInitial = 0.05, thresIncrement = 0.25, continuous = TRUE, cropToPoly = TRUE,
 #' poly = poly, progress = TRUE, stack = TRUE)
 #'
@@ -320,7 +320,7 @@ aohMixS <- function(eooSp = NULL, modSp = NULL, thresInitial = NULL , thresIncre
        dfres[j,5] <- prop
 
 
-    # Removing temp files and displaying progress bar
+    # Removing temp files
     if (removeTempFile == TRUE) {
       removeTmpFiles(h=0.0)
     } # default
@@ -342,6 +342,7 @@ aohMixS <- function(eooSp = NULL, modSp = NULL, thresInitial = NULL , thresIncre
         aohMix<-extend(aohMix, c(10,10))
                  }
 
+     # Displaying progress bar
     if(progress == TRUE){
       setTxtProgressBar(pb, j)
     }
