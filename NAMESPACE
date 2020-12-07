@@ -2,7 +2,7 @@
 
 export(aHull)
 export(aoh)
-export(aohMix)
+export(aohMixK)
 export(aohMixS)
 export(aohVal)
 export(checkOcc)
