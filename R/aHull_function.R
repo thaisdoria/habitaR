@@ -239,6 +239,7 @@ aHull <- function(occ = NULL, crs = NULL, distOcc = NULL, fraction = NULL,
   # If 'poly' is provided
   # Filtering the species occurrences based on a specified area
   if (class(occ) == "spOcc" & !is.null(poly)){
+    poly <- poly
     lin <- as(poly, "SpatialLinesDataFrame")
     pts <- as.data.frame(as(lin, "SpatialPointsDataFrame"))
     pol.x<-pts$coords.x1
