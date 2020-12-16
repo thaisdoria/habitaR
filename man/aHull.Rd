@@ -138,7 +138,7 @@ hull methods for estimating species ranges and richness maps. Plant Ecology &
 Diversity, 10(5-6):389-401.
 }
 \seealso{
-The dynamic alpha hulls drawn from the sequentially increase of alpha
+The dynamic alpha hulls drawn from the sequentially increasing of alpha
 values are created with \code{\link[rangeBuilder:getDynamicAlphaHull]{getDynamicAlphaHull}}
 from \pkg{rangeBuilder} package.
 }
