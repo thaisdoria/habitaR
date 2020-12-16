@@ -118,8 +118,9 @@ By default, \code{aohMixK} returns a list with three elements:
         of this analysis.
         \item DifSizes - A value representing how bigger is the EOO comparing with the MOD.
         This measure can be used to evaluate the performance of this analysis.
-        \item Prop - Proportion of the EOO maintained in the corrected for over-prediction
-        SDMs. This measure can be used to evaluate the performance of this analysis.
+        \item Prop - Proportion of the EOO (AlphaHull) maintained in the corrected
+        for over-prediction SDMs. This measure can be used to evaluate the performance
+        of this analysis.
         }
      }
 }
