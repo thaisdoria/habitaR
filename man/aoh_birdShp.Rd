@@ -5,7 +5,7 @@
 \alias{aoh_birdShp}
 \title{AOH shapefile for Birds}
 \format{
-A SpatialPolygons with 3 features.
+A SpatialPolygons with 4 features.
 }
 \usage{
 data(aoh_birdShp)
