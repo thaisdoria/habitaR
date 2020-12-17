@@ -86,7 +86,7 @@ if (getRversion() >= "2.15.1") utils::globalVariables('class_ref')
 #' @keywords datasets
 #' @name eoo_birdShp
 #' @usage data(eoo_birdShp)
-#' @format A SpatialPolygonDataFrame with 3 features.
+#' @format A SpatialPolygonDataFrame with 4 features.
 NULL
 
 #### eoo_birdRas ####
@@ -103,7 +103,7 @@ NULL
 #' @keywords datasets
 #' @name eoo_birdRas
 #' @usage data(eoo_birdRas)
-#' @format A RasterStack with 3 layers.
+#' @format A RasterStack with 4 layers.
 NULL
 
 
@@ -119,7 +119,7 @@ NULL
 #' @keywords datasets
 #' @name aoh_birdShp
 #' @usage data(aoh_birdShp)
-#' @format A SpatialPolygons with 3 features.
+#' @format A SpatialPolygons with 4 features.
 NULL
 
 
@@ -149,18 +149,61 @@ NULL
 #' @keywords datasets
 #' @name climSuit_bird
 #' @usage data(climSuit_bird)
-#' @format A list with 3 Rasterlayers.
+#' @format A list with 2 Rasterlayers.
 NULL
 
+#### PLANTS DATASET ####
 
-#### sdm_plantRas ####
-#'  Lorem ipsum
+#### df_plantOcc ####
+#'  Occurrence records for Plants
 #'
-#' Lorem ipsum Lorem ipsum Lorem ipsum
+#' Dataset with geographical coordinates exemplifying how the list file for the
+#' argument \code{occ} of the function \code{aHull} should be structured.
 
 #' @docType data
 #' @keywords datasets
-#' @name sdm_plantRas
-#' @usage data(sdm_plantRas)
-#' @format A list with 6 Rasterlayers.
+#' @name df_plantOcc
+#' @usage data(df_plantOcc)
+#' @format A list with 12 data frames.
 NULL
+
+#### spOcc_plants ####
+#'  A 'spOcc' object corresponding to a list with SpatialPoints for Plants
+#'
+#' Dataset with SpatialPoints exemplifying how the list file for the
+#' argument \code{occ} of the function \code{aHull} should be structured.
+
+#' @docType data
+#' @keywords datasets
+#' @name spOcc_plants
+#' @usage data(spOcc_plants)
+#' @format A list with 12 SpatialPoints.
+NULL
+
+#### ahull_plantShp ####
+#'  An 'spOcc' object corresponding to a list with SpatialPoints for Plants
+#'
+#' Dataset with SpatialPoints exemplifying how the list file for the
+#' argument \code{occ} of the function \code{aHull} should be structured.
+
+#' @docType data
+#' @keywords datasets
+#' @name spOcc_plants
+#' @usage data(spOcc_plants)
+#' @format A list with 12 SpatialPoints.
+
+#### ahull_plantRas ####
+
+#### sdm_plantRas5spp ####
+
+#### sdm_plantSta5spp ####
+
+#### plants_thresholds ####
+
+#### df_plantOcc5spp ####
+
+#### Sp_plantOcc5spp ####
+
+#### spdf_plantShp5spp ####
+
+#### spOcc_plantOcc5spp ####

@@ -232,7 +232,6 @@
 #' Taxa in Madagascar with High-Resolution Planning Tools. Science, 320(5873),
 #' 222-226.
 #'
-#' 2. VER QUEM MAIS
 #'
 #' @author Thaís Dória & Daniel Gonçalves-Souza
 #' @export aohMixK
@@ -419,9 +418,9 @@ aohMixK <- function(modSp = modSp, occ = NULL, crs = NULL, distOcc = NULL, thres
    if(continuous){
    for (i in 1:length(mod.ahulls.r)){
     mod.ahulls.r[[i]][mod.ahulls.r[[i]] == 0]<-NA
-    mod.ahulls.r.cont<-mask(modras[[i]], mod.ahulls.r[[i]])
+    mod.ahulls.r.cont<-mask(modSp[[i]], mod.ahulls.r[[i]])
     mod.ahulls.r.cont[is.na(mod.ahulls.r.cont[])]<- 0
-    mod.ahulls.r.cont<-mask(mod.ahulls.r.cont, modras[[i]])
+    mod.ahulls.r.cont<-mask(mod.ahulls.r.cont, modSp[[i]])
     plot(mod.ahulls.r.cont)
     list.r[[i]]<-mod.ahulls.r.cont
     # Displaying progress bar
@@ -476,7 +475,7 @@ aohMixK <- function(modSp = modSp, occ = NULL, crs = NULL, distOcc = NULL, thres
 
   # Rasterizing
   eoos.ahulls.r <- mapply(rasterize, eoos.ahulls, MoreArgs =
-                       list(modras[[1]], background = 0, mask=FALSE))
+                       list(modSp[[1]], background = 0, mask=FALSE))
 
   for (i in 1:length(eoos.ahulls.r)){
       r1<-eoos.ahulls.r[[i]] #ahull (EOOs)
