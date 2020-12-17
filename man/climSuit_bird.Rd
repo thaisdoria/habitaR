@@ -5,7 +5,7 @@
 \alias{climSuit_bird}
 \title{Climatic suitability map for Birds}
 \format{
-A list with 3 Rasterlayers.
+A list with 2 Rasterlayers.
 }
 \usage{
 data(climSuit_bird)
