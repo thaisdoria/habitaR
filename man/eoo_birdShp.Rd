@@ -5,7 +5,7 @@
 \alias{eoo_birdShp}
 \title{EOO shapefile for Birds}
 \format{
-A SpatialPolygonDataFrame with 3 features.
+A SpatialPolygonDataFrame with 4 features.
 }
 \usage{
 data(eoo_birdShp)
