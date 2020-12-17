@@ -3,9 +3,9 @@
 \docType{data}
 \name{eoo_birdRas}
 \alias{eoo_birdRas}
-\title{EOO Raster for Birds}
+\title{EOO raster for Birds}
 \format{
-A RasterStack with 3 layers.
+A RasterStack with 4 layers.
 }
 \usage{
 data(eoo_birdRas)
