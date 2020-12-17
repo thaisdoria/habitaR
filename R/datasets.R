@@ -90,7 +90,7 @@ if (getRversion() >= "2.15.1") utils::globalVariables('class_ref')
 NULL
 
 #### eoo_birdRas ####
-#' EOO Raster for Birds
+#' EOO raster for Birds
 #'
 #'  Extent of Occurrence' (EOO) corresponding to the original (i.e. not refined)
 #'  spatial distribution of Birds in class of 'SpatialPolygonsDataFrame'.
@@ -157,8 +157,8 @@ NULL
 #### df_plantOcc ####
 #'  Occurrence records for Plants
 #'
-#' Dataset with geographical coordinates exemplifying how the list file for the
-#' argument \code{occ} of the function \code{aHull} should be structured.
+#' Dataset with geographical coordinates exemplifying how the occurrences data file
+#' for the argument \code{occ} of the function \code{aHull} should be structured.
 
 #' @docType data
 #' @keywords datasets
@@ -168,42 +168,161 @@ NULL
 NULL
 
 #### spOcc_plants ####
-#'  A 'spOcc' object corresponding to a list with SpatialPoints for Plants
+#'  Occurrence records for Plants
 #'
-#' Dataset with SpatialPoints exemplifying how the list file for the
+#' Dataset with SpatialPoints exemplifying how the occurrences data file for the
 #' argument \code{occ} of the function \code{aHull} should be structured.
 
 #' @docType data
 #' @keywords datasets
 #' @name spOcc_plants
 #' @usage data(spOcc_plants)
-#' @format A list with 12 SpatialPoints.
+#' @format A spOcc' object corresponding to a list with 12 SpatialPoints.
+NULL
+
+#### poly ####
+#' Shapefile of Caatinga
+#'
+#' Polygon of an region exemplifying how the polygon file for the
+#' argument \code{poly} of the functions \code{checkOcc}, \code{aHull} and
+#' \code{aohMixS} should be structured.
+
+#' @docType data
+#' @keywords datasets
+#' @name poly
+#' @usage data(poly)
+#' @format A SpatialPolygonsDataFrame object.
+NULL
+
+#### ras ####
+#' Raster model
+#'
+#' A fictitious dataset exemplifying how the raster file for the
+#' argument \code{ras} of the function \code{aHull} should be structured.
+
+#' @docType data
+#' @keywords datasets
+#' @name ras
+#' @usage data(ras)
+#' @format A RasterLayer.
 NULL
 
 #### ahull_plantShp ####
-#'  An 'spOcc' object corresponding to a list with SpatialPoints for Plants
+#' EOO shapefile for Plants (ahull)
 #'
-#' Dataset with SpatialPoints exemplifying how the list file for the
-#' argument \code{occ} of the function \code{aHull} should be structured.
+#' Dataset with SpatialPolygons exemplifying how the distribution file for the
+#' argument \code{eooSp} of the function \code{aohMixS} should be structured.
 
 #' @docType data
 #' @keywords datasets
-#' @name spOcc_plants
-#' @usage data(spOcc_plants)
-#' @format A list with 12 SpatialPoints.
+#' @name ahull_plantShp
+#' @usage data(ahull_plantShp)
+#' @format An 'aHull' object corresponding to a list with 5 SpatialPolygons.
+NULL
 
 #### ahull_plantRas ####
+#'  EOO raster for Plants (ahull)
+#'
+#' Dataset with RasterLayer exemplifying how the distribution file for the
+#' argument \code{eooSp} of the function \code{aohMixS} should be structured.
 
-#### sdm_plantRas5spp ####
-
-#### sdm_plantSta5spp ####
-
-#### plants_thresholds ####
-
-#### df_plantOcc5spp ####
-
-#### Sp_plantOcc5spp ####
+#' @docType data
+#' @keywords datasets
+#' @name ahull_plantRas
+#' @usage data(ahull_plantRas)
+#' @format An 'aHull' object corresponding to a list with 5 RasterLayers.
+NULL
 
 #### spdf_plantShp5spp ####
+#' EOO shapefile for Plants
+#'
+#' Dataset with SpatialPolygonsDataFrame exemplifying how the distribution file
+#' for the argument \code{eooSp} of the function \code{aohMixS} should be
+#' structured.
+
+#' @docType data
+#' @keywords datasets
+#' @name spdf_plantShp5spp
+#' @usage data(spdf_plantShp5spp)
+#' @format A SpatialPolygonsDataFrame with 5 Polygons.
+NULL
+
+#### sdm_plantRas5spp ####
+#' SDM raster for Plants
+#'
+#' Dataset with RasterLayers exemplifying how the distribution model file for
+#' the argument \code{modSp} of the functions \code{aohMixS} and \code{aohMixK}
+#' should be structured.
+
+#' @docType data
+#' @keywords datasets
+#' @name sdm_plantRas5spps
+#' @usage data(sdm_plantRas5spp)
+#' @format A list with 5 RasterLayers.
+NULL
+
+#### sdm_plantSta5spp ####
+#' SDMs stack for Plants
+#'
+#' Dataset with RasterStack exemplifying how the distribution model file for
+#' the argument \code{modSp} of the functions \code{aohMixS} and \code{aohMixK}
+#' should be structured.
+
+#' @docType data
+#' @keywords datasets
+#' @name sdm_plantSta5spp
+#' @usage data(sdm_plantSta5spp)
+#' @format A RasterStack with 5 RasterLayers.
+NULL
+
+#### plants_thresholds ####
+#' Thresholds for Plants' SDMs
+#'
+#' A fictitious dataset exemplifying how the data frame for the argument
+#' \code{threshold} of the function \code{aohMixK} should be structured.
+
+#' @docType data
+#' @keywords datasets
+#' @name plants_thresholds
+#' @usage data(plants_thresholds)
+#' @format A data frame with 5 rows and 1 variables
+NULL
+
+#### df_plantOcc5spp ####
+#'  Occurrence records for Plants
+#'
+#' Dataset with geographical coordinates exemplifying how the occurrences data file
+#' for the argument \code{occ} of the function \code{aohMixK} should be structured.
+
+#' @docType data
+#' @keywords datasets
+#' @name df_plantOcc5spp
+#' @usage data(df_plantOcc5spp)
+#' @format A list with 5 data frames.
+NULL
+
+#### Sp_plantOcc5spp ####
+#' Occurrence records for Plants
+#'
+#' Dataset with SpatialPoints exemplifying how the occurrences data file for the
+#' argument \code{occ} of the function \code{aohMixK} should be structured.
+
+#' @docType data
+#' @keywords datasets
+#' @name Sp_plantOcc5spp
+#' @usage data(Sp_plantOcc5spp)
+#' @format A spOcc' object corresponding to a list with 5 SpatialPoints.
+NULL
 
 #### spOcc_plantOcc5spp ####
+#'  Occurrence records for Plants
+#'
+#' Dataset with SpatialPoints exemplifying how the occurrences data file for the
+#' argument \code{occ} of the function \code{aohMixK} should be structured.
+
+#' @docType data
+#' @keywords datasets
+#' @name spOcc_plantOcc5spp
+#' @usage data(spOcc_plantOcc5spp)
+#' @format A spOcc' object corresponding to a list with 5 SpatialPoints.
+NULL
