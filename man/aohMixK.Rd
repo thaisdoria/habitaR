@@ -249,8 +249,6 @@ stack = FALSE, validation = TRUE)
 Beentje, H., ... Zjhra, M. L. (2008). Aligning Conservation Priorities Across
 Taxa in Madagascar with High-Resolution Planning Tools. Science, 320(5873),
 222-226.
-
-2. VER QUEM MAIS
 }
 \seealso{
 The dynamic alpha hulls drawn from the sequentially increasing of alpha
