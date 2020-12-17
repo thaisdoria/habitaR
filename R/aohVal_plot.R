@@ -13,7 +13,7 @@
 #' et al. (2011).
 #' @encoding UTF-8
 #' @author Thaís Dória & Daniel Gonçalves-Souza
-#' @export aohValplot
+#' @export plotaohVal
 
 plotaohVal<-function(aohVal){
   plot(as.numeric(aohVal$MP), as.numeric(aohVal$PP), type="p", ylim=c(0,1),
