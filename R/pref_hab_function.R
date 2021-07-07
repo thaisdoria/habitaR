@@ -77,27 +77,29 @@ prefHab <- function(sp, key = NULL, cat = NULL,
   # Looping for each sp
   for (i in 1:length(sp)) {
     # Searching data in IUCN
-    hab.spp <- "tryPrefHab(sp[i], key = key)"
-    hab.spp <- tryFun(hab.spp)
+    hab_spp <- "tryPrefHab(sp[i], key = key)"
+    hab_spp <- tryFun(hab_spp)
     # If no data for sp
-    if (length(hab.spp$result) == 0) {
+    if (length(hab_spp$result) == 0) {
       warning(paste('No habitat information was found for', sp[i]))
       df[i, 2:ncol(df)] <- rep(0, length(2:ncol(df)))
       df[i, 1] <- sp[i]
     }
     # If data found
-    if (length(hab.spp$result) > 0) {
-      pref.tab <- hab.spp$result
-      pref.tab <- pref.tab[pref.tab$suitability %in% suitability, ]
-      pref.tab <- pref.tab[pref.tab$season %in% season, ]
-      ifelse(mi,
-             pref.tab <- pref.tab[is.na(pref.tab$majorimportance) == FALSE, ],
-             pref.tab <- pref.tab)
-      code <- hab.spp$result$code
+    if (length(hab_spp$result) > 0) {
+      pref_tab <- hab_spp$result
+      pref_tab <- pref_tab[pref_tab$suitability %in% suitability, ]
+      pref_tab <- pref_tab[pref_tab$season %in% season, ]
+      if (mi) {
+        pref_tab <- pref_tab[is.na(pref_tab$majorimportance) == FALSE, ]
+      } else {
+        pref_tab <- pref_tab
+      }
+      code <- hab_spp$result$code
       # Comparing IUCN's Habitat code with user code
-      yes.hab <- cat[, 1] %in% code
-      cat.hab <- names(df)[2:ncol(df)] %in% unique(cat$User_code[yes.hab])
-      df[i, 2:ncol(df)] <- as.numeric(cat.hab)
+      yes_hab <- cat[, 1] %in% code
+      cat_hab <- names(df)[2:ncol(df)] %in% unique(cat$User_code[yes_hab])
+      df[i, 2:ncol(df)] <- as.numeric(cat_hab)
       df[i, 1] <- sp[i]
     }
     if (progress) {
